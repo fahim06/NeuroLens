@@ -1,2 +1,2 @@
-First Machine learning project with GUI
+# First Machine learning project with GUI
 
