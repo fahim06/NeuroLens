@@ -127,7 +127,7 @@ pandocfilters==1.5.0
 parso==0.8.3
 partd==1.4.1
 passlib==1.7.4
-Pillow==10.1.0
+Pillow==10.2.0
 platformdirs==4.0.0
 prometheus-client==0.18.0
 prompt-toolkit==3.0.41
