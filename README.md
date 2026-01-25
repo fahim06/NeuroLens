@@ -1,12 +1,12 @@
-# CIFAR-10 Image Classifier GUI
+# NeuroLens: CIFAR-10 Image Classifier
 
 ![Project Banner](assets/logo.png)
 
 ## Project Description
 
-This project is a **Graphical User Interface (GUI)** application built with **Taipy** that interacts with a *
-*Convolutional Neural Network (CNN)** trained on the **CIFAR-10** dataset. The application allows users to upload images
-and receive real-time classification predictions from the deep learning model.
+**NeuroLens** is a professional **Graphical User Interface (GUI)** application built with **Taipy** that interacts with
+a **Convolutional Neural Network (CNN)** trained on the **CIFAR-10** dataset. The application allows users to upload
+images and receive real-time classification predictions from the deep learning model.
 
 The CIFAR-10 dataset consists of 60,000 32x32 color images in 10 classes, with 6,000 images per class. The classes are:
 
