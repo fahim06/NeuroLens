@@ -170,7 +170,7 @@ sortedcontainers==2.4.0
 soupsieve==2.5
 SQLAlchemy==2.0.23
 stack-data==0.6.3
-taipy==3.0.0
+taipy==4.0.0
 taipy-config==3.0.0
 taipy-core==3.0.0
 taipy-gui==3.0.0
