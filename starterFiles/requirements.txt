@@ -34,7 +34,7 @@ cycler==0.12.1
 dask==2023.11.0
 debugpy==1.8.0
 decorator==5.1.1
-deepdiff==6.2.3
+deepdiff==8.6.1
 defusedxml==0.7.1
 distributed==2026.1.1
 dnspython==2.4.2
