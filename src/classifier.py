@@ -31,7 +31,11 @@ def get_asset_path(filename):
 model_path = get_asset_path("baseline_mariya.keras")
 # Ensure the model exists before loading to avoid crash if files are missing entirely
 if os.path.exists(model_path):
-    model = models.load_model(model_path)
+    try:
+        model = models.load_model(model_path)
+    except Exception as e:
+        print(f"Warning: Failed to load model from {model_path}: {e}")
+        model = None
 else:
     print(f"Warning: Model file not found at {model_path}")
     model = None
@@ -92,4 +96,4 @@ def on_change(state, var_name, var_val):
 
 app = Gui(page=index)
 if __name__ == '__main__':
-    app.run(use_reloader=True)
+    app.run(use_reloader=True, port="auto")

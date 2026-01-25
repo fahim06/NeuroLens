@@ -2,130 +2,160 @@
 
 ![Project Banner](assets/logo.png)
 
-## Project Description
+## 📖 Overview
 
-**NeuroLens** is a professional **Graphical User Interface (GUI)** application built with **Taipy** that interacts with
-a **Convolutional Neural Network (CNN)** trained on the **CIFAR-10** dataset. The application allows users to upload
-images and receive real-time classification predictions from the deep learning model.
+**NeuroLens** is a professional **Graphical User Interface (GUI)** application designed to make deep learning
+accessible. Built with **Taipy**, it interfaces with a **Convolutional Neural Network (CNN)** trained on the **CIFAR-10
+** dataset. This application empowers users to upload images and receive real-time classification predictions, bridging
+the gap between complex machine learning models and end-user interaction.
 
-The CIFAR-10 dataset consists of 60,000 32x32 color images in 10 classes, with 6,000 images per class. The classes are:
+The **CIFAR-10** dataset comprises 60,000 32x32 color images across 10 distinct classes:
 
-* Airplane
-* Automobile
-* Bird
-* Cat
-* Deer
-* Dog
-* Frog
-* Horse
-* Ship
-* Truck
+* ✈️ Airplane
+* 🚗 Automobile
+* 🐦 Bird
+* 🐱 Cat
+* 🦌 Deer
+* 🐶 Dog
+* 🐸 Frog
+* 🐴 Horse
+* 🚢 Ship
+* 🚚 Truck
 
-## Why This Project Was Built
+---
 
-This project was created to bridge the gap between raw machine learning code (often found in Jupyter Notebooks) and
-end-users. While data scientists are comfortable working with code, stakeholders and general users need a more
-accessible way to interact with AI models. This project demonstrates how to deploy a trained TensorFlow/Keras model into
-an interactive, user-friendly web application.
+## 🚀 Key Features
 
-## Importance
+* **User-Friendly Interface:** A clean, web-based GUI that requires no coding knowledge to operate.
+* **Real-Time Inference:** Instant classification of uploaded images using a pre-trained CNN model.
+* **Visual Feedback:** Displays the uploaded image alongside the model's prediction and confidence score.
+* **Cross-Platform:** Runs seamlessly on Windows, macOS, and Linux.
 
-* **Accessibility:** It allows non-technical users to interact with Deep Learning models without writing a single line
-  of code.
-* **Visualization:** It provides a visual interface for testing the model's performance on real-world images.
-* **Practical Application:** It showcases the end-to-end workflow of a machine learning project, from model training to
-  deployment.
+---
 
-## System Requirements
+## 🛠 System Requirements
 
-To ensure the application runs smoothly, your system should meet the following specifications:
+To ensure optimal performance, your system should meet the following specifications:
 
-* **Operating System:** Windows 10/11, macOS (Intel or Apple Silicon), or Linux (Ubuntu 20.04+ recommended).
-* **Processor (CPU):** Modern multi-core processor (Intel i5/Ryzen 5 or better recommended).
-* **Memory (RAM):** Minimum 8 GB (16 GB recommended for smoother performance with TensorFlow).
-* **Storage:** At least 2 GB of free disk space for dependencies and model files.
-* **Graphics (GPU):** Optional. The inference runs efficiently on CPU for single images.
+| Component | Requirement |
+| :--- | :--- |
+| **OS** | Windows 10/11, macOS (Intel/Apple Silicon), Linux (Ubuntu 20.04+) |
+| **Python** | Version 3.9, 3.10, or 3.11 (3.12+ not fully supported by TensorFlow yet) |
+| **CPU** | Modern multi-core processor (Intel i5 / Ryzen 5 or better) |
+| **RAM** | 8 GB minimum (16 GB recommended) |
+| **Storage** | 2 GB free space |
 
-## Installation & Usage
+---
 
-### Prerequisites
+## 📦 Installation Guide
 
-* **Python Version:** You must have **Python 3.9, 3.10, or 3.11** installed.
-    * *Note: TensorFlow 2.14+ may have compatibility issues with Python 3.12+ as of the current release.*
-* **Git:** To clone the repository.
+Follow these steps to set up NeuroLens on your local machine.
 
-### Installation Steps
-
-1. **Clone the repository:**
-   ```bash
-   git clone git@github.com:fahim06/NeuroLens.git
-   cd NeuroLens
-   ```
-
-2. **Set up a Virtual Environment:**
-   It is highly recommended to use a virtual environment to avoid conflicts with other projects.
-
-   **Option A: Using venv (Standard Python)**
-    * **macOS/Linux:**
-      ```bash
-      python3 -m venv venv
-      source venv/bin/activate
-      ```
-    * **Windows:**
-      ```bash
-      python -m venv venv
-      .\venv\Scripts\activate
-      ```
-
-   **Option B: Using Conda**
-    * **Create and activate environment:**
-      ```bash
-      conda create --name neurolens python=3.10
-      conda activate neurolens
-      ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-### Running the Application
-
-To start the GUI application, run the following command from the project root (ensure your virtual environment is
-active):
+### 1. Clone the Repository
 
 ```bash
-python src/classifier.py
+git clone git@github.com:fahim06/NeuroLens.git
+cd NeuroLens
 ```
 
-The application will launch automatically in your default web browser. If it does not, check the terminal output for the
-local URL (usually `http://127.0.0.1:5000`).
+### 2. Set Up a Virtual Environment
 
-## Project Structure
+Isolating dependencies is highly recommended. Choose one of the methods below:
 
-The project has been organized for better maintainability and clarity:
+#### Option A: Using `venv` (Standard Python)
 
+* **macOS/Linux:**
+  ```bash
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+* **Windows:**
+  ```bash
+  python -m venv venv
+  .\venv\Scripts\activate
+  ```
+
+#### Option B: Using Conda
+
+```bash
+conda create --name neurolens python=3.10
+conda activate neurolens
 ```
+
+### 3. Install Dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+---
+
+## 🖥️ Usage
+
+1. **Launch the Application:**
+   Ensure your virtual environment is active, then run:
+   ```bash
+   python src/classifier.py
+   ```
+
+2. **Access the GUI:**
+   The application will automatically open in your default web browser. If not, navigate to the URL displayed in your
+   terminal (typically `http://127.0.0.1:5000`).
+
+3. **Classify Images:**
+    * Click the **"Browse"** button to select an image from your computer.
+    * (Optional) Use sample images located in `assets/demo_images/` for quick testing.
+    * View the predicted class and probability score instantly.
+
+---
+
+## 📂 Project Structure
+
+```plaintext
 NeuroLens/
-├── assets/                 # Contains static assets and models
-│   ├── demo_images/        # Sample images for testing the classifier
-│   ├── baseline_mariya.keras  # Pre-trained Keras model
-│   ├── logo.png            # Project logo
-│   └── placeholder_image.png # Default image for the GUI
-├── notebooks/              # Jupyter Notebooks for model training and experimentation
-│   ├── NeuralNetworkBuilder.ipynb
-│   └── NeuralNetworkQuickBuilder.ipynb
-├── src/                    # Source code for the application
-│   └── classifier.py       # Main application script using Taipy
-├── requirements.txt        # List of project dependencies
-└── README.md               # Project documentation
+├── .github/                # CI/CD workflows
+├── assets/                 # Static resources and models
+│   ├── demo_images/        # Sample images for testing
+│   ├── baseline_mariya.keras  # Pre-trained CNN model
+│   ├── logo.png            # Application branding
+│   └── placeholder_image.png
+├── notebooks/              # Research & Development
+│   ├── NeuralNetworkBuilder.ipynb       # Detailed model training steps
+│   └── NeuralNetworkQuickBuilder.ipynb  # Concise training script
+├── src/                    # Application Source Code
+│   └── classifier.py       # Main entry point (Taipy GUI logic)
+├── tests/                  # Unit tests
+├── requirements.txt        # Python dependencies
+├── LICENSE                 # MIT License
+└── README.md               # Project Documentation
 ```
 
-## Technologies Used
+---
 
-* **Python:** The core programming language.
-* **Taipy:** For building the web-based GUI.
-* **TensorFlow/Keras:** For building and running the Convolutional Neural Network.
-* **NumPy:** For numerical operations and image processing.
-* **Pillow (PIL):** For image manipulation.
+## 🧰 Technologies Used
+
+* **[Python](https://www.python.org/):** Core programming language.
+* **[Taipy](https://www.taipy.io/):** Framework for building data and AI web applications.
+* **[TensorFlow](https://www.tensorflow.org/) / [Keras](https://keras.io/):** Deep learning framework for model training
+  and inference.
+* **[NumPy](https://numpy.org/):** Efficient numerical computation.
+* **[Pillow (PIL)](https://python-pillow.org/):** Image processing library.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project.
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
