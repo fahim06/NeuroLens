@@ -23,23 +23,13 @@ basedir = os.path.dirname(__file__)
 def get_asset_path(filename):
     """
     Helper to resolve asset paths.
-    Checks the new 'assets' directory first.
-    Falls back to 'starterFiles' if the file is not found (for backward compatibility if files weren't moved).
+    Checks the 'assets' directory.
     """
-    # Check ../assets first
-    path = os.path.join(basedir, "../assets", filename)
-    if os.path.exists(path):
-        return path
-    # Fallback to ../starterFiles
-    path = os.path.join(basedir, "../starterFiles", filename)
-    if os.path.exists(path):
-        return path
-    # Default to assets path
     return os.path.join(basedir, "../assets", filename)
 
 
 model_path = get_asset_path("baseline_mariya.keras")
-# Ensure model exists before loading to avoid crash if files are missing entirely
+# Ensure the model exists before loading to avoid crash if files are missing entirely
 if os.path.exists(model_path):
     model = models.load_model(model_path)
 else:

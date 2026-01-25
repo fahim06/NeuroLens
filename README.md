@@ -58,13 +58,14 @@ To ensure the application runs smoothly, your system should meet the following s
 
 1. **Clone the repository:**
    ```bash
-   git clone git@github.com:fahim06/ML_gui.git
-   cd ML_gui
+   git clone git@github.com:fahim06/NeuroLens.git
+   cd NeuroLens
    ```
 
-2. **Set up a Virtual Environment (Recommended):**
+2. **Set up a Virtual Environment:**
    It is highly recommended to use a virtual environment to avoid conflicts with other projects.
 
+   **Option A: Using venv (Standard Python)**
     * **macOS/Linux:**
       ```bash
       python3 -m venv venv
@@ -74,6 +75,13 @@ To ensure the application runs smoothly, your system should meet the following s
       ```bash
       python -m venv venv
       .\venv\Scripts\activate
+      ```
+
+   **Option B: Using Conda**
+    * **Create and activate environment:**
+      ```bash
+      conda create --name neurolens python=3.10
+      conda activate neurolens
       ```
 
 3. **Install dependencies:**
@@ -99,8 +107,9 @@ local URL (usually `http://127.0.0.1:5000`).
 The project has been organized for better maintainability and clarity:
 
 ```
-ML_gui/
+NeuroLens/
 ├── assets/                 # Contains static assets and models
+│   ├── demo_images/        # Sample images for testing the classifier
 │   ├── baseline_mariya.keras  # Pre-trained Keras model
 │   ├── logo.png            # Project logo
 │   └── placeholder_image.png # Default image for the GUI
