@@ -2,11 +2,12 @@
 
 ## Supported Versions
 
-We are committed to ensuring the security of NeuroLens. Currently, we support the latest stable release.
+We are committed to ensuring the security of NeuroLens. Currently, we support the following versions:
 
 | Version | Supported          | Notes                  |
 |---------|--------------------|------------------------|
-| 1.0.x   | :white_check_mark: | Current Stable Release |
+| 2.0.x   | :white_check_mark: | Current Stable Release |
+| 1.0.x   | :x:                | No longer supported    |
 | < 1.0   | :x:                | No longer supported    |
 
 ## Reporting a Vulnerability

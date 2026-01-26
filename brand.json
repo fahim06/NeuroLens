@@ -4,7 +4,7 @@
     "tagline": "AI-Powered Image Classification with Deep Learning",
     "description": "A professional GUI application for deep learning image classification using CNN trained on CIFAR-10 dataset.",
     "version": "2.0.0",
-    "author": "NeuroLens Team",
+    "author": "Fahim Yusuf",
     "website": "https://github.com/fahim06/NeuroLens",
     "repository": "https://github.com/fahim06/NeuroLens"
   },
