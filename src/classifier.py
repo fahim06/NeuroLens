@@ -1,8 +1,18 @@
+import os
+from datetime import datetime
+
+import numpy as np
+from PIL import Image
 from taipy.gui import Gui
 from tensorflow.keras import models
-from PIL import Image
-import numpy as np
-import os
+
+# Brand Configuration
+BRAND_NAME = "NeuroLens"
+BRAND_TAGLINE = "AI-Powered Image Classification with Deep Learning"
+BRAND_VERSION = "2.0.0"
+COPYRIGHT_YEAR = datetime.now().year
+COPYRIGHT_HOLDER = "Fahim Yusuf"
+GITHUB_URL = "https://github.com/fahim06"
 
 class_names = {
     0: 'airplane',
@@ -67,9 +77,18 @@ img_path = os.path.relpath(img_asset_path, os.getcwd())
 logo_asset_path = get_asset_path("logo.png")
 logo_path = os.path.relpath(logo_asset_path, os.getcwd())
 
+# Favicon path - use favicon from root directory
+favicon_path = "favicon.ico"
+
 content = ""
 prob = 0
 pred = "Waiting for input..."
+
+# Dynamic brand variables for UI
+brand_name = BRAND_NAME
+copyright_holder = COPYRIGHT_HOLDER
+copyright_year = COPYRIGHT_YEAR
+github_url = GITHUB_URL
 
 index = """
 <|app-wrapper|
@@ -80,7 +99,7 @@ index = """
 <|NeuroLens|text|class_name=app-title|>
 <|AI-Powered Image Classification with Deep Learning|text|class_name=app-subtitle|>
 
-<|feature-tags|
+<|layout|columns=1 1 1|gap=0.5rem|class_name=feature-tags|
 <|🧠 CNN Model|text|class_name=feature-tag|>
 <|⚡ Real-time Analysis|text|class_name=feature-tag|>
 <|🎯 10 Classes|text|class_name=feature-tag|>
@@ -118,12 +137,20 @@ index = """
 
 <|footer|
 <|footer-content|
-<|Built with ❤️ using Taipy & TensorFlow|text|class_name=footer-text|>
+<|{logo_path}|image|class_name=footer-logo|>
+<|Built with Taipy & TensorFlow  •  © {copyright_year}|text|class_name=footer-text|>
+<|{copyright_holder}|button|class_name=footer-author-btn|on_action=open_github|>
 |>
 |>
 
 |>
 """
+
+
+def open_github(state):
+    """Open GitHub profile in new tab."""
+    import webbrowser
+    webbrowser.open(GITHUB_URL)
 
 
 def on_change(state, var_name, var_val):
@@ -137,4 +164,9 @@ def on_change(state, var_name, var_val):
 
 app = Gui(page=index, css_file="main.css")
 if __name__ == '__main__':
-    app.run(use_reloader=True, port=5001, title="NeuroLens", favicon=logo_path)
+    # Use absolute path for favicon
+    import pathlib
+
+    project_root = pathlib.Path(__file__).parent.parent
+    favicon_file = project_root / "assets" / "logo.png"
+    app.run(use_reloader=True, port=5001, title="NeuroLens", favicon=str(favicon_file), watermark="")

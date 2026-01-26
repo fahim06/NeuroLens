@@ -265,7 +265,7 @@ body {
 
 .header-container {
   width: 100%;
-  padding: var(--space-10) var(--space-6) var(--space-16);
+  padding: var(--space-6) var(--space-6) var(--space-8);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -293,21 +293,21 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
 /* Logo Styles */
 .app-logo {
-  width: 72px;
-  height: 72px;
+  width: 48px !important;
+  height: 48px !important;
   object-fit: contain;
-  border-radius: var(--radius-xl);
-  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
   background: var(--gradient-subtle);
   border: 1px solid var(--border-subtle);
   filter: drop-shadow(0 4px 20px rgba(99, 102, 241, 0.3));
   transition: transform var(--transition-base), filter var(--transition-base);
-  animation: fadeInDown 0.5s ease-out, float 6s ease-in-out infinite;
+  animation: fadeInDown 0.5s ease-out;
 }
 
 .app-logo:hover {
@@ -317,7 +317,7 @@ body {
 
 /* Title Styles */
 .app-title {
-  font-size: var(--font-size-4xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: var(--letter-spacing-tight);
   line-height: var(--line-height-tight);
@@ -331,7 +331,7 @@ body {
 }
 
 .app-subtitle {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-normal);
   color: var(--text-secondary);
   max-width: 500px;
@@ -341,26 +341,49 @@ body {
 
 /* Feature Tags */
 .feature-tags {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-  margin-top: var(--space-4);
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+  margin-top: var(--space-3);
   animation: fadeInUp 0.6s ease-out 0.3s backwards;
+  max-width: 500px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Override Taipy layout grid for feature tags */
+.feature-tags.taipy-layout {
+  display: flex !important;
+  grid-template-columns: none !important;
+}
+
+/* Override Taipy default stacking */
+.feature-tags > *,
+.feature-tags > div {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
 }
 
 .feature-tag {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
   background: var(--bg-glass);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--text-secondary);
   transition: all var(--transition-base);
+  white-space: nowrap;
+  width: auto !important;
+  flex: 0 0 auto !important;
 }
 
 .feature-tag:hover {
@@ -410,9 +433,9 @@ body {
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
   transition: all var(--transition-slow);
   animation: scaleIn 0.5s ease-out backwards;
 }
@@ -427,6 +450,7 @@ body {
   height: 1px;
   background: var(--gradient-primary);
   opacity: 0.5;
+  z-index: 1;
 }
 
 .card:hover {
@@ -644,27 +668,29 @@ body {
   letter-spacing: var(--letter-spacing-wider);
   color: var(--text-tertiary);
   width: 100%;
-  text-align: center;
-  margin-top: var(--space-8);
+  text-align: left;
+  margin-top: var(--space-6);
   margin-bottom: var(--space-3);
+  display: block;
+  clear: both;
 }
 
 /* First label in results card */
 .card .label-text:first-of-type {
-  margin-top: var(--space-4);
+  margin-top: var(--space-2);
 }
 
 /* Prediction Result */
 .prediction-result {
-  font-size: var(--font-size-4xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-extrabold);
   text-align: center;
-  min-height: 4rem;
-  margin: var(--space-3) 0 var(--space-6);
-  padding: var(--space-6) var(--space-8);
+  min-height: 3.5rem;
+  margin: 0 0 var(--space-8);
+  padding: var(--space-5) var(--space-6);
   width: 100%;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-xl);
   border: 2px solid var(--color-primary-500);
   text-transform: capitalize;
   color: var(--color-accent-300);
@@ -672,6 +698,8 @@ body {
   transition: all var(--transition-base);
   animation: fadeIn 0.3s ease-out;
   box-shadow: 0 0 30px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: block;
+  clear: both;
 }
 
 .prediction-result:hover {
@@ -700,8 +728,10 @@ body {
 /* Confidence Indicator */
 .custom-indicator {
   width: 100%;
-  margin-top: var(--space-2);
+  margin-top: 0;
   margin-bottom: var(--space-6);
+  display: block;
+  clear: both;
 }
 
 .custom-indicator .MuiLinearProgress-root {
@@ -725,26 +755,30 @@ body {
   justify-content: center;
   gap: var(--space-3);
   width: 100%;
-  margin-top: var(--space-6);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-2);
   padding: var(--space-4);
   background: var(--bg-tertiary);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
+  clear: both;
 }
 
 .confidence-value {
-  font-size: var(--font-size-4xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-extrabold);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1;
 }
 
 .confidence-label {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
+  line-height: 1;
 }
 
 /* Progress Bar Alternative */
@@ -812,61 +846,179 @@ body {
 }
 
 /* ============================================
-   11. FOOTER
+   11. FOOTER (Compact & Minimal)
    ============================================ */
 
 .footer {
-  margin-top: var(--space-16);
-  padding: var(--space-10) var(--space-6) var(--space-16);
+  margin-top: var(--space-12);
+  padding: var(--space-4) var(--space-6);
   text-align: center;
   border-top: 1px solid var(--border-subtle);
-  background: linear-gradient(to bottom, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  background: var(--bg-secondary);
   position: relative;
 }
 
+/* Subtle top accent line */
 .footer::before {
   content: '';
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px;
-  height: 2px;
+  width: 60px;
+  height: 1px;
   background: var(--gradient-primary);
   border-radius: var(--radius-full);
 }
 
+/* Single-row horizontal layout */
 .footer-content {
   max-width: var(--container-xl);
   margin: 0 auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
+/* Compact footer logo */
+.footer-logo {
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  border-radius: var(--radius-sm);
+  opacity: 0.8;
+  transition: opacity var(--transition-fast);
+}
+
+.footer-logo:hover {
+  opacity: 1;
+}
+
+/* Divider dot */
+.footer-divider {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-xs);
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* Tech text - minimal */
+.footer-tech-text {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-normal);
+}
+
+/* Footer combined text */
 .footer-text {
-  font-size: var(--font-size-base);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
-  padding: var(--space-3) var(--space-6);
-  background: var(--bg-glass);
-  backdrop-filter: var(--glass-blur);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-subtle);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-bold);
 }
 
+/* Author name button (hyperlink style) */
+.footer-author-btn,
+.footer-author-btn button {
+  font-size: var(--font-size-xs) !important;
+  color: var(--color-primary-400) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-left: var(--space-1) !important;
+  cursor: pointer !important;
+  text-decoration: underline;
+  font-weight: var(--font-weight-bold) !important;
+  box-shadow: none !important;
+  min-width: auto !important;
+}
+
+.footer-author-btn:hover,
+.footer-author-btn button:hover {
+  color: var(--color-primary-300) !important;
+  text-decoration: underline;
+}
+
+/* GitHub button in footer */
+.footer-github-btn,
+.footer-github-btn button {
+  font-size: var(--font-size-xs) !important;
+  color: var(--color-primary-400) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  text-decoration: underline;
+  font-weight: var(--font-weight-medium) !important;
+  box-shadow: none !important;
+  min-width: auto !important;
+}
+
+.footer-github-btn:hover,
+.footer-github-btn button:hover {
+  color: var(--color-primary-300) !important;
+}
+
+/* Copyright text */
+.footer-copyright {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-normal);
+}
+
+/* Hyperlink for 'reserved' */
+.footer-copyright a,
 .footer-link {
   color: var(--color-primary-400);
   text-decoration: none;
   transition: color var(--transition-fast);
+  font-weight: var(--font-weight-medium);
 }
 
+.footer-copyright a:hover,
 .footer-link:hover {
   color: var(--color-primary-300);
+  text-decoration: underline;
+}
+
+/* Accessibility - focus state */
+.footer-copyright a:focus-visible,
+.footer-link:focus-visible {
+  outline: 2px solid var(--color-primary-400);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Footer Responsive - Mobile (stacked compact) */
+@media screen and (max-width: 600px) {
+  .footer {
+    padding: var(--space-4) var(--space-4);
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .footer-divider {
+    display: none;
+  }
+
+  .footer-logo {
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+  }
 }
 
 /* ============================================
@@ -884,8 +1036,8 @@ body {
   }
 
   .app-logo {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
   }
 
   .app-title {
@@ -915,12 +1067,13 @@ body {
   }
 
   .feature-tags {
-    gap: var(--space-1);
+    gap: var(--space-2);
+    flex-wrap: wrap;
   }
 
   .feature-tag {
-    padding: var(--space-1) var(--space-3);
-    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-2);
+    font-size: 0.65rem;
   }
 }
 
@@ -935,8 +1088,8 @@ body {
   }
 
   .app-logo {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
   }
 
   .app-title {
@@ -975,7 +1128,7 @@ body {
   }
 
   .header-container {
-    padding: var(--space-12) var(--space-6) var(--space-16);
+    padding: var(--space-6) var(--space-6) var(--space-8);
   }
 }
 
@@ -987,12 +1140,12 @@ body {
   }
 
   .header-container {
-    padding: var(--space-16) var(--space-8) var(--space-20);
+    padding: var(--space-8) var(--space-8) var(--space-10);
   }
 
   .app-logo {
-    width: 80px;
-    height: 80px;
+    width: 56px !important;
+    height: 56px !important;
   }
 
   .card {
@@ -1007,11 +1160,11 @@ body {
   }
 
   .app-title {
-    font-size: var(--font-size-5xl);
+    font-size: var(--font-size-4xl);
   }
 
   .app-subtitle {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-base);
     max-width: 600px;
   }
 }
@@ -1226,9 +1379,79 @@ body {
 /* Ensure Taipy components respect our design */
 .taipy-text {
   font-family: var(--font-family-primary) !important;
+  display: block !important;
+  margin-bottom: var(--space-2);
 }
 
 .taipy-image {
   max-width: 100%;
   height: auto;
 }
+
+/* Fix Taipy component stacking and spacing */
+.card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure proper spacing for all Taipy elements in cards */
+.card .taipy-text,
+.card .taipy-indicator,
+.card .taipy-selector,
+.card .taipy-image {
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-2);
+  display: block;
+  clear: both;
+}
+
+/* Prevent absolute positioning issues */
+.card * {
+  position: relative;
+}
+
+/* Force logo size override for Taipy image component */
+.app-logo.taipy-image,
+img.app-logo,
+.header-container .app-logo,
+.header-inner .app-logo,
+[class*="app-logo"] {
+  width: 56px !important;
+  height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+}
+
+/* Responsive logo size overrides */
+@media screen and (max-width: 479px) {
+  .app-logo.taipy-image,
+  img.app-logo,
+  .header-container .app-logo,
+  .header-inner .app-logo,
+  [class*="app-logo"] {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  .app-logo.taipy-image,
+  img.app-logo,
+  .header-container .app-logo,
+  .header-inner .app-logo,
+  [class*="app-logo"] {
+    width: 64px !important;
+    height: 64px !important;
+    max-width: 64px !important;
+    max-height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+  }
+}
+
