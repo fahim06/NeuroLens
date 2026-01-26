@@ -1,9 +1,9 @@
 /**
- * NeuroLens v2.0 - Modern UI Stylesheet
+ * NeuroLens v2.1.0 - Modern UI Stylesheet
  * Premium • Minimal • Responsive • Tech-forward
  *
  * Table of Contents:
- * 1. Imports & Design System
+ * 1. Design System & CSS Variables
  * 2. Base Styles & Reset
  * 3. Animations & Keyframes
  * 4. Layout Components
@@ -19,11 +19,126 @@
  */
 
 /* ============================================
-   1. IMPORTS & DESIGN SYSTEM
+   1. DESIGN SYSTEM & CSS VARIABLES
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('design-system.css');
+
+:root {
+  /* Color Palette - Primary (Indigo) */
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+
+  /* Color Palette - Accent (Cyan) */
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+
+  /* Background Colors */
+  --bg-primary: #030712;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --bg-card: rgba(15, 23, 42, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.03);
+
+  /* Text Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+
+  /* Border Colors */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.12);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+
+  /* Typography */
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+
+  /* Spacing Scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 4px 24px -4px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 8px 32px -4px rgba(0, 0, 0, 0.4);
+
+  /* Glass Effect */
+  --glass-blur: blur(12px);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+}
 
 /* ============================================
    2. BASE STYLES & RESET
@@ -220,6 +335,7 @@ body {
   max-width: var(--container-xl);
   margin: 0 auto;
   padding: 0 var(--space-6);
+  box-sizing: border-box;
 }
 
 /* Background Decorations */
@@ -265,11 +381,12 @@ body {
 
 .header-container {
   width: 100%;
-  padding: var(--space-6) var(--space-6) var(--space-8);
+  padding: var(--space-4) var(--space-4) var(--space-6);
   text-align: center;
   position: relative;
   overflow: hidden;
   animation: fadeIn 0.6s ease-out;
+  box-sizing: border-box;
 }
 
 /* Animated Background Glow */
@@ -317,7 +434,7 @@ body {
 
 /* Title Styles */
 .app-title {
-  font-size: var(--font-size-3xl);
+  font-size: clamp(1.5rem, 6vw, 2.25rem);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: var(--letter-spacing-tight);
   line-height: var(--line-height-tight);
@@ -328,15 +445,17 @@ body {
   background-clip: text;
   animation: fadeInUp 0.6s ease-out 0.1s backwards, gradientShift 8s ease infinite;
   margin: 0;
+  text-align: center;
 }
 
 .app-subtitle {
-  font-size: var(--font-size-sm);
+  font-size: clamp(0.75rem, 2.5vw, 0.9rem);
   font-weight: var(--font-weight-normal);
   color: var(--text-secondary);
-  max-width: 500px;
+  max-width: 90%;
   margin: 0 auto;
   animation: fadeInUp 0.6s ease-out 0.2s backwards;
+  text-align: center;
 }
 
 /* Feature Tags */
@@ -429,15 +548,18 @@ body {
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8);
+  padding: var(--space-6);
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  height: 100%;
+  height: auto;
+  min-height: 0;
   overflow: visible;
   transition: all var(--transition-slow);
   animation: scaleIn 0.5s ease-out backwards;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Card Gradient Border Effect */
@@ -525,13 +647,13 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-8);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
   background: var(--gradient-primary);
   background-size: 200% auto;
   color: var(--text-primary);
   font-family: var(--font-family-primary);
-  font-size: var(--font-size-base);
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
   font-weight: var(--font-weight-semibold);
   border: none;
   border-radius: var(--radius-xl);
@@ -540,6 +662,8 @@ body {
   box-shadow: var(--shadow-glow-primary);
   position: relative;
   overflow: hidden;
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 /* Button Hover Effect */
@@ -618,15 +742,17 @@ body {
 
 .preview-image {
   width: 100%;
-  max-width: 320px;
+  max-width: 100%;
+  height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  margin-top: var(--space-6);
+  margin: var(--space-4) auto;
   border-radius: var(--radius-xl);
   border: 2px solid var(--border-default);
   background: var(--bg-tertiary);
   box-shadow: var(--shadow-xl);
   transition: all var(--transition-base);
+  display: block;
 }
 
 .preview-image:hover {
@@ -639,8 +765,8 @@ body {
 .image-container {
   position: relative;
   width: 100%;
-  max-width: 320px;
-  margin-top: var(--space-6);
+  max-width: 100%;
+  margin-top: var(--space-4);
 }
 
 .image-overlay {
@@ -682,12 +808,12 @@ body {
 
 /* Prediction Result */
 .prediction-result {
-  font-size: var(--font-size-3xl);
+  font-size: clamp(1.25rem, 4vw, 1.875rem);
   font-weight: var(--font-weight-extrabold);
   text-align: center;
-  min-height: 3.5rem;
-  margin: 0 0 var(--space-8);
-  padding: var(--space-5) var(--space-6);
+  min-height: 2.5rem;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4) var(--space-4);
   width: 100%;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%);
   border-radius: var(--radius-xl);
@@ -700,6 +826,8 @@ body {
   box-shadow: 0 0 30px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: block;
   clear: both;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .prediction-result:hover {
@@ -751,13 +879,14 @@ body {
 /* Confidence Score Display */
 .confidence-display {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   width: 100%;
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   margin-bottom: var(--space-2);
-  padding: var(--space-4);
+  padding: var(--space-3);
   background: var(--bg-tertiary);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
@@ -765,7 +894,7 @@ body {
 }
 
 .confidence-value {
-  font-size: var(--font-size-3xl);
+  font-size: clamp(1.5rem, 5vw, 1.875rem);
   font-weight: var(--font-weight-extrabold);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
@@ -775,7 +904,7 @@ body {
 }
 
 .confidence-label {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
   line-height: 1;
@@ -1358,22 +1487,59 @@ body {
    14. TAIPY-SPECIFIC OVERRIDES
    ============================================ */
 
-/* Layout Grid Override */
+/* Layout Grid Override - Main two-column layout */
 .taipy-layout {
   display: grid !important;
-  gap: var(--space-8) !important;
+  gap: var(--space-6) !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
+/* Two column layout for desktop */
+@media screen and (min-width: 768px) {
+  .taipy-layout {
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--space-8) !important;
+  }
+}
+
+/* Single column for mobile and tablets */
 @media screen and (max-width: 767px) {
   .taipy-layout {
     grid-template-columns: 1fr !important;
+    gap: var(--space-6) !important;
+  }
+
+  .main-layout {
+    padding: 0 var(--space-4) !important;
+  }
+}
+
+/* Extra small devices */
+@media screen and (max-width: 479px) {
+  .taipy-layout {
+    gap: var(--space-4) !important;
+  }
+
+  .main-layout {
+    padding: 0 var(--space-3) !important;
+  }
+
+  .header-container {
+    padding: var(--space-4) var(--space-3) var(--space-6) !important;
+  }
+
+  .feature-tags {
+    flex-wrap: wrap !important;
+    gap: var(--space-1) !important;
   }
 }
 
 /* Taipy Default Overrides */
 .taipy-selector,
 .taipy-indicator {
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* Ensure Taipy components respect our design */
@@ -1384,8 +1550,8 @@ body {
 }
 
 .taipy-image {
-  max-width: 100%;
-  height: auto;
+  max-width: 100% !important;
+  height: auto !important;
 }
 
 /* Fix Taipy component stacking and spacing */
@@ -1403,11 +1569,19 @@ body {
   margin-bottom: var(--space-2);
   display: block;
   clear: both;
+  width: 100% !important;
 }
 
 /* Prevent absolute positioning issues */
 .card * {
   position: relative;
+}
+
+/* App wrapper full width */
+.app-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
 }
 
 /* Force logo size override for Taipy image component */
@@ -1416,12 +1590,12 @@ img.app-logo,
 .header-container .app-logo,
 .header-inner .app-logo,
 [class*="app-logo"] {
-  width: 56px !important;
-  height: 56px !important;
-  max-width: 56px !important;
-  max-height: 56px !important;
-  min-width: 56px !important;
-  min-height: 56px !important;
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
 }
 
 /* Responsive logo size overrides */
@@ -1431,12 +1605,12 @@ img.app-logo,
   .header-container .app-logo,
   .header-inner .app-logo,
   [class*="app-logo"] {
-    width: 48px !important;
-    height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
   }
 }
 
@@ -1446,12 +1620,12 @@ img.app-logo,
   .header-container .app-logo,
   .header-inner .app-logo,
   [class*="app-logo"] {
-    width: 64px !important;
-    height: 64px !important;
-    max-width: 64px !important;
-    max-height: 64px !important;
-    min-width: 64px !important;
-    min-height: 64px !important;
+    width: 56px !important;
+    height: 56px !important;
+    max-width: 56px !important;
+    max-height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
   }
 }
 
