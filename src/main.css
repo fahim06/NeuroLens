@@ -335,6 +335,7 @@ body {
   max-width: var(--container-xl);
   margin: 0 auto;
   padding: 0 var(--space-6);
+  box-sizing: border-box;
 }
 
 /* Background Decorations */
@@ -380,11 +381,12 @@ body {
 
 .header-container {
   width: 100%;
-  padding: var(--space-6) var(--space-6) var(--space-8);
+  padding: var(--space-4) var(--space-4) var(--space-6);
   text-align: center;
   position: relative;
   overflow: hidden;
   animation: fadeIn 0.6s ease-out;
+  box-sizing: border-box;
 }
 
 /* Animated Background Glow */
@@ -432,7 +434,7 @@ body {
 
 /* Title Styles */
 .app-title {
-  font-size: var(--font-size-3xl);
+  font-size: clamp(1.5rem, 6vw, 2.25rem);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: var(--letter-spacing-tight);
   line-height: var(--line-height-tight);
@@ -443,15 +445,17 @@ body {
   background-clip: text;
   animation: fadeInUp 0.6s ease-out 0.1s backwards, gradientShift 8s ease infinite;
   margin: 0;
+  text-align: center;
 }
 
 .app-subtitle {
-  font-size: var(--font-size-sm);
+  font-size: clamp(0.75rem, 2.5vw, 0.9rem);
   font-weight: var(--font-weight-normal);
   color: var(--text-secondary);
-  max-width: 500px;
+  max-width: 90%;
   margin: 0 auto;
   animation: fadeInUp 0.6s ease-out 0.2s backwards;
+  text-align: center;
 }
 
 /* Feature Tags */
@@ -544,15 +548,18 @@ body {
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8);
+  padding: var(--space-6);
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  height: 100%;
+  height: auto;
+  min-height: 0;
   overflow: visible;
   transition: all var(--transition-slow);
   animation: scaleIn 0.5s ease-out backwards;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Card Gradient Border Effect */
@@ -640,13 +647,13 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-8);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
   background: var(--gradient-primary);
   background-size: 200% auto;
   color: var(--text-primary);
   font-family: var(--font-family-primary);
-  font-size: var(--font-size-base);
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
   font-weight: var(--font-weight-semibold);
   border: none;
   border-radius: var(--radius-xl);
@@ -655,6 +662,8 @@ body {
   box-shadow: var(--shadow-glow-primary);
   position: relative;
   overflow: hidden;
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 /* Button Hover Effect */
@@ -733,15 +742,17 @@ body {
 
 .preview-image {
   width: 100%;
-  max-width: 320px;
+  max-width: 100%;
+  height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  margin-top: var(--space-6);
+  margin: var(--space-4) auto;
   border-radius: var(--radius-xl);
   border: 2px solid var(--border-default);
   background: var(--bg-tertiary);
   box-shadow: var(--shadow-xl);
   transition: all var(--transition-base);
+  display: block;
 }
 
 .preview-image:hover {
@@ -754,8 +765,8 @@ body {
 .image-container {
   position: relative;
   width: 100%;
-  max-width: 320px;
-  margin-top: var(--space-6);
+  max-width: 100%;
+  margin-top: var(--space-4);
 }
 
 .image-overlay {
@@ -797,12 +808,12 @@ body {
 
 /* Prediction Result */
 .prediction-result {
-  font-size: var(--font-size-3xl);
+  font-size: clamp(1.25rem, 4vw, 1.875rem);
   font-weight: var(--font-weight-extrabold);
   text-align: center;
-  min-height: 3.5rem;
-  margin: 0 0 var(--space-8);
-  padding: var(--space-5) var(--space-6);
+  min-height: 2.5rem;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4) var(--space-4);
   width: 100%;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%);
   border-radius: var(--radius-xl);
@@ -815,6 +826,8 @@ body {
   box-shadow: 0 0 30px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: block;
   clear: both;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .prediction-result:hover {
@@ -866,13 +879,14 @@ body {
 /* Confidence Score Display */
 .confidence-display {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   width: 100%;
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   margin-bottom: var(--space-2);
-  padding: var(--space-4);
+  padding: var(--space-3);
   background: var(--bg-tertiary);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
@@ -880,7 +894,7 @@ body {
 }
 
 .confidence-value {
-  font-size: var(--font-size-3xl);
+  font-size: clamp(1.5rem, 5vw, 1.875rem);
   font-weight: var(--font-weight-extrabold);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
@@ -890,7 +904,7 @@ body {
 }
 
 .confidence-label {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
   line-height: 1;
@@ -1473,22 +1487,59 @@ body {
    14. TAIPY-SPECIFIC OVERRIDES
    ============================================ */
 
-/* Layout Grid Override */
+/* Layout Grid Override - Main two-column layout */
 .taipy-layout {
   display: grid !important;
-  gap: var(--space-8) !important;
+  gap: var(--space-6) !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
+/* Two column layout for desktop */
+@media screen and (min-width: 768px) {
+  .taipy-layout {
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--space-8) !important;
+  }
+}
+
+/* Single column for mobile and tablets */
 @media screen and (max-width: 767px) {
   .taipy-layout {
     grid-template-columns: 1fr !important;
+    gap: var(--space-6) !important;
+  }
+
+  .main-layout {
+    padding: 0 var(--space-4) !important;
+  }
+}
+
+/* Extra small devices */
+@media screen and (max-width: 479px) {
+  .taipy-layout {
+    gap: var(--space-4) !important;
+  }
+
+  .main-layout {
+    padding: 0 var(--space-3) !important;
+  }
+
+  .header-container {
+    padding: var(--space-4) var(--space-3) var(--space-6) !important;
+  }
+
+  .feature-tags {
+    flex-wrap: wrap !important;
+    gap: var(--space-1) !important;
   }
 }
 
 /* Taipy Default Overrides */
 .taipy-selector,
 .taipy-indicator {
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* Ensure Taipy components respect our design */
@@ -1499,8 +1550,8 @@ body {
 }
 
 .taipy-image {
-  max-width: 100%;
-  height: auto;
+  max-width: 100% !important;
+  height: auto !important;
 }
 
 /* Fix Taipy component stacking and spacing */
@@ -1518,11 +1569,19 @@ body {
   margin-bottom: var(--space-2);
   display: block;
   clear: both;
+  width: 100% !important;
 }
 
 /* Prevent absolute positioning issues */
 .card * {
   position: relative;
+}
+
+/* App wrapper full width */
+.app-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
 }
 
 /* Force logo size override for Taipy image component */
@@ -1531,12 +1590,12 @@ img.app-logo,
 .header-container .app-logo,
 .header-inner .app-logo,
 [class*="app-logo"] {
-  width: 56px !important;
-  height: 56px !important;
-  max-width: 56px !important;
-  max-height: 56px !important;
-  min-width: 56px !important;
-  min-height: 56px !important;
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
 }
 
 /* Responsive logo size overrides */
@@ -1546,12 +1605,12 @@ img.app-logo,
   .header-container .app-logo,
   .header-inner .app-logo,
   [class*="app-logo"] {
-    width: 48px !important;
-    height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
   }
 }
 
@@ -1561,12 +1620,12 @@ img.app-logo,
   .header-container .app-logo,
   .header-inner .app-logo,
   [class*="app-logo"] {
-    width: 64px !important;
-    height: 64px !important;
-    max-width: 64px !important;
-    max-height: 64px !important;
-    min-width: 64px !important;
-    min-height: 64px !important;
+    width: 56px !important;
+    height: 56px !important;
+    max-width: 56px !important;
+    max-height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
   }
 }
 
