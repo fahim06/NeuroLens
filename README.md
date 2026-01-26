@@ -168,13 +168,11 @@ NeuroLens/
 │   └── NeuralNetworkQuickBuilder.ipynb  # Quick training script
 ├── src/
 │   ├── classifier.py           # Main application entry point
-│   ├── main.css                # Modern UI stylesheet
-│   └── design-system.css       # Design tokens & variables
+│   └── main.css                # UI stylesheet with design system
 ├── tests/
 │   └── test_classifier.py      # Unit tests
 ├── .gitignore
 ├── brand.json                  # Brand configuration
-├── generate_favicons.py        # Favicon generation script
 ├── LICENSE                     # MIT License
 ├── README.md                   # Project documentation
 ├── requirements.txt            # Python dependencies

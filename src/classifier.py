@@ -1,4 +1,6 @@
 import os
+import pathlib
+import webbrowser
 from datetime import datetime
 
 import numpy as np
@@ -8,8 +10,6 @@ from tensorflow.keras import models
 
 # Brand Configuration
 BRAND_NAME = "NeuroLens"
-BRAND_TAGLINE = "AI-Powered Image Classification with Deep Learning"
-BRAND_VERSION = "2.0.0"
 COPYRIGHT_YEAR = datetime.now().year
 COPYRIGHT_HOLDER = "Fahim Yusuf"
 GITHUB_URL = "https://github.com/fahim06"
@@ -31,21 +31,15 @@ basedir = os.path.dirname(__file__)
 
 
 def get_asset_path(filename):
-    """
-    Helper to resolve asset paths.
-    Checks the 'assets' directory.
-    """
+    """Helper to resolve asset paths."""
     return os.path.join(basedir, "../assets", filename)
 
 
 model_path = get_asset_path("baseline_mariya.keras")
-# Ensure the model exists before loading to avoid crash if files are missing entirely
 if os.path.exists(model_path):
     try:
         model = models.load_model(model_path)
     except Exception as e:
-        # In CI/CD or if file is corrupted (e.g. LFS pointer), we might fail to load.
-        # We catch ValueError specifically for Keras loading issues.
         print(f"Warning: Failed to load model from {model_path}: {e}")
         model = None
 else:
@@ -70,25 +64,14 @@ def predict_image(model_n, path_to_img):
     return top_prob, top_pred
 
 
-# Use relative paths for UI elements so Taipy can serve them
-img_asset_path = get_asset_path("placeholder_image.png")
-img_path = os.path.relpath(img_asset_path, os.getcwd())
-
-logo_asset_path = get_asset_path("logo.png")
-logo_path = os.path.relpath(logo_asset_path, os.getcwd())
-
-# Favicon path - use favicon from root directory
-favicon_path = "favicon.ico"
-
+# UI state variables
+img_path = os.path.relpath(get_asset_path("placeholder_image.png"), os.getcwd())
+logo_path = os.path.relpath(get_asset_path("logo.png"), os.getcwd())
 content = ""
 prob = 0
 pred = "Waiting for input..."
-
-# Dynamic brand variables for UI
-brand_name = BRAND_NAME
 copyright_holder = COPYRIGHT_HOLDER
 copyright_year = COPYRIGHT_YEAR
-github_url = GITHUB_URL
 
 index = """
 <|app-wrapper|
@@ -149,7 +132,6 @@ index = """
 
 def open_github(state):
     """Open GitHub profile in new tab."""
-    import webbrowser
     webbrowser.open(GITHUB_URL)
 
 
@@ -159,13 +141,11 @@ def on_change(state, var_name, var_val):
         state.prob = round(top_prob * 100)
         state.pred = top_pred
         state.img_path = var_val
-    # print(var_name, var_val)
 
 
 app = Gui(page=index, css_file="main.css")
+
 if __name__ == '__main__':
-    # Use absolute path for favicon
-    import pathlib
 
     project_root = pathlib.Path(__file__).parent.parent
     favicon_file = project_root / "assets" / "logo.png"
