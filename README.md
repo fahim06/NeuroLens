@@ -105,9 +105,23 @@ python -m venv venv
 
 #### Option B: Using Conda
 
+The NeuroLens conda environment is already configured and ready to use:
+
 ```bash
-conda create --name neurolens python=3.10
-conda activate neurolens
+conda activate NeuroLens
+```
+
+Or use the convenient activation script:
+
+```bash
+./activate_neurolens.sh
+```
+
+If you need to create the environment from scratch:
+
+```bash
+conda create --name NeuroLens python=3.10
+conda activate NeuroLens
 ```
 
 ### 3. Install Dependencies
