@@ -10,6 +10,7 @@ from tensorflow.keras import models
 
 # Brand Configuration
 BRAND_NAME = "NeuroLens"
+BRAND_VERSION = "2.1.0"
 COPYRIGHT_YEAR = datetime.now().year
 COPYRIGHT_HOLDER = "Fahim Yusuf"
 GITHUB_URL = "https://github.com/fahim06"
