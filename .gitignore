@@ -138,3 +138,13 @@ cython_debug/
 .idea/
 .vscode/
 !/.idea/runConfigurations/
+
+# macOS
+.DS_Store
+*.DS_Store
+
+# Taipy
+.taipy/
+
+# Todo
+.todo/
