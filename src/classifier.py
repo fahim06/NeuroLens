@@ -72,32 +72,56 @@ prob = 0
 pred = "Waiting for input..."
 
 index = """
+<|app-wrapper|
+
 <|header-container|
+<|header-inner|
 <|{logo_path}|image|class_name=app-logo|>
 <|NeuroLens|text|class_name=app-title|>
-<|AI-Powered Image Classification|text|class_name=app-subtitle|>
+<|AI-Powered Image Classification with Deep Learning|text|class_name=app-subtitle|>
+
+<|feature-tags|
+<|🧠 CNN Model|text|class_name=feature-tag|>
+<|⚡ Real-time Analysis|text|class_name=feature-tag|>
+<|🎯 10 Classes|text|class_name=feature-tag|>
+|>
+|>
 |>
 
 <|main-layout|
-<|layout|columns=1 1|columns[mobile]=1|gap=2rem|
+<|layout|columns=1 1|columns[mobile]=1|gap=2.5rem|
 
 <|card|
-<|Input Image|text|class_name=card-title|>
-<|{content}|file_selector|extensions=.png|label=Upload Image|class_name=custom-file-selector|>
+<|📤 Upload Image|text|class_name=card-title|>
+<|{content}|file_selector|extensions=.png,.jpg,.jpeg|label=Choose Image|class_name=custom-file-selector|>
 <|{img_path}|image|class_name=preview-image|>
+<|Supports PNG, JPG, JPEG formats|text|class_name=label-text|>
 |>
 
 <|card|
-<|Analysis Results|text|class_name=card-title|>
+<|🔍 Analysis Results|text|class_name=card-title|>
 
 <|Predicted Class|text|class_name=label-text|>
 <|{pred}|text|class_name=prediction-result|>
 
 <|Confidence Score|text|class_name=label-text|>
 <|{prob}|indicator|value={prob}|min=0|max=100|width=100%|class_name=custom-indicator|>
+
+<|confidence-display|
+<|{prob}%|text|class_name=confidence-value|>
+<|Accuracy|text|class_name=confidence-label|>
+|>
 |>
 
 |>
+|>
+
+<|footer|
+<|footer-content|
+<|Built with ❤️ using Taipy & TensorFlow|text|class_name=footer-text|>
+|>
+|>
+
 |>
 """
 
