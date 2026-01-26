@@ -6,7 +6,8 @@ We are committed to ensuring the security of NeuroLens. Currently, we support th
 
 | Version | Supported          | Notes                  |
 |---------|--------------------|------------------------|
-| 2.0.x   | :white_check_mark: | Current Stable Release |
+| 2.1.x   | :white_check_mark: | Current Stable Release |
+| 2.0.x   | :white_check_mark: | Security fixes only    |
 | 1.0.x   | :x:                | No longer supported    |
 | < 1.0   | :x:                | No longer supported    |
 
