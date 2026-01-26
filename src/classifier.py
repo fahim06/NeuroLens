@@ -49,15 +49,41 @@ else:
 
 
 def predict_image(model_n, path_to_img):
+    """
+    Predict the class of an image using the CNN model.
+
+    Preprocessing steps:
+    1. Load image and convert to RGB
+    2. Center crop to square aspect ratio (preserves features)
+    3. Resize to 32x32 using LANCZOS interpolation (high quality)
+    4. Normalize pixel values to 0-1 range
+    5. Run inference and return prediction
+    """
     if model_n is None:
         return 0, "Model not loaded"
 
+    # Load and convert to RGB
     img = Image.open(path_to_img)
     img = img.convert("RGB")
-    img = img.resize((32, 32))
-    data = np.asarray(img)
-    data = data / 255
-    probs = model_n.predict(np.array([data])[:1])
+
+    # Center crop to square (preserves aspect ratio, avoids distortion)
+    width, height = img.size
+    min_dim = min(width, height)
+    left = (width - min_dim) // 2
+    top = (height - min_dim) // 2
+    right = left + min_dim
+    bottom = top + min_dim
+    img = img.crop((left, top, right, bottom))
+
+    # Resize to 32x32 using high-quality LANCZOS interpolation
+    img = img.resize((32, 32), Image.Resampling.LANCZOS)
+
+    # Convert to numpy array and normalize
+    data = np.asarray(img, dtype=np.float32)
+    data = data / 255.0
+
+    # Add batch dimension and predict
+    probs = model_n.predict(np.expand_dims(data, axis=0), verbose=0)
 
     top_prob = probs.max()
     top_pred = class_names[np.argmax(probs)]
