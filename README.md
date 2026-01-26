@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-2.1.0-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-green.svg" alt="Python">
   <img src="https://img.shields.io/badge/license-MIT-orange.svg" alt="License">
   <img src="https://img.shields.io/badge/framework-Taipy-purple.svg" alt="Taipy">
@@ -38,7 +38,7 @@ The model can classify images into 10 distinct categories:
 
 ---
 
-## ✨ What's New in v2.0.0
+## ✨ What's New in v2.1.0
 
 - 🎨 **Modern UI Redesign** - Premium glassmorphism design with gradient accents
 - 📱 **Fully Responsive** - Works on mobile, tablet, laptop, and desktop
@@ -46,6 +46,8 @@ The model can classify images into 10 distinct categories:
 - ⚡ **Improved Performance** - Optimized CSS and animations
 - 🔧 **Brand System** - Centralized branding configuration
 - 🎯 **Better UX** - Cleaner layout with micro-interactions
+- 🔄 **Fluid Typography** - Text scales smoothly across all screen sizes
+- 📐 **Enhanced Layout** - Improved responsive grid system
 
 ---
 
@@ -168,13 +170,11 @@ NeuroLens/
 │   └── NeuralNetworkQuickBuilder.ipynb  # Quick training script
 ├── src/
 │   ├── classifier.py           # Main application entry point
-│   ├── main.css                # Modern UI stylesheet
-│   └── design-system.css       # Design tokens & variables
+│   └── main.css                # UI stylesheet with design system
 ├── tests/
 │   └── test_classifier.py      # Unit tests
 ├── .gitignore
 ├── brand.json                  # Brand configuration
-├── generate_favicons.py        # Favicon generation script
 ├── LICENSE                     # MIT License
 ├── README.md                   # Project documentation
 ├── requirements.txt            # Python dependencies
