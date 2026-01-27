@@ -1,19 +1,13 @@
 # NeuroLens: CIFAR-10 Image Classifier
 
-<p align="center">
-  <img src="assets/logo.png" alt="NeuroLens Logo" width="120">
-</p>
+![NeuroLens Logo](assets/logo.png)
 
-<p align="center">
-  <strong>AI-Powered Image Classification with Deep Learning</strong>
-</p>
+## AI-Powered Image Classification with Deep Learning
 
-<p align="center">
-  <img src="https://img.shields.io/badge/version-2.1.0-blue.svg" alt="Version">
-  <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-green.svg" alt="Python">
-  <img src="https://img.shields.io/badge/license-MIT-orange.svg" alt="License">
-  <img src="https://img.shields.io/badge/framework-Taipy-purple.svg" alt="Taipy">
-</p>
+![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)
+![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-green.svg)
+![License](https://img.shields.io/badge/license-MIT-orange.svg)
+![Taipy](https://img.shields.io/badge/framework-Taipy-purple.svg)
 
 ---
 
@@ -131,7 +125,7 @@ python src/classifier.py
 
 The application will automatically open in your default web browser at:
 
-```
+```link
 http://127.0.0.1:5001
 ```
 
@@ -243,13 +237,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 👤 Author
 
-**Fahim Yusuf**
+## **Fahim Yusuf**
 
 - GitHub: [@fahim06](https://github.com/fahim06)
 
 ---
 
-<p align="center">
-  Built with ❤️ using Taipy & TensorFlow
-</p>
-
+Built using Taipy & TensorFlow
