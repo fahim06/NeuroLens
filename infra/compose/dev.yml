@@ -1,0 +1,254 @@
+# Docker Compose - Development Environment
+# Full NeuroLens stack for local development
+
+version: "3.9"
+
+services:
+  # ============================================
+  # Backend API
+  # ============================================
+  backend:
+    build:
+      context: ../..
+      dockerfile: infra/docker/backend.Dockerfile
+      target: development
+    container_name: neurolens-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../backend:/app/backend:ro
+      - ../../ml:/app/ml:ro
+      - backend-cache:/app/.cache
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - REDIS_URL=redis://redis:6379
+      - MODEL_SERVICE_URL=http://inference:8001
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+    depends_on:
+      redis:
+        condition: service_healthy
+      inference:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - neurolens-network
+    restart: unless-stopped
+
+  # ============================================
+  # Inference Server
+  # ============================================
+  inference:
+    build:
+      context: ../..
+      dockerfile: infra/docker/inference.Dockerfile
+      target: production
+    container_name: neurolens-inference
+    ports:
+      - "8001:8001"
+    volumes:
+      - ../../ml:/app/ml:ro
+      - model-storage:/app/models
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - MODEL_PATH=/app/models/production
+      - WARMUP_REQUESTS=3
+      - TF_CPP_MIN_LOG_LEVEL=2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - neurolens-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  # ============================================
+  # Frontend (Vite Dev Server)
+  # ============================================
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: neurolens-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - neurolens-network
+    restart: unless-stopped
+
+  # ============================================
+  # Redis (Caching & Sessions)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: neurolens-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - neurolens-network
+    restart: unless-stopped
+
+  # ============================================
+  # MLflow Tracking Server
+  # ============================================
+  mlflow:
+    image: python:3.11-slim
+    container_name: neurolens-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-data:/mlflow
+    command: >
+      bash -c "
+        pip install mlflow &&
+        mlflow server \
+          --backend-store-uri sqlite:///mlflow/mlflow.db \
+          --default-artifact-root /mlflow/artifacts \
+          --host 0.0.0.0 \
+          --port 5000
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - neurolens-network
+    restart: unless-stopped
+
+  # ============================================
+  # Jupyter Notebook (Development)
+  # ============================================
+  jupyter:
+    build:
+      context: ../..
+      dockerfile: infra/docker/training.Dockerfile
+      target: notebook
+    container_name: neurolens-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ../../notebooks:/app/notebooks
+      - ../../ml:/app/ml
+      - ../../data:/app/data
+      - model-storage:/app/models
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
+    networks:
+      - neurolens-network
+    profiles:
+      - dev-tools
+
+  # ============================================
+  # TensorBoard (Visualization)
+  # ============================================
+  tensorboard:
+    image: tensorflow/tensorflow:2.15.0
+    container_name: neurolens-tensorboard
+    ports:
+      - "6006:6006"
+    volumes:
+      - ../../logs:/logs:ro
+    command: tensorboard --logdir=/logs --host=0.0.0.0 --port=6006
+    networks:
+      - neurolens-network
+    profiles:
+      - dev-tools
+
+  # ============================================
+  # Prometheus (Metrics)
+  # ============================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: neurolens-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    networks:
+      - neurolens-network
+    profiles:
+      - monitoring
+
+  # ============================================
+  # Grafana (Dashboards)
+  # ============================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: neurolens-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - neurolens-network
+    profiles:
+      - monitoring
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  neurolens-network:
+    driver: bridge
+    name: neurolens-network
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  redis-data:
+    name: neurolens-redis-data
+  mlflow-data:
+    name: neurolens-mlflow-data
+  model-storage:
+    name: neurolens-model-storage
+  backend-cache:
+    name: neurolens-backend-cache
+  prometheus-data:
+    name: neurolens-prometheus-data
+  grafana-data:
+    name: neurolens-grafana-data
