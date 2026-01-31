@@ -103,6 +103,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
@@ -145,3 +147,20 @@ cython_debug/
 
 # Taipy
 .taipy/
+
+# Node.js / Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Machine Learning artifacts
+*.h5
+*.pkl
+*.pt
+*.pth
+*.onnx
+*.tflite
+wandb/
+ml/datasets/
