@@ -1,7 +1,18 @@
 """
 NeuroLens FastAPI Application
 
-Main application entry point.
+Phase 2: Backend API Entry Point
+
+Responsibilities:
+- Create FastAPI instance
+- Load settings
+- Attach routers
+- Configure middleware
+
+Rules:
+- No business logic
+- No ML imports
+- No database logic
 """
 
 from contextlib import asynccontextmanager
@@ -12,6 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import router as api_v1_router
 from app.core.config import settings
+from app.core.logging import setup_logging, logger
 
 
 @asynccontextmanager
@@ -21,21 +33,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     
     Handles startup and shutdown events.
     """
-    # Startup
-    print(f"Starting {settings.app_name} v{settings.app_version}")
-    print(f"Environment: {settings.app_env}")
-    print(f"Debug: {settings.app_debug}")
+    # Setup logging
+    setup_logging()
     
-    # TODO: Initialize ML models
-    # TODO: Initialize database connections
-    # TODO: Initialize cache
+    # Startup
+    logger.info(f"Starting {settings.app_name} v{settings.app_version}")
+    logger.info(f"Environment: {settings.app_env}")
+    logger.info(f"Debug: {settings.app_debug}")
+    logger.info(f"API Version: {settings.api_version}")
     
     yield
     
     # Shutdown
-    print(f"Shutting down {settings.app_name}")
-    
-    # TODO: Cleanup resources
+    logger.info(f"Shutting down {settings.app_name}")
 
 
 def create_app() -> FastAPI:
@@ -43,6 +53,7 @@ def create_app() -> FastAPI:
     Application factory.
     
     Creates and configures the FastAPI application.
+    Phase 2: Health and System endpoints only.
     """
     app = FastAPI(
         title=settings.app_name,
@@ -50,7 +61,7 @@ def create_app() -> FastAPI:
         version=settings.app_version,
         docs_url="/docs" if settings.app_debug else None,
         redoc_url="/redoc" if settings.app_debug else None,
-        openapi_url=f"{settings.api_prefix}/openapi.json",
+        openapi_url=f"{settings.api_prefix}/openapi.json" if settings.app_debug else None,
         lifespan=lifespan,
     )
     

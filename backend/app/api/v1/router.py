@@ -1,38 +1,24 @@
 """
 API v1 Router
 
+Phase 2: Backend API Router
 Versioned API routes following the strategy: /api/v1/*
-All endpoints are strictly typed with request/response schemas.
+
+Rules:
+- All routes go through version router
+- No unversioned endpoints
+- No ML imports in Phase 2
+- No database logic in Phase 2
 """
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import health, inference, models, training
+from app.api.v1.routes import health_router, system_router
 
 # Create versioned router
-router = APIRouter(prefix="/v1")
+router = APIRouter()
 
-# Include endpoint routers
-router.include_router(
-    health.router,
-    prefix="/health",
-    tags=["Health"],
-)
-
-router.include_router(
-    inference.router,
-    prefix="/inference",
-    tags=["Inference"],
-)
-
-router.include_router(
-    models.router,
-    prefix="/models",
-    tags=["Models"],
-)
-
-router.include_router(
-    training.router,
-    prefix="/training",
-    tags=["Training"],
-)
+# Include route modules
+# Phase 2: Health and System only
+router.include_router(health_router)
+router.include_router(system_router)

@@ -1,17 +1,22 @@
 """
 NeuroLens Configuration Module
 
+Phase 2: Backend API Configuration
 Centralized configuration management using Pydantic Settings.
-Follows the configuration strategy defined in Phase 1 architecture.
 
 Configuration Sources (priority order):
 1. Environment variables
 2. .env file
 3. Default values
+
+Rules:
+- Use Pydantic Settings
+- Read from environment variables
+- Support local, staging, production
+- No hardcoded secrets
 """
 
 from functools import lru_cache
-from pathlib import Path
 from typing import Any
 
 from pydantic import field_validator
@@ -21,6 +26,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """
     Application settings loaded from environment variables.
+    
+    Phase 2 Required Fields:
+    - APP_NAME
+    - API_VERSION
+    - ENV
+    - DEBUG
+    - ALLOWED_ORIGINS
     
     All configuration is centralized here following the principle:
     - No secrets in code
@@ -36,47 +48,44 @@ class Settings(BaseSettings):
     )
     
     # =========================================================================
-    # Application Settings
+    # Application Settings (Phase 2 Required)
     # =========================================================================
     app_name: str = "NeuroLens"
-    app_env: str = "development"
-    app_debug: bool = False
+    app_env: str = "local"  # local, staging, production
+    app_debug: bool = True
     app_version: str = "3.0.0"
     
     # =========================================================================
-    # API Settings
+    # API Settings (Phase 2 Required)
     # =========================================================================
+    api_version: str = "v1"
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_prefix: str = "/api/v1"
-    api_reload: bool = False
+    api_reload: bool = True
     
     # =========================================================================
-    # Security Settings
+    # CORS Settings (Phase 2 Required)
+    # =========================================================================
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+    ]
+
+    # =========================================================================
+    # Security Settings (Stubs for Phase 9)
     # =========================================================================
     secret_key: str = "development-secret-key-change-in-production"
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 30
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
-    
-    # =========================================================================
-    # ML Settings
-    # =========================================================================
-    ml_model_path: Path = Path("ml/registry")
-    ml_dataset_path: Path = Path("ml/datasets")
-    ml_cache_path: Path = Path(".cache/ml")
     
     # =========================================================================
     # Logging Settings
     # =========================================================================
     log_level: str = "INFO"
-    log_format: str = "json"
-    
-    # =========================================================================
-    # Feature Flags
-    # =========================================================================
-    feature_training_enabled: bool = True
-    feature_explainability_enabled: bool = True
+    log_format: str = "text"  # text in local, json in production
     
     # =========================================================================
     # Validators
