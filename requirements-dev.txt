@@ -1,0 +1,10 @@
+# Dev requirements for CI and local development
+ruff
+black
+mypy
+pytest
+pytest-cov
+isort
+flake8
+pylint
+bandit
