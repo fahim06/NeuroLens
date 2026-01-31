@@ -5,6 +5,9 @@
 name: Feature CI
 
 on:
+  push:
+    branches:
+      - "**"
   pull_request:
     branches:
       - dev
