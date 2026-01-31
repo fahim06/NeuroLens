@@ -1,17 +1,29 @@
 """
-NeuroLens ML Module
+NeuroLens Backend ML Module
 
-ML Layer Responsibilities (per Phase 1 Architecture):
-- Training
-- Inference
-- Evaluation
-- Feature extraction
-- Explainability
+Backend-specific ML contracts and preprocessing for API integration.
+The core ML architecture lives in the top-level `ml/` package.
 
-ML System Boundaries:
-- No UI logic in ML
-- No API logic in ML
-- No file-system coupling
-- Explicit input/output contracts
-- Deterministic pipelines
+This module provides:
+- API-level contracts (protocols for type safety)
+- Preprocessing utilities for request handling
+- Bridge between FastAPI and ML core
 """
+
+from backend.app.ml.contracts import (
+    BaseModel as MLBaseModel,
+    BaseTrainer,
+    BaseExplainer,
+    Preprocessor,
+    Postprocessor,
+)
+from backend.app.ml.preprocessing import ImagePreprocessor
+
+__all__ = [
+    "MLBaseModel",
+    "BaseTrainer",
+    "BaseExplainer",
+    "Preprocessor",
+    "Postprocessor",
+    "ImagePreprocessor",
+]
