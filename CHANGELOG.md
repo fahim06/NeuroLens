@@ -9,27 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.0] - 2026-01-26
 
-### Added
+### Added (2.1.0)
 
 - 🔄 **Fluid Typography** - Text now scales smoothly across all screen sizes using CSS `clamp()`
 - 📐 **Enhanced Responsive Grid** - Improved Taipy layout overrides for better mobile/desktop switching
 - 📦 **Inline CSS Variables** - All design tokens now embedded directly in main.css
 
-### Changed
+### Changed (2.1.0)
 
 - 📱 **Improved Mobile Layout** - Cards now stack properly on mobile devices
 - 🎨 **Better Image Responsiveness** - Preview images scale to 100% container width
 - ⚡ **Optimized Padding** - Reduced excessive spacing for cleaner mobile experience
 - 🔧 **Streamlined Codebase** - Removed unused files and variables
 
-### Fixed
+### Fixed (2.1.0)
 
 - 🐛 Fixed broken UI caused by missing CSS variables import
 - 🐛 Fixed layout overflow issues on small screens
 - 🐛 Fixed prediction result text wrapping on mobile
 - 🐛 Fixed confidence display alignment on narrow screens
 
-### Removed
+### Removed (2.1.0)
 
 - 🗑️ Removed `design-system.css` (merged into main.css)
 - 🗑️ Removed `generate_favicons.py` (one-time use script)
@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0] - 2026-01-26
 
-### Added
+### Added (2.0.0)
 
 - 🎨 **Complete UI Redesign** - Premium glassmorphism design with gradient accents
 - 📱 **Fully Responsive Design** - Works on mobile, tablet, laptop, and desktop (5 breakpoints)
@@ -51,14 +51,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🔄 **CI/CD Pipeline** - GitHub Actions for automated testing
 - 📄 **PWA Manifest** - Web app manifest for progressive web app support
 
-### Changed
+### Changed (2.0.0)
 
 - 🏗️ **Project Structure** - Reorganized files into `src/`, `assets/`, `tests/`, `notebooks/`
 - 📝 **Documentation** - Comprehensive README with badges and detailed instructions
 - 🎯 **UX Improvements** - Cleaner layout with better visual hierarchy
 - 🔒 **Security Policy** - Added SECURITY.md with vulnerability reporting guidelines
 
-### Technical
+### Technical (2.0.0)
 
 - Taipy GUI framework for web interface
 - TensorFlow/Keras for CNN model inference
@@ -69,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - Initial Release
 
-### Added
+### Added (1.0.0)
 
 - Basic image classification using CNN trained on CIFAR-10
 - Simple Taipy GUI interface

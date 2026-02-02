@@ -1,0 +1,62 @@
+# EfficientNet Training Configuration
+# NeuroLens v3.0 - Transfer Learning
+
+# Inherit from base and override
+_base_: "base.yaml"
+
+# Model settings
+model:
+  name: "efficientnet"
+  version: "1.0.0"
+  architecture: "efficientnet_b0"
+  num_classes: 4
+  input_shape: [224, 224, 3]
+  pretrained: true
+  pretrained_weights: "imagenet"
+
+  # Transfer learning settings
+  transfer_learning:
+    freeze_backbone: true
+    fine_tune_after: 50 # epochs to unfreeze
+    fine_tune_layers: 20 # last N layers to fine-tune
+    fine_tune_lr_multiplier: 0.1
+
+# Training settings - adjusted for transfer learning
+training:
+  epochs: 100
+  batch_size: 32
+  initial_learning_rate: 0.001
+
+  # Two-phase training
+  phase_1:
+    epochs: 50
+    learning_rate: 0.001
+    freeze_backbone: true
+
+  phase_2:
+    epochs: 50
+    learning_rate: 0.0001
+    freeze_backbone: false
+    trainable_layers: 20
+
+# Stronger augmentation for transfer learning
+augmentation:
+  enabled: true
+  horizontal_flip: true
+  vertical_flip: false
+  rotation_range: 20
+  zoom_range: 0.15
+  brightness_range: [0.85, 1.15]
+  shear_range: 0.15
+  width_shift_range: 0.1
+  height_shift_range: 0.1
+
+# Regularization
+regularization:
+  dropout: 0.3
+  l2_weight_decay: 0.0001
+  label_smoothing: 0.1
+
+# MLflow
+mlflow:
+  experiment_name: "neurolens-efficientnet"

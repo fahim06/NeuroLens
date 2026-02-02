@@ -1,3 +1,11 @@
+# =============================================================================
+# NeuroLens v3.0 - Project .gitignore
+# =============================================================================
+
+# =============================================================================
+# Python
+# =============================================================================
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -27,8 +35,6 @@ share/python-wheels/
 MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -55,19 +61,6 @@ cover/
 *.mo
 *.pot
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
 # Sphinx documentation
 docs/_build/
 
@@ -76,6 +69,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb_checkpoints/
 
 # IPython
 profile_default/
@@ -85,66 +79,256 @@ ipython_config.py
 .python-version
 
 # pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   with no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+Pipfile.lock
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+# PEP 582
 __pypackages__/
 
-# Celery stuff
+# Celery
 celerybeat-schedule
 celerybeat.pid
 
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
+# Type checkers
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pyre type checker
 .pyre/
-
-# pytype static type analyzer
 .pytype/
 
 # Cython debug symbols
 cython_debug/
 
-# IDEs
-.idea/
+# =============================================================================
+# Environments & Secrets
+# =============================================================================
+
+# Environment files (keep examples)
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+!.env.example
+!envs/.env.example
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Conda (don't ignore yml files - they're config)
+# envs/*.yml are tracked
+
+# =============================================================================
+# Node.js / Frontend (React + Vite)
+# =============================================================================
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+frontend/dist/
+frontend/build/
+.next/
+out/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# Local env files
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+!frontend/.env.example
+
+# Vite
+*.local
+.vite/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
+# =============================================================================
+# Machine Learning & Data Science
+# =============================================================================
+
+# Model weights & checkpoints
+*.h5
+*.hdf5
+*.keras
+*.pkl
+*.pickle
+*.joblib
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.pb
+*.savedmodel/
+checkpoints/
+
+# Keep baseline model in assets (tracked)
+!assets/baseline_mariya.keras
+
+# Datasets (large files)
+ml/datasets/raw/
+ml/datasets/processed/
+data/
+datasets/
+*.csv
+*.tsv
+*.parquet
+*.feather
+!**/test_*.csv
+
+# Experiment tracking
+wandb/
+mlruns/
+.mlflow/
+tensorboard_logs/
+runs/
+lightning_logs/
+
+# Model registry local storage
+ml/registry/models/
+registry.json
+
+# =============================================================================
+# IDEs & Editors
+# =============================================================================
+
+# VS Code
 .vscode/
-!/.idea/runConfigurations/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains (PyCharm, WebStorm)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+auto-save-list
+tramp
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# =============================================================================
+# Operating Systems
+# =============================================================================
 
 # macOS
 .DS_Store
-*.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
 
-# Taipy
-.taipy/
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
 
-# Todo
-.todo/
+# Linux
+*~
+
+# =============================================================================
+# Backend / FastAPI
+# =============================================================================
+
+# SQLite databases
+*.db
+*.sqlite3
+*.sqlite3-journal
+
+# Uploaded files (runtime)
+uploads/
+temp/
+tmp/
+
+# Logs
+logs/
+*.log
+
+# =============================================================================
+# Docker & Infrastructure
+# =============================================================================
+
+# Docker
+.docker/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+
+# Kubernetes secrets
+*-secret.yaml
+*-secrets.yaml
+
+# =============================================================================
+# Miscellaneous
+# =============================================================================
+
+# Compressed files (usually large)
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Secrets & credentials
+secrets/
+credentials/
+*.pem
+*.key
+!*.key.example
+
+# Local config overrides
+local_settings.py
+config.local.*
+
+# Profiling
+*.prof
+*.lprof

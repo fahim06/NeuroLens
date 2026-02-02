@@ -1,0 +1,67 @@
+# ===== Root Governance =====
+
+*                           @platform-architect @release-manager
+
+## ===== Core System =====
+
+/config/                    @platform-architect
+/envs/                      @environment-architect
+/scripts/                   @mlops-engineer
+/docs/                      @platform-architect
+
+## ===== Backend =====
+
+/src/api/                   @backend-engineer
+
+## ===== Frontend =====
+
+/src/frontend/              @frontend-architect
+
+## ===== ML Core =====
+
+/src/ml/core/               @ml-architect
+
+## ===== Training =====
+
+/src/ml/training/           @training-engineer
+
+## ===== Inference =====
+
+/src/ml/inference/          @inference-engineer
+
+## ===== Data =====
+
+/src/data/                  @data-engineer
+
+## ===== MLOps =====
+
+/mlops/                     @mlops-engineer
+
+## ===== Monitoring =====
+
+/monitoring/                @observability-engineer
+
+## ===== Security =====
+
+/security/                  @security-architect
+
+## ===== Product =====
+
+/product/                   @product-systems
+
+## ===== CI/CD =====
+
+/.github/workflows/         @mlops-engineer @release-manager
+
+## ===== Infrastructure =====
+
+/infra/                     @mlops-engineer
+
+## ===== Research =====
+
+/research/                  @research-lead
+
+## ===== Release Control =====
+
+/main/                      @release-manager
+/dev/                       @platform-architect

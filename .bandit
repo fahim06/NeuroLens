@@ -1,0 +1,42 @@
+# NeuroLens Security Scanning Configuration
+# Bandit - Python Security Linter
+
+[bandit]
+# Exclude test files and migrations
+exclude_dirs = ["tests", "migrations", ".venv", "venv", "__pycache__"]
+
+# Skip certain test IDs if needed (be careful with this)
+# skips = []
+
+# Aggregate output by vulnerability type
+aggregate = "vuln"
+
+# Output format
+format = "json"
+
+# Confidence level threshold
+confidence-level = "medium"
+
+# Severity level threshold
+severity-level = "medium"
+
+# Number of lines of context
+number = 3
+
+# Recurse into subdirectories
+recursive = true
+
+# Verbose output
+verbose = true
+
+[bandit.assert_used]
+# Allow assert in test files
+skips = ["*_test.py", "test_*.py"]
+
+[bandit.hardcoded_password_string]
+# Don't flag example/placeholder passwords in docs
+word_list = ["password", "passwd", "pwd", "secret", "token", "api_key"]
+
+[bandit.hardcoded_tmp_directory]
+# Secure temporary directory patterns
+tmp_dirs = ["/tmp", "/var/tmp", "/dev/shm"]
