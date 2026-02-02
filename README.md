@@ -191,6 +191,12 @@ JWT authentication enabled.
 Role-based API access enforced.
 Phase 2 complete.
 
+## API Status
+
+Core REST APIs implemented.
+Inference endpoint stubbed via service layer.
+Phase 3 complete.
+
 ---
 
 <div align="center">
@@ -206,4 +212,4 @@ Phase 2 complete.
 ## Project Status
 
 Django REST rebuild in progress.  
-Current phase: **Phase 2 — Authentication & Security**
+Current phase: **Phase 3 — Core REST APIs**

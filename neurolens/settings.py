@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     # Local apps
     'core',
     'users',
+    'datasets',
+    'inference',
 ]
 
 MIDDLEWARE = [
