@@ -329,3 +329,6 @@ config.local.*
 # Profiling
 *.prof
 *.lprof
+
+
+.credentials

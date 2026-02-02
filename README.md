@@ -180,6 +180,13 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 
 ---
 
+## Backend Status
+
+Django REST backend initialized.
+Phase 1 complete: Core architecture & health API.
+
+---
+
 <div align="center">
 
 **NeuroLens v3.0.0-dev.1** — Pre-Production Release
