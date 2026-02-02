@@ -41,7 +41,9 @@ class InferenceRequest(models.Model):
     input_data = models.JSONField(default=dict, blank=True)
     result = models.JSONField(default=dict, blank=True)
     error_message = models.TextField(blank=True, default='')
+    celery_task_id = models.CharField(max_length=255, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     
     class Meta:

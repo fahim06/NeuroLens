@@ -111,33 +111,54 @@ python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.hea
 
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
-| `/api/inference/predict/` | POST | JWT | Run prediction |
+| `/api/inference/predict/` | POST | JWT | Run prediction (sync) |
+| `/api/inference/predict/async/` | POST | JWT | Run prediction (async) |
+| `/api/inference/<id>/status/` | GET | JWT | Check async request status |
 | `/api/inference/history/` | GET | JWT | View prediction history |
 
 ### Example Prediction Request
 
 ```bash
+# Synchronous prediction
 curl -X POST http://localhost:8000/api/inference/predict/ \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"image_data": "<base64_encoded_image>"}'
+
+# Asynchronous prediction (requires Redis)
+curl -X POST http://localhost:8000/api/inference/predict/async/ \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"image_data": "<base64_encoded_image>"}'
 ```
 
+### Running with Celery (Optional)
+
+For async inference, start Redis and Celery:
+
+```bash
+# Start Redis (macOS)
+brew services start redis
+
+# Start Celery worker
+celery -A neurolens worker --loglevel=info
+```
+
 ## 🔐 Roles & Permissions
 
-| Role | Permissions |
-|------|-------------|
-| `admin` | Full access to all resources |
+| Role        | Permissions                           |
+|-------------|---------------------------------------|
+| `admin`     | Full access to all resources          |
 | `beta_user` | Access to beta features, own datasets |
-| `viewer` | Read-only access to own datasets |
+| `viewer`    | Read-only access to own datasets      |
 
 ## 📦 Conda Environments
 
-| Environment | Purpose |
-|-------------|---------|
-| `neurolens-django` | Django API runtime |
-| `neurolens-ml` | ML inference with TensorFlow |
-| `neurolens-dev` | Development tools (pytest, ruff) |
+| Environment        | Purpose                          |
+|--------------------|----------------------------------|
+| `neurolens-django` | Django API runtime               |
+| `neurolens-ml`     | ML inference with TensorFlow     |
+| `neurolens-dev`    | Development tools (pytest, ruff) |
 
 ## 🧪 Testing
 
@@ -159,22 +180,28 @@ MIT License - see [LICENSE](LICENSE)
 
 ## 📋 Django Rebuild Status
 
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 0 | Reset & Foundation | ✅ Complete |
-| 1 | Core Architecture | ✅ Complete |
-| 2 | JWT Authentication | ✅ Complete |
-| 3 | Core REST APIs | ✅ Complete |
-| 4 | ML Integration | ✅ Complete |
-| 5 | Beta Stabilization | 🔄 Next |
-| 6 | Beta Release | ⏳ Pending |
-| 7 | Final Release | ⏳ Pending |
+| Phase | Description        | Status     |
+|-------|--------------------|------------|
+| 0     | Reset & Foundation | ✅ Complete |
+| 1     | Core Architecture  | ✅ Complete |
+| 2     | JWT Authentication | ✅ Complete |
+| 3     | Core REST APIs     | ✅ Complete |
+| 4     | ML Integration     | ✅ Complete |
+| 5     | Beta Stabilization | ✅ Complete |
+| 6     | Beta Release       | 🔄 Next    |
+| 7     | Final Release      | ⏳ Pending  |
+
+## Beta Readiness
+
+Asynchronous inference enabled.
+System stabilized for beta users.
+Phase 5 complete.
 
 ---
 
 <div align="center">
 
-**NeuroLens v4.0.0-alpha** — Django REST Rebuild
+**NeuroLens v4.0.0-beta** — Django REST Rebuild
 
 *Built for reliability, scalability, and security*
 

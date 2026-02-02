@@ -20,7 +20,9 @@ class InferenceRequestSerializer(serializers.ModelSerializer):
             'input_data',
             'result',
             'error_message',
+            'celery_task_id',
             'created_at',
+            'started_at',
             'completed_at'
         ]
         read_only_fields = [
@@ -30,7 +32,9 @@ class InferenceRequestSerializer(serializers.ModelSerializer):
             'status',
             'result',
             'error_message',
+            'celery_task_id',
             'created_at',
+            'started_at',
             'completed_at'
         ]
 
