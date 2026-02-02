@@ -279,7 +279,7 @@ def test_secrets_scanning():
     
     # Test detection
     assert scan_content('sk_test_FAKE1234567890abcdefghi'), "Stripe key not detected"
-    assert scan_content('api_key = "1234567890abcdefghijklmn"'), "API key not detected"
+    assert scan_content('api_key = "FAKE1234567890abcdefghij"'), "API key not detected"
     assert not scan_content('normal code here'), "False positive on normal text"
     
     print("✓ Secrets scanning works")
