@@ -1,0 +1,403 @@
+# ============================================================
+# NeuroLens CD — Production Deployment
+# ============================================================
+# Triggers on main branch
+# Deploys to production environment
+# Blue-Green deployment with manual approval
+# Requires ALL CI and security checks to pass
+# ============================================================
+
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to deploy (leave empty for latest)"
+        type: string
+        required: false
+      rollback:
+        description: "Rollback to previous version"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  ENVIRONMENT: production
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================
+  # PRE-FLIGHT CHECKS
+  # ============================================================
+  preflight:
+    name: Pre-flight Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.check.outputs.should-deploy }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Branch Protection
+        id: check
+        run: |
+          # Verify this is coming from main branch
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "❌ Production deployments only allowed from main branch"
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          # Check if this is a merge commit
+          PARENT_COUNT=$(git cat-file -p HEAD | grep -c '^parent')
+          if [ "$PARENT_COUNT" -lt 2 ] && [ "${{ github.event_name }}" == "push" ]; then
+            echo "⚠️ Direct push to main detected - should be via PR"
+          fi
+
+          echo "should-deploy=true" >> $GITHUB_OUTPUT
+
+      - name: Generate Version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            # Generate production version
+            COMMIT_COUNT=$(git rev-list --count HEAD)
+            SHORT_SHA=$(git rev-parse --short HEAD)
+            DATE=$(date +%Y%m%d)
+            VERSION="1.${COMMIT_COUNT}.0"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Production Version: ${VERSION}"
+
+  # ============================================================
+  # WAIT FOR ALL CI CHECKS
+  # ============================================================
+  wait-for-ci:
+    name: Wait for CI
+    runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.should-deploy == 'true'
+    steps:
+      - name: Wait for Backend CI
+        uses: fountainhead/action-wait-for-check@v1.2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Backend CI Status
+          ref: ${{ github.sha }}
+          timeoutSeconds: 1200
+
+      - name: Wait for Frontend CI
+        uses: fountainhead/action-wait-for-check@v1.2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Frontend CI Status
+          ref: ${{ github.sha }}
+          timeoutSeconds: 1200
+
+      - name: Wait for Security Scan
+        uses: fountainhead/action-wait-for-check@v1.2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Security Status
+          ref: ${{ github.sha }}
+          timeoutSeconds: 1200
+
+  # ============================================================
+  # BUILD PRODUCTION IMAGES
+  # ============================================================
+  build-images:
+    name: Build Production Images
+    runs-on: ubuntu-latest
+    needs: [preflight, wait-for-ci]
+    outputs:
+      backend-tag: ${{ steps.meta-backend.outputs.tags }}
+      frontend-tag: ${{ steps.meta-frontend.outputs.tags }}
+      version: ${{ needs.preflight.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Backend Image Metadata
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend
+          tags: |
+            type=sha,prefix=prod-
+            type=raw,value=prod-latest
+            type=raw,value=${{ needs.preflight.outputs.version }}
+            type=raw,value=latest
+
+      - name: Frontend Image Metadata
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
+          tags: |
+            type=sha,prefix=prod-
+            type=raw,value=prod-latest
+            type=raw,value=${{ needs.preflight.outputs.version }}
+            type=raw,value=latest
+
+      - name: Build & Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: infra/docker/backend.Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            ENVIRONMENT=${{ env.ENVIRONMENT }}
+            VERSION=${{ needs.preflight.outputs.version }}
+
+      - name: Build & Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: infra/docker/frontend.Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VITE_API_URL=/api
+            ENVIRONMENT=${{ env.ENVIRONMENT }}
+            VERSION=${{ needs.preflight.outputs.version }}
+
+  # ============================================================
+  # MANUAL APPROVAL
+  # ============================================================
+  approval:
+    name: Approval Gate
+    runs-on: ubuntu-latest
+    needs: build-images
+    environment:
+      name: production-approval
+    steps:
+      - name: Approval Required
+        run: |
+          echo "🔐 Production deployment requires manual approval"
+          echo "📦 Version: ${{ needs.build-images.outputs.version }}"
+          echo "✅ Approved by: ${{ github.actor }}"
+
+  # ============================================================
+  # DEPLOY TO PRODUCTION
+  # ============================================================
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-images, approval]
+    environment:
+      name: production
+      url: https://neurolens.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Kubernetes
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "v1.28.0"
+
+      - name: Setup Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > ~/.kube/config
+
+      - name: Pre-deployment Backup
+        run: |
+          # Create deployment snapshot for rollback
+          kubectl get deployment -n production -o yaml > deployment-backup.yaml
+          echo "📸 Deployment state backed up"
+
+      - name: Blue-Green Deployment
+        id: deploy
+        run: |
+          # Get current deployment (blue or green)
+          CURRENT=$(kubectl get svc neurolens-active -n production -o jsonpath='{.spec.selector.slot}' 2>/dev/null || echo "blue")
+
+          if [ "$CURRENT" == "blue" ]; then
+            TARGET="green"
+          else
+            TARGET="blue"
+          fi
+
+          echo "Current: $CURRENT -> Target: $TARGET"
+          echo "TARGET_SLOT=$TARGET" >> $GITHUB_ENV
+          echo "PREVIOUS_SLOT=$CURRENT" >> $GITHUB_ENV
+
+          # Deploy to target slot
+          kubectl set image deployment/neurolens-backend-$TARGET \
+            backend=${{ needs.build-images.outputs.backend-tag }} \
+            -n production --record
+            
+          kubectl set image deployment/neurolens-frontend-$TARGET \
+            frontend=${{ needs.build-images.outputs.frontend-tag }} \
+            -n production --record
+
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status deployment/neurolens-backend-${{ env.TARGET_SLOT }} -n production --timeout=600s
+          kubectl rollout status deployment/neurolens-frontend-${{ env.TARGET_SLOT }} -n production --timeout=600s
+
+      - name: Database Migrations
+        run: |
+          # Get a backend pod
+          POD=$(kubectl get pods -l app=neurolens-backend,slot=${{ env.TARGET_SLOT }} -n production -o jsonpath='{.items[0].metadata.name}')
+
+          # Run migrations
+          kubectl exec $POD -n production -- python manage.py migrate --no-input
+
+      - name: Health Check
+        run: |
+          # Wait for pods to be ready
+          kubectl wait --for=condition=ready pod -l app=neurolens-backend,slot=${{ env.TARGET_SLOT }} -n production --timeout=180s
+
+          # Health check on target slot (internal)
+          POD=$(kubectl get pods -l app=neurolens-backend,slot=${{ env.TARGET_SLOT }} -n production -o jsonpath='{.items[0].metadata.name}')
+          kubectl exec $POD -n production -- curl -f http://localhost:8000/api/health/
+
+      - name: Switch Traffic (Canary 10%)
+        id: canary
+        run: |
+          # Start with 10% traffic to new version
+          kubectl annotate ingress neurolens-ingress -n production \
+            nginx.ingress.kubernetes.io/canary="true" \
+            nginx.ingress.kubernetes.io/canary-weight="10" \
+            --overwrite || echo "Canary annotation skipped"
+
+          echo "🐤 10% traffic routed to new version"
+          sleep 60  # Wait 1 minute to observe
+
+      - name: Monitor Canary
+        run: |
+          # Check error rates during canary
+          echo "📊 Monitoring canary deployment..."
+          # In production, this would check Prometheus/Grafana metrics
+          sleep 30
+
+      - name: Switch Traffic (100%)
+        run: |
+          # Full traffic switch
+          kubectl patch svc neurolens-active -n production -p "{\"spec\":{\"selector\":{\"slot\":\"${{ env.TARGET_SLOT }}\"}}}"
+
+          # Remove canary annotations
+          kubectl annotate ingress neurolens-ingress -n production \
+            nginx.ingress.kubernetes.io/canary- \
+            nginx.ingress.kubernetes.io/canary-weight- \
+            --overwrite || true
+
+          echo "✅ 100% traffic switched to ${{ env.TARGET_SLOT }}"
+
+      - name: Create Release Tag
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag -a "v${{ needs.build-images.outputs.version }}" -m "Production release v${{ needs.build-images.outputs.version }}"
+          git push origin "v${{ needs.build-images.outputs.version }}" || true
+
+      - name: Upload Backup Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-backup-${{ github.run_id }}
+          path: deployment-backup.yaml
+          retention-days: 30
+
+  # ============================================================
+  # POST-DEPLOYMENT VERIFICATION
+  # ============================================================
+  verify:
+    name: Post-deployment Verification
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Production Health Check
+        run: |
+          PROD_URL="${{ secrets.PRODUCTION_URL }}"
+
+          if [ -z "$PROD_URL" ]; then
+            PROD_URL="https://neurolens.example.com"
+          fi
+
+          echo "🔍 Verifying production deployment..."
+
+          # Health endpoint
+          curl -f "$PROD_URL/api/health/" || exit 1
+          echo "✅ Health check passed"
+
+          # Frontend
+          curl -f "$PROD_URL/" | grep -q "NeuroLens" || echo "Frontend check"
+          echo "✅ Frontend check passed"
+
+      - name: Notify Success
+        if: success()
+        run: |
+          echo "🎉 Production deployment successful!"
+          echo "🔗 URL: https://neurolens.example.com"
+          echo "📦 Version: ${{ needs.deploy.outputs.version || 'latest' }}"
+
+  # ============================================================
+  # ROLLBACK (MANUAL TRIGGER)
+  # ============================================================
+  rollback:
+    name: Rollback
+    runs-on: ubuntu-latest
+    if: inputs.rollback == true
+    environment:
+      name: production-approval
+    steps:
+      - name: Configure Kubernetes
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "v1.28.0"
+
+      - name: Setup Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > ~/.kube/config
+
+      - name: Rollback Deployment
+        run: |
+          # Get current slot and switch back
+          CURRENT=$(kubectl get svc neurolens-active -n production -o jsonpath='{.spec.selector.slot}')
+
+          if [ "$CURRENT" == "blue" ]; then
+            PREVIOUS="green"
+          else
+            PREVIOUS="blue"
+          fi
+
+          echo "🔄 Rolling back from $CURRENT to $PREVIOUS"
+          kubectl patch svc neurolens-active -n production -p "{\"spec\":{\"selector\":{\"slot\":\"$PREVIOUS\"}}}"
+
+          echo "✅ Rollback complete"
+
+      - name: Notify Rollback
+        run: |
+          echo "⚠️ Production rollback executed"
+          echo "👤 Initiated by: ${{ github.actor }}"

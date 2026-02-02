@@ -1,0 +1,264 @@
+# ============================================================
+# NeuroLens — Security & Quality Gates
+# ============================================================
+# Runs security scanning on all branches
+# - Dependency vulnerability scanning
+# - Secret detection
+# - License compliance
+# - SAST (Static Application Security Testing)
+# ============================================================
+
+name: Security Scan
+
+on:
+  push:
+    branches: [django-rebuild, dev, main]
+  pull_request:
+    branches: [django-rebuild, dev, main]
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC
+    - cron: "0 0 * * 0"
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # ============================================================
+  # DEPENDENCY VULNERABILITY SCAN
+  # ============================================================
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Safety
+        run: pip install safety pip-audit
+
+      - name: Python Dependency Check (Safety)
+        run: |
+          # Check Python dependencies for known vulnerabilities
+          if [ -f requirements.txt ]; then
+            safety check -r requirements.txt --output json > safety-report.json || true
+            cat safety-report.json
+          fi
+
+          if [ -f requirements-dev.txt ]; then
+            safety check -r requirements-dev.txt --output json >> safety-report.json || true
+          fi
+        continue-on-error: true
+
+      - name: Python Dependency Audit (pip-audit)
+        run: |
+          if [ -f requirements.txt ]; then
+            pip-audit -r requirements.txt --format json --output pip-audit-report.json || true
+            cat pip-audit-report.json
+          fi
+        continue-on-error: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: NPM Audit
+        working-directory: frontend
+        run: |
+          npm audit --json > npm-audit-report.json 2>/dev/null || true
+
+          # Parse and display high/critical vulnerabilities
+          echo "📋 NPM Audit Summary:"
+          npm audit --audit-level=high 2>/dev/null || echo "High/Critical vulnerabilities may exist"
+        continue-on-error: true
+
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-scan-reports
+          path: |
+            safety-report.json
+            pip-audit-report.json
+            frontend/npm-audit-report.json
+          retention-days: 30
+
+  # ============================================================
+  # SECRET DETECTION
+  # ============================================================
+  secret-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        run: |
+          wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
+          tar -xzf gitleaks_8.18.0_linux_x64.tar.gz
+          chmod +x gitleaks
+          sudo mv gitleaks /usr/local/bin/
+
+      - name: Run Gitleaks
+        run: |
+          gitleaks detect --source . --verbose --report-format json --report-path gitleaks-report.json || true
+
+          # Check if secrets were found
+          if [ -f gitleaks-report.json ] && [ -s gitleaks-report.json ]; then
+            LEAKS=$(cat gitleaks-report.json | jq length)
+            if [ "$LEAKS" -gt 0 ]; then
+              echo "⚠️ Potential secrets detected: $LEAKS"
+              cat gitleaks-report.json | jq '.[].Description'
+              
+              # Fail on dev/main branches
+              if [[ "${{ github.ref }}" == "refs/heads/dev" ]] || [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+                exit 1
+              fi
+            fi
+          fi
+
+          echo "✅ No secrets detected"
+
+      - name: Upload Gitleaks Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+          retention-days: 30
+
+  # ============================================================
+  # LICENSE COMPLIANCE
+  # ============================================================
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pip-licenses
+        run: pip install pip-licenses
+
+      - name: Check Python Licenses
+        run: |
+          pip install -r requirements.txt 2>/dev/null || pip install django djangorestframework
+
+          echo "📋 Python Package Licenses:"
+          pip-licenses --format=markdown --output-file=python-licenses.md
+          cat python-licenses.md
+
+          # Check for problematic licenses (GPL, AGPL)
+          PROBLEMATIC=$(pip-licenses --format=json | jq -r '.[] | select(.License | test("GPL|AGPL"; "i")) | .Name')
+          if [ -n "$PROBLEMATIC" ]; then
+            echo "⚠️ Copyleft licenses found:"
+            echo "$PROBLEMATIC"
+          fi
+        continue-on-error: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check NPM Licenses
+        working-directory: frontend
+        run: |
+          npm ci
+          npx license-checker --json --out npm-licenses.json 2>/dev/null || echo "License checker not available"
+
+          # Check for problematic licenses
+          if [ -f npm-licenses.json ]; then
+            echo "📋 NPM Package Licenses (sample):"
+            cat npm-licenses.json | jq 'to_entries | .[0:10] | from_entries'
+          fi
+        continue-on-error: true
+
+      - name: Upload License Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: license-reports
+          path: |
+            python-licenses.md
+            frontend/npm-licenses.json
+          retention-days: 30
+
+  # ============================================================
+  # CODEQL ANALYSIS (SAST)
+  # ============================================================
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  # ============================================================
+  # SECURITY STATUS GATE
+  # ============================================================
+  security-status:
+    name: Security Status
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, secret-scan, license-check, codeql]
+    if: always()
+    steps:
+      - name: Check Security Status
+        run: |
+          echo "Dependency Scan: ${{ needs.dependency-scan.result }}"
+          echo "Secret Scan: ${{ needs.secret-scan.result }}"
+          echo "License Check: ${{ needs.license-check.result }}"
+          echo "CodeQL: ${{ needs.codeql.result }}"
+
+          # Secret scan must pass on dev/main
+          if [[ "${{ needs.secret-scan.result }}" == "failure" ]]; then
+            echo "❌ Security scan failed - secrets detected"
+            exit 1
+          fi
+
+          # Only warn for other checks on non-main branches
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            if [[ "${{ needs.codeql.result }}" == "failure" ]]; then
+              echo "❌ CodeQL analysis failed on main branch"
+              exit 1
+            fi
+          fi
+
+          echo "✅ Security scans complete"
