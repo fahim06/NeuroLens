@@ -4,12 +4,12 @@
 
 We are committed to ensuring the security of NeuroLens. Currently, we support the following versions:
 
-| Version | Supported          | Notes                      |
-|---------|--------------------|----------------------------|
+| Version | Supported          | Notes                       |
+|---------|--------------------|-----------------------------|
 | 3.0.x   | :white_check_mark: | Current Development Release |
-| 2.1.x   | :x:                | Deprecated                 |
-| 2.0.x   | :x:                | No longer supported        |
-| < 2.0   | :x:                | No longer supported        |
+| 2.1.x   | :x:                | Deprecated                  |
+| 2.0.x   | :x:                | No longer supported         |
+| < 2.0   | :x:                | No longer supported         |
 
 ## Security Features (v3.0)
 

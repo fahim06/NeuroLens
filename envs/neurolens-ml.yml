@@ -3,20 +3,12 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.11
+  - python=3.12
   - pip
   - numpy
   - scipy
-  - pandas
-  - matplotlib
-  - seaborn
   - scikit-learn
-  - opencv
+  - matplotlib
   - pillow
-  - jupyterlab
-  - ipykernel
   - pip:
       - tensorflow
-      - keras
-      - mlflow
-      - dvc

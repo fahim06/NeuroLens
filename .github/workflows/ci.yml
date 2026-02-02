@@ -81,7 +81,7 @@ jobs:
       - name: Check Imports
         shell: bash -el {0}
         run: |
-          python -c "import sys; sys.path.insert(0, '.'); from backend import app"
+          python -c "import sys; sys.path.insert(0, '.'); from backend.app import main"
 
   # ============================================================
   # ML CHECKS
@@ -115,7 +115,7 @@ jobs:
       - name: Check Imports
         shell: bash -el {0}
         run: |
-          python -c "import sys; sys.path.insert(0, '.'); from ml import core"
+          python -c "import sys; sys.path.insert(0, '.'); from ml.core import base"
 
   # ============================================================
   # FRONTEND CHECKS (when frontend is tracked)
