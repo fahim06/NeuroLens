@@ -1,0 +1,607 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Inference | NeuroLens{% endblock %}
+
+{% block page_title %}Inference{% endblock %}
+
+{% block header_actions %}
+<button class="btn btn-primary btn-sm" id="newInferenceBtn">
+    <i class="fa-solid fa-plus"></i>
+    <span>New Analysis</span>
+</button>
+{% endblock %}
+
+{% block content %}
+<!-- New Inference Section -->
+<div class="inference-section card" id="inferenceSection" style="display: none;">
+    <div class="card-header">
+        <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Run New Analysis</h3>
+        <button class="btn btn-ghost btn-sm" id="closeInferenceBtn">
+            <i class="fa-solid fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="card-body">
+        <form id="inferenceForm">
+            <!-- Dataset Selection -->
+            <div class="form-group">
+                <label for="datasetSelect" class="form-label">Select Dataset</label>
+                <select id="datasetSelect" name="dataset_id" class="form-input" required>
+                    <option value="">-- Select a dataset --</option>
+                </select>
+            </div>
+            
+            <!-- Model Selection -->
+            <div class="form-group">
+                <label for="modelSelect" class="form-label">AI Model</label>
+                <select id="modelSelect" name="model" class="form-input">
+                    <option value="retinal_classifier_v1">Retinal Classifier v1 (Default)</option>
+                    <option value="dr_detector_v2">Diabetic Retinopathy Detector v2</option>
+                    <option value="glaucoma_screener_v1">Glaucoma Screener v1</option>
+                </select>
+            </div>
+            
+            <!-- Optional: Single Image Upload -->
+            <div class="form-group">
+                <label class="form-label">Or Upload Single Image</label>
+                <div class="upload-area upload-area-sm" id="singleUploadArea">
+                    <div class="upload-icon-sm">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    <p class="upload-text-sm">Click or drag image here</p>
+                    <input type="file" id="singleImageInput" name="image" accept="image/*" hidden>
+                </div>
+                <div class="selected-image" id="selectedImage" style="display: none;">
+                    <img id="imagePreview" src="" alt="Preview">
+                    <button type="button" class="btn-remove" id="removeImageBtn">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="cancelInferenceBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="runInferenceBtn">
+                    <i class="fa-solid fa-play"></i> Run Analysis
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Active Processing -->
+<div class="card processing-card" id="processingCard" style="display: none;">
+    <div class="processing-header">
+        <div class="processing-spinner">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+        </div>
+        <div class="processing-info">
+            <h3 id="processingTitle">Processing Analysis...</h3>
+            <p id="processingStatus">Analyzing images with AI model</p>
+        </div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill processing" id="processingProgress" style="width: 0%;"></div>
+    </div>
+    <p class="processing-hint">
+        <i class="fa-solid fa-info-circle"></i>
+        Polling every 2 seconds for status updates
+    </p>
+</div>
+
+<!-- Results Display -->
+<div class="results-section" id="resultsSection" style="display: none;">
+    <div class="section-header">
+        <h2 class="section-title">Analysis Results</h2>
+        <button class="btn btn-outline btn-sm" id="closeResultsBtn">
+            <i class="fa-solid fa-times"></i> Close
+        </button>
+    </div>
+    
+    <div class="results-grid" id="resultsGrid">
+        <!-- Results will be inserted here -->
+    </div>
+</div>
+
+<!-- Inference History -->
+<div class="section-header">
+    <h2 class="section-title">Analysis History</h2>
+    <button class="btn btn-ghost btn-sm" id="refreshHistoryBtn" title="Refresh">
+        <i class="fa-solid fa-sync"></i>
+    </button>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="data-table" id="historyTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Dataset / Image</th>
+                    <th>Model</th>
+                    <th>Status</th>
+                    <th>Result</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                <tr>
+                    <td colspan="7" class="loading-cell">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading history...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPoller = null;
+let selectedImageFile = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Load initial data
+    loadDatasets();
+    loadHistory();
+    
+    // Check for pre-selected dataset from datasets page
+    const selectedDatasetId = sessionStorage.getItem('selectedDatasetId');
+    if (selectedDatasetId) {
+        sessionStorage.removeItem('selectedDatasetId');
+        setTimeout(() => {
+            document.getElementById('datasetSelect').value = selectedDatasetId;
+            document.getElementById('inferenceSection').style.display = 'block';
+        }, 500);
+    }
+    
+    // Toggle handlers
+    const newInferenceBtn = document.getElementById('newInferenceBtn');
+    const inferenceSection = document.getElementById('inferenceSection');
+    const closeInferenceBtn = document.getElementById('closeInferenceBtn');
+    const cancelInferenceBtn = document.getElementById('cancelInferenceBtn');
+    
+    newInferenceBtn.addEventListener('click', () => {
+        inferenceSection.style.display = 'block';
+        inferenceSection.scrollIntoView({ behavior: 'smooth' });
+    });
+    
+    closeInferenceBtn.addEventListener('click', () => {
+        inferenceSection.style.display = 'none';
+        resetInferenceForm();
+    });
+    
+    cancelInferenceBtn.addEventListener('click', () => {
+        inferenceSection.style.display = 'none';
+        resetInferenceForm();
+    });
+    
+    // Single image upload
+    const singleUploadArea = document.getElementById('singleUploadArea');
+    const singleImageInput = document.getElementById('singleImageInput');
+    const selectedImage = document.getElementById('selectedImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+    
+    singleUploadArea.addEventListener('click', () => singleImageInput.click());
+    
+    singleUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        singleUploadArea.classList.add('dragover');
+    });
+    
+    singleUploadArea.addEventListener('dragleave', () => {
+        singleUploadArea.classList.remove('dragover');
+    });
+    
+    singleUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        singleUploadArea.classList.remove('dragover');
+        if (e.dataTransfer.files[0]) {
+            handleSingleImage(e.dataTransfer.files[0]);
+        }
+    });
+    
+    singleImageInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) {
+            handleSingleImage(e.target.files[0]);
+        }
+    });
+    
+    removeImageBtn.addEventListener('click', () => {
+        selectedImageFile = null;
+        selectedImage.style.display = 'none';
+        singleUploadArea.style.display = 'flex';
+        singleImageInput.value = '';
+    });
+    
+    // Form submission
+    document.getElementById('inferenceForm').addEventListener('submit', handleInference);
+    
+    // Refresh history
+    document.getElementById('refreshHistoryBtn').addEventListener('click', loadHistory);
+    
+    // Close results
+    document.getElementById('closeResultsBtn').addEventListener('click', () => {
+        document.getElementById('resultsSection').style.display = 'none';
+    });
+});
+
+function handleSingleImage(file) {
+    if (!file.type.startsWith('image/')) {
+        NeuroLens.showToast('Please select an image file', 'warning');
+        return;
+    }
+    
+    selectedImageFile = file;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('imagePreview').src = e.target.result;
+        document.getElementById('selectedImage').style.display = 'block';
+        document.getElementById('singleUploadArea').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+function resetInferenceForm() {
+    document.getElementById('inferenceForm').reset();
+    selectedImageFile = null;
+    document.getElementById('selectedImage').style.display = 'none';
+    document.getElementById('singleUploadArea').style.display = 'flex';
+    if (currentPoller) {
+        currentPoller.stop();
+        currentPoller = null;
+    }
+}
+
+async function loadDatasets() {
+    const select = document.getElementById('datasetSelect');
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/datasets/');
+        
+        if (response && response.ok) {
+            const data = await response.json();
+            const datasets = Array.isArray(data) ? data : (data.results || []);
+            
+            select.innerHTML = '<option value="">-- Select a dataset --</option>' +
+                datasets.map(d => `<option value="${d.id}">${d.name} (${d.image_count || 0} images)</option>`).join('');
+        }
+    } catch (error) {
+        console.error('Failed to load datasets:', error);
+    }
+}
+
+async function loadHistory() {
+    const tbody = document.getElementById('historyBody');
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="7" class="loading-cell">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading history...
+            </td>
+        </tr>
+    `;
+    
+    const refreshBtn = document.getElementById('refreshHistoryBtn');
+    refreshBtn.querySelector('i').classList.add('fa-spin');
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/inferences/');
+        
+        if (response && response.ok) {
+            const data = await response.json();
+            const inferences = Array.isArray(data) ? data : (data.results || []);
+            
+            if (inferences.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <h3>No analyses yet</h3>
+                                <p>Run your first AI analysis on a dataset</p>
+                                <button class="btn btn-primary" onclick="document.getElementById('newInferenceBtn').click()">
+                                    <i class="fa-solid fa-plus"></i> New Analysis
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = inferences.map(inf => `
+                <tr>
+                    <td><code>${(inf.id || '').substring(0, 8)}...</code></td>
+                    <td>${inf.dataset_name || inf.image_name || 'Unknown'}</td>
+                    <td><span class="badge">${inf.model || 'default'}</span></td>
+                    <td>
+                        <span class="badge ${NeuroLens.getStatusClass(inf.status)}">
+                            ${inf.status === 'processing' ? '<i class="fa-solid fa-spinner fa-spin"></i> ' : ''}
+                            ${inf.status || 'unknown'}
+                        </span>
+                    </td>
+                    <td>${formatResult(inf)}</td>
+                    <td>${NeuroLens.formatDate(inf.created_at)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-ghost btn-sm" onclick="viewResults('${inf.id}')" 
+                                    title="View Results" ${inf.status !== 'completed' ? 'disabled' : ''}>
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="btn btn-ghost btn-sm" onclick="downloadResults('${inf.id}')" 
+                                    title="Download" ${inf.status !== 'completed' ? 'disabled' : ''}>
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            throw new Error('Failed to load history');
+        }
+    } catch (error) {
+        console.error('Failed to load history:', error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="error-cell">
+                    <i class="fa-solid fa-exclamation-circle"></i> 
+                    Failed to load history. <a href="#" onclick="loadHistory()">Retry</a>
+                </td>
+            </tr>
+        `;
+    } finally {
+        refreshBtn.querySelector('i').classList.remove('fa-spin');
+    }
+}
+
+function formatResult(inference) {
+    if (inference.status !== 'completed') {
+        return '-';
+    }
+    
+    if (inference.prediction || inference.result) {
+        const pred = inference.prediction || inference.result;
+        const conf = inference.confidence ? `(${(inference.confidence * 100).toFixed(1)}%)` : '';
+        return `<strong>${pred}</strong> ${conf}`;
+    }
+    
+    return 'View details';
+}
+
+async function handleInference(e) {
+    e.preventDefault();
+    
+    const datasetId = document.getElementById('datasetSelect').value;
+    const model = document.getElementById('modelSelect').value;
+    
+    if (!datasetId && !selectedImageFile) {
+        NeuroLens.showToast('Please select a dataset or upload an image', 'warning');
+        return;
+    }
+    
+    // Show processing state
+    document.getElementById('inferenceSection').style.display = 'none';
+    const processingCard = document.getElementById('processingCard');
+    processingCard.style.display = 'block';
+    processingCard.scrollIntoView({ behavior: 'smooth' });
+    
+    const runBtn = document.getElementById('runInferenceBtn');
+    runBtn.disabled = true;
+    
+    try {
+        let response;
+        
+        if (selectedImageFile) {
+            // Single image upload
+            const formData = new FormData();
+            formData.append('image', selectedImageFile);
+            formData.append('model', model);
+            response = await NeuroLens.apiUpload('/v1/inferences/', formData);
+        } else {
+            // Dataset inference
+            response = await NeuroLens.apiRequest('/v1/inferences/', {
+                method: 'POST',
+                body: JSON.stringify({
+                    dataset_id: datasetId,
+                    model: model
+                })
+            });
+        }
+        
+        if (response && response.ok) {
+            const inference = await response.json();
+            NeuroLens.showToast('Analysis started!', 'success');
+            
+            // Start polling for status (every 2 seconds as per Phase 7 spec)
+            startPolling(inference.id);
+        } else {
+            const error = await response?.json();
+            throw new Error(error?.detail || 'Failed to start analysis');
+        }
+    } catch (error) {
+        console.error('Inference error:', error);
+        NeuroLens.showToast(error.message || 'Failed to start analysis', 'error');
+        processingCard.style.display = 'none';
+        runBtn.disabled = false;
+    }
+}
+
+function startPolling(inferenceId) {
+    const progressFill = document.getElementById('processingProgress');
+    const processingStatus = document.getElementById('processingStatus');
+    let progress = 0;
+    
+    // Stop any existing poller
+    if (currentPoller) {
+        currentPoller.stop();
+    }
+    
+    currentPoller = new NeuroLens.StatusPoller(
+        // Check function
+        async () => {
+            const response = await NeuroLens.apiRequest(`/v1/inferences/${inferenceId}/`);
+            
+            if (!response || !response.ok) {
+                throw new Error('Failed to check status');
+            }
+            
+            const inference = await response.json();
+            
+            // Update UI based on status
+            if (inference.status === 'processing') {
+                progress = Math.min(progress + 5, 90);
+                progressFill.style.width = progress + '%';
+                processingStatus.textContent = inference.message || 'Processing images...';
+                return { done: false };
+            } else if (inference.status === 'completed') {
+                progressFill.style.width = '100%';
+                return { done: true, data: inference };
+            } else if (inference.status === 'failed') {
+                throw new Error(inference.error || 'Analysis failed');
+            }
+            
+            return { done: false };
+        },
+        
+        // On complete
+        (data) => {
+            document.getElementById('processingCard').style.display = 'none';
+            NeuroLens.showToast('Analysis completed!', 'success');
+            displayResults(data);
+            loadHistory();
+            resetInferenceForm();
+        },
+        
+        // On error
+        (error) => {
+            document.getElementById('processingCard').style.display = 'none';
+            NeuroLens.showToast(error.message || 'Analysis failed', 'error');
+            resetInferenceForm();
+            loadHistory();
+        }
+    );
+    
+    currentPoller.start();
+}
+
+function displayResults(inference) {
+    const resultsSection = document.getElementById('resultsSection');
+    const resultsGrid = document.getElementById('resultsGrid');
+    
+    resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    
+    // Handle different result formats
+    if (inference.results && Array.isArray(inference.results)) {
+        // Multiple image results
+        resultsGrid.innerHTML = inference.results.map(result => `
+            <div class="result-card">
+                <div class="result-image">
+                    <img src="${result.image_url || '/static/ui/images/placeholder.png'}" alt="Analyzed image">
+                </div>
+                <div class="result-content">
+                    <h4 class="result-title">${result.image_name || 'Image'}</h4>
+                    <div class="result-prediction">
+                        <span class="prediction-label">Prediction:</span>
+                        <span class="prediction-value badge ${getResultClass(result.prediction)}">
+                            ${result.prediction || 'Unknown'}
+                        </span>
+                    </div>
+                    <div class="result-confidence">
+                        <span class="confidence-label">Confidence:</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${(result.confidence || 0) * 100}%;"></div>
+                        </div>
+                        <span class="confidence-value">${((result.confidence || 0) * 100).toFixed(1)}%</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        // Single result
+        resultsGrid.innerHTML = `
+            <div class="result-card single">
+                <div class="result-icon ${getResultClass(inference.prediction)}">
+                    <i class="fa-solid ${getResultIcon(inference.prediction)}"></i>
+                </div>
+                <div class="result-content">
+                    <h3 class="result-title">Analysis Complete</h3>
+                    <div class="result-prediction">
+                        <span class="prediction-label">Classification:</span>
+                        <span class="prediction-value badge ${getResultClass(inference.prediction)}">
+                            ${inference.prediction || inference.result || 'Unknown'}
+                        </span>
+                    </div>
+                    ${inference.confidence ? `
+                    <div class="result-confidence">
+                        <span class="confidence-label">Confidence:</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${inference.confidence * 100}%;"></div>
+                        </div>
+                        <span class="confidence-value">${(inference.confidence * 100).toFixed(1)}%</span>
+                    </div>
+                    ` : ''}
+                    ${inference.explanation ? `
+                    <div class="result-explanation">
+                        <p>${inference.explanation}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+}
+
+function getResultClass(prediction) {
+    if (!prediction) return 'info';
+    const lower = prediction.toLowerCase();
+    if (lower.includes('normal') || lower.includes('healthy') || lower.includes('negative')) {
+        return 'success';
+    }
+    if (lower.includes('severe') || lower.includes('critical') || lower.includes('positive')) {
+        return 'error';
+    }
+    if (lower.includes('mild') || lower.includes('moderate')) {
+        return 'warning';
+    }
+    return 'info';
+}
+
+function getResultIcon(prediction) {
+    if (!prediction) return 'fa-question';
+    const lower = prediction.toLowerCase();
+    if (lower.includes('normal') || lower.includes('healthy') || lower.includes('negative')) {
+        return 'fa-check-circle';
+    }
+    if (lower.includes('severe') || lower.includes('critical') || lower.includes('positive')) {
+        return 'fa-exclamation-circle';
+    }
+    return 'fa-info-circle';
+}
+
+async function viewResults(id) {
+    try {
+        const response = await NeuroLens.apiRequest(`/v1/inferences/${id}/`);
+        
+        if (response && response.ok) {
+            const inference = await response.json();
+            displayResults(inference);
+        } else {
+            throw new Error('Failed to load results');
+        }
+    } catch (error) {
+        console.error('View results error:', error);
+        NeuroLens.showToast('Failed to load results', 'error');
+    }
+}
+
+function downloadResults(id) {
+    NeuroLens.showToast('Download feature coming soon', 'info');
+}
+</script>
+{% endblock %}

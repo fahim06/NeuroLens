@@ -180,16 +180,71 @@ MIT License - see [LICENSE](LICENSE)
 
 ## 📋 Django Rebuild Status
 
-| Phase | Description        | Status     |
-|-------|--------------------|------------|
-| 0     | Reset & Foundation | ✅ Complete |
-| 1     | Core Architecture  | ✅ Complete |
-| 2     | JWT Authentication | ✅ Complete |
-| 3     | Core REST APIs     | ✅ Complete |
-| 4     | ML Integration     | ✅ Complete |
-| 5     | Beta Stabilization | ✅ Complete |
-| 6     | Beta Release       | 🔄 Next    |
-| 7     | Final Release      | ⏳ Pending  |
+| Phase | Description            | Status     |
+|-------|------------------------|------------|
+| 0     | Reset & Foundation     | ✅ Complete |
+| 1     | Core Architecture      | ✅ Complete |
+| 2     | JWT Authentication     | ✅ Complete |
+| 3     | Core REST APIs         | ✅ Complete |
+| 4     | ML Integration         | ✅ Complete |
+| 5     | Beta Stabilization     | ✅ Complete |
+| 6     | Beta Release           | ✅ Complete |
+| 7     | Full Responsive UI/UX  | ✅ Complete |
+| 8     | Final Release          | ⏳ Pending  |
+
+---
+
+## 🎨 Beta UI/UX Interface (Phase 7)
+
+NeuroLens includes a fully responsive web interface for beta testing.
+
+### Features
+
+- **Animated Login Page** — Floating particles, gradient background, smooth transitions
+- **Responsive Dashboard** — Stats cards, quick actions, recent activity
+- **Dataset Management** — Drag-and-drop upload, file preview, progress tracking
+- **AI Inference** — Run analysis with 2-second polling for status updates
+- **Profile Settings** — Theme toggle, account management, API access
+
+### Design System
+
+- **Mobile-First** — Optimized for all screen sizes (320px to 1920px+)
+- **Dark/Light Mode** — User-selectable theme with persistence
+- **CSS Architecture** — Separated into 4 modular files:
+  - `base.css` — Variables, reset, typography, components
+  - `layout.css` — Page structure, sidebar, cards
+  - `animations.css` — Transitions, keyframes, effects
+  - `responsive.css` — All breakpoints, touch optimization
+
+### Access the UI
+
+```bash
+# Start the server
+python manage.py runserver
+
+# Open browser to:
+# http://localhost:8000/ui/login/
+```
+
+### Pages
+
+| Route | Description |
+|-------|-------------|
+| `/ui/login/` | Animated login with JWT auth |
+| `/ui/dashboard/` | Overview stats and quick actions |
+| `/ui/datasets/` | Upload and manage datasets |
+| `/ui/inference/` | Run AI analysis with polling |
+| `/ui/profile/` | Settings and account management |
+
+### Technology Stack
+
+- Pure HTML5 + CSS3 + Vanilla JavaScript
+- No frontend frameworks (React, Vue, etc.)
+- Django templates with `{% load static %}`
+- Font Awesome 6.4 for icons
+- LocalStorage for token management
+
+---
 
 ## Beta Readiness
 

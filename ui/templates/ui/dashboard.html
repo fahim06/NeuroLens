@@ -1,0 +1,275 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard | NeuroLens{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block header_actions %}
+<span class="badge success">Online</span>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: var(--primary);">
+            <i class="fa-solid fa-database"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value" id="datasetCount">--</span>
+            <span class="stat-label">Datasets</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: var(--success);">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value" id="inferenceCount">--</span>
+            <span class="stat-label">Inferences</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: var(--warning);">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value" id="pendingCount">--</span>
+            <span class="stat-label">Pending</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: var(--info);">
+            <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value" id="accuracyValue">--</span>
+            <span class="stat-label">Avg Accuracy</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="section-header">
+    <h2 class="section-title">Quick Actions</h2>
+</div>
+
+<div class="nav-cards">
+    <a href="{% url 'ui:datasets' %}" class="nav-card">
+        <div class="nav-card-icon">
+            <i class="fa-solid fa-folder-plus"></i>
+        </div>
+        <h3 class="nav-card-title">Upload Dataset</h3>
+        <p class="nav-card-description">Upload retinal images for analysis</p>
+    </a>
+    
+    <a href="{% url 'ui:inference' %}" class="nav-card">
+        <div class="nav-card-icon">
+            <i class="fa-solid fa-brain"></i>
+        </div>
+        <h3 class="nav-card-title">Run Analysis</h3>
+        <p class="nav-card-description">Analyze images with AI models</p>
+    </a>
+    
+    <a href="{% url 'ui:profile' %}" class="nav-card">
+        <div class="nav-card-icon">
+            <i class="fa-solid fa-user-gear"></i>
+        </div>
+        <h3 class="nav-card-title">Settings</h3>
+        <p class="nav-card-description">Manage your profile & preferences</p>
+    </a>
+</div>
+
+<!-- Recent Activity -->
+<div class="section-header">
+    <h2 class="section-title">Recent Activity</h2>
+    <a href="{% url 'ui:inference' %}" class="btn btn-outline btn-sm">View All</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="data-table" id="recentActivityTable">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="recentActivityBody">
+                <tr>
+                    <td colspan="4" class="loading-cell">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="section-header">
+    <h2 class="section-title">System Status</h2>
+</div>
+
+<div class="card">
+    <div class="system-status">
+        <div class="status-item">
+            <div class="status-indicator success"></div>
+            <span class="status-name">API Server</span>
+            <span class="status-value">Healthy</span>
+        </div>
+        <div class="status-item">
+            <div class="status-indicator success"></div>
+            <span class="status-name">ML Engine</span>
+            <span class="status-value">Ready</span>
+        </div>
+        <div class="status-item">
+            <div class="status-indicator success"></div>
+            <span class="status-name">Database</span>
+            <span class="status-value">Connected</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadDashboardData();
+});
+
+async function loadDashboardData() {
+    try {
+        // Load stats
+        const statsResponse = await NeuroLens.apiRequest('/v1/stats/dashboard/');
+        if (statsResponse && statsResponse.ok) {
+            const stats = await statsResponse.json();
+            
+            document.getElementById('datasetCount').textContent = stats.datasets || 0;
+            document.getElementById('inferenceCount').textContent = stats.inferences || 0;
+            document.getElementById('pendingCount').textContent = stats.pending || 0;
+            document.getElementById('accuracyValue').textContent = 
+                stats.avg_accuracy ? `${(stats.avg_accuracy * 100).toFixed(1)}%` : 'N/A';
+        } else {
+            // Fallback: Try loading individual counts
+            await loadIndividualStats();
+        }
+        
+        // Load recent activity
+        await loadRecentActivity();
+        
+    } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+        NeuroLens.showToast('Failed to load some data', 'warning');
+    }
+}
+
+async function loadIndividualStats() {
+    try {
+        // Try to get dataset count
+        const datasetsResp = await NeuroLens.apiRequest('/v1/datasets/');
+        if (datasetsResp && datasetsResp.ok) {
+            const data = await datasetsResp.json();
+            const count = Array.isArray(data) ? data.length : (data.count || 0);
+            document.getElementById('datasetCount').textContent = count;
+        } else {
+            document.getElementById('datasetCount').textContent = '0';
+        }
+        
+        // Try to get inference count
+        const inferenceResp = await NeuroLens.apiRequest('/v1/inferences/');
+        if (inferenceResp && inferenceResp.ok) {
+            const data = await inferenceResp.json();
+            const items = Array.isArray(data) ? data : (data.results || []);
+            const count = items.length || data.count || 0;
+            const pending = items.filter(i => i.status === 'pending' || i.status === 'processing').length;
+            
+            document.getElementById('inferenceCount').textContent = count;
+            document.getElementById('pendingCount').textContent = pending;
+        } else {
+            document.getElementById('inferenceCount').textContent = '0';
+            document.getElementById('pendingCount').textContent = '0';
+        }
+        
+        document.getElementById('accuracyValue').textContent = 'N/A';
+        
+    } catch (error) {
+        console.error('Failed to load individual stats:', error);
+        document.getElementById('datasetCount').textContent = '0';
+        document.getElementById('inferenceCount').textContent = '0';
+        document.getElementById('pendingCount').textContent = '0';
+        document.getElementById('accuracyValue').textContent = 'N/A';
+    }
+}
+
+async function loadRecentActivity() {
+    const tbody = document.getElementById('recentActivityBody');
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/inferences/?limit=5');
+        
+        if (response && response.ok) {
+            const data = await response.json();
+            const items = Array.isArray(data) ? data : (data.results || []);
+            
+            if (items.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-cell">
+                            <div class="empty-state-inline">
+                                <i class="fa-solid fa-inbox"></i>
+                                <span>No recent activity</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = items.slice(0, 5).map(item => `
+                <tr>
+                    <td>
+                        <span class="badge info">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Inference
+                        </span>
+                    </td>
+                    <td>${item.name || item.id || 'Unnamed'}</td>
+                    <td>
+                        <span class="badge ${NeuroLens.getStatusClass(item.status)}">
+                            ${item.status || 'unknown'}
+                        </span>
+                    </td>
+                    <td>${NeuroLens.formatDate(item.created_at)}</td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="empty-cell">
+                        <div class="empty-state-inline">
+                            <i class="fa-solid fa-inbox"></i>
+                            <span>No recent activity</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    } catch (error) {
+        console.error('Failed to load recent activity:', error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="error-cell">
+                    <i class="fa-solid fa-exclamation-circle"></i> Failed to load
+                </td>
+            </tr>
+        `;
+    }
+}
+</script>
+{% endblock %}

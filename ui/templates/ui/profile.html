@@ -1,0 +1,543 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Profile | NeuroLens{% endblock %}
+
+{% block page_title %}Profile & Settings{% endblock %}
+
+{% block content %}
+<div class="profile-layout">
+    <!-- Profile Card -->
+    <div class="card profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">U</div>
+            <div class="profile-info">
+                <h2 class="profile-name" id="profileName">User</h2>
+                <span class="profile-role badge info" id="profileRole">Beta User</span>
+            </div>
+        </div>
+        
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <span class="stat-value" id="totalDatasets">--</span>
+                <span class="stat-label">Datasets</span>
+            </div>
+            <div class="profile-stat">
+                <span class="stat-value" id="totalInferences">--</span>
+                <span class="stat-label">Analyses</span>
+            </div>
+            <div class="profile-stat">
+                <span class="stat-value" id="memberSince">--</span>
+                <span class="stat-label">Member Since</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Sections -->
+    <div class="settings-sections">
+        <!-- Account Settings -->
+        <div class="card settings-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-user-gear"></i> Account Settings</h3>
+            </div>
+            <div class="card-body">
+                <form id="accountForm">
+                    <div class="form-group">
+                        <label for="usernameField" class="form-label">Username</label>
+                        <input type="text" id="usernameField" class="form-input" disabled>
+                        <span class="form-hint">Username cannot be changed</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emailField" class="form-label">Email</label>
+                        <input type="email" id="emailField" class="form-input" placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullNameField" class="form-label">Full Name</label>
+                        <input type="text" id="fullNameField" class="form-input" placeholder="Enter your full name">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Password Change -->
+        <div class="card settings-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-key"></i> Change Password</h3>
+            </div>
+            <div class="card-body">
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" id="currentPassword" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" id="newPassword" class="form-input" required minlength="8">
+                        <span class="form-hint">Minimum 8 characters</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-lock"></i> Update Password
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Appearance Settings -->
+        <div class="card settings-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-palette"></i> Appearance</h3>
+            </div>
+            <div class="card-body">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Dark Mode</h4>
+                        <p>Switch between light and dark themes</p>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Compact View</h4>
+                        <p>Reduce spacing for more content</p>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="compactViewToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notifications -->
+        <div class="card settings-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
+            </div>
+            <div class="card-body">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Analysis Complete</h4>
+                        <p>Notify when inference analysis is done</p>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="analysisNotifyToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Error Alerts</h4>
+                        <p>Show notifications for errors</p>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="errorNotifyToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- API Keys (for advanced users) -->
+        <div class="card settings-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-key"></i> API Access</h3>
+            </div>
+            <div class="card-body">
+                <div class="api-token-section">
+                    <p class="section-description">
+                        Generate an API token to access NeuroLens programmatically.
+                    </p>
+                    
+                    <div class="form-group">
+                        <label for="apiToken" class="form-label">API Token</label>
+                        <div class="input-with-button">
+                            <input type="password" id="apiToken" class="form-input" readonly 
+                                   value="••••••••••••••••••••••••••••••••">
+                            <button type="button" class="btn btn-ghost" id="toggleTokenBtn" title="Show/Hide">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-ghost" id="copyTokenBtn" title="Copy">
+                                <i class="fa-solid fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline" id="regenerateTokenBtn">
+                        <i class="fa-solid fa-rotate"></i> Regenerate Token
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div class="card settings-card danger-zone">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h3>
+            </div>
+            <div class="card-body">
+                <div class="danger-item">
+                    <div class="danger-info">
+                        <h4>Delete All Data</h4>
+                        <p>Permanently delete all your datasets and inference results</p>
+                    </div>
+                    <button type="button" class="btn btn-danger" id="deleteDataBtn">
+                        <i class="fa-solid fa-trash"></i> Delete All Data
+                    </button>
+                </div>
+                
+                <div class="danger-item">
+                    <div class="danger-info">
+                        <h4>Delete Account</h4>
+                        <p>Permanently delete your account and all associated data</p>
+                    </div>
+                    <button type="button" class="btn btn-danger" id="deleteAccountBtn">
+                        <i class="fa-solid fa-user-xmark"></i> Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadProfile();
+    initSettings();
+    
+    // Account form submission
+    document.getElementById('accountForm').addEventListener('submit', handleAccountUpdate);
+    
+    // Password form submission
+    document.getElementById('passwordForm').addEventListener('submit', handlePasswordChange);
+    
+    // Dark mode toggle
+    document.getElementById('darkModeToggle').addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+        }
+        updateThemeIcon(localStorage.getItem('theme'));
+    });
+    
+    // Token actions
+    document.getElementById('toggleTokenBtn').addEventListener('click', toggleToken);
+    document.getElementById('copyTokenBtn').addEventListener('click', copyToken);
+    document.getElementById('regenerateTokenBtn').addEventListener('click', regenerateToken);
+    
+    // Danger zone actions
+    document.getElementById('deleteDataBtn').addEventListener('click', handleDeleteData);
+    document.getElementById('deleteAccountBtn').addEventListener('click', handleDeleteAccount);
+});
+
+async function loadProfile() {
+    const userData = NeuroLens.UserManager.getData();
+    
+    if (userData) {
+        updateProfileUI(userData);
+    }
+    
+    try {
+        // Try to fetch fresh profile data
+        const response = await NeuroLens.apiRequest('/v1/auth/profile/');
+        
+        if (response && response.ok) {
+            const profile = await response.json();
+            NeuroLens.UserManager.setData(profile);
+            updateProfileUI(profile);
+        }
+        
+        // Load stats
+        await loadProfileStats();
+        
+    } catch (error) {
+        console.error('Failed to load profile:', error);
+    }
+}
+
+function updateProfileUI(data) {
+    document.getElementById('profileAvatar').textContent = 
+        (data.username || 'U').charAt(0).toUpperCase();
+    document.getElementById('profileName').textContent = 
+        data.full_name || data.username || 'User';
+    document.getElementById('profileRole').textContent = 
+        data.role || 'Beta User';
+    
+    document.getElementById('usernameField').value = data.username || '';
+    document.getElementById('emailField').value = data.email || '';
+    document.getElementById('fullNameField').value = data.full_name || '';
+    
+    if (data.date_joined) {
+        const date = new Date(data.date_joined);
+        document.getElementById('memberSince').textContent = 
+            date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+}
+
+async function loadProfileStats() {
+    try {
+        // Load dataset count
+        const datasetsResp = await NeuroLens.apiRequest('/v1/datasets/');
+        if (datasetsResp && datasetsResp.ok) {
+            const data = await datasetsResp.json();
+            const count = Array.isArray(data) ? data.length : (data.count || 0);
+            document.getElementById('totalDatasets').textContent = count;
+        } else {
+            document.getElementById('totalDatasets').textContent = '0';
+        }
+        
+        // Load inference count
+        const inferencesResp = await NeuroLens.apiRequest('/v1/inferences/');
+        if (inferencesResp && inferencesResp.ok) {
+            const data = await inferencesResp.json();
+            const count = Array.isArray(data) ? data.length : (data.count || 0);
+            document.getElementById('totalInferences').textContent = count;
+        } else {
+            document.getElementById('totalInferences').textContent = '0';
+        }
+    } catch (error) {
+        console.error('Failed to load stats:', error);
+    }
+}
+
+function initSettings() {
+    // Initialize dark mode toggle based on current theme
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    document.getElementById('darkModeToggle').checked = currentTheme === 'dark';
+    
+    // Load saved settings from localStorage
+    const compactView = localStorage.getItem('compactView') === 'true';
+    document.getElementById('compactViewToggle').checked = compactView;
+    if (compactView) {
+        document.body.classList.add('compact');
+    }
+    
+    document.getElementById('compactViewToggle').addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.body.classList.add('compact');
+            localStorage.setItem('compactView', 'true');
+        } else {
+            document.body.classList.remove('compact');
+            localStorage.setItem('compactView', 'false');
+        }
+    });
+}
+
+async function handleAccountUpdate(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('emailField').value.trim();
+    const fullName = document.getElementById('fullNameField').value.trim();
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/auth/profile/', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                email: email,
+                full_name: fullName
+            })
+        });
+        
+        if (response && response.ok) {
+            const data = await response.json();
+            NeuroLens.UserManager.setData(data);
+            NeuroLens.showToast('Profile updated successfully', 'success');
+        } else {
+            const error = await response?.json();
+            throw new Error(error?.detail || 'Update failed');
+        }
+    } catch (error) {
+        console.error('Update error:', error);
+        NeuroLens.showToast(error.message || 'Failed to update profile', 'error');
+    }
+}
+
+async function handlePasswordChange(e) {
+    e.preventDefault();
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (newPassword !== confirmPassword) {
+        NeuroLens.showToast('Passwords do not match', 'warning');
+        return;
+    }
+    
+    if (newPassword.length < 8) {
+        NeuroLens.showToast('Password must be at least 8 characters', 'warning');
+        return;
+    }
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/auth/password/', {
+            method: 'POST',
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        });
+        
+        if (response && response.ok) {
+            NeuroLens.showToast('Password updated successfully', 'success');
+            document.getElementById('passwordForm').reset();
+        } else {
+            const error = await response?.json();
+            throw new Error(error?.detail || 'Password change failed');
+        }
+    } catch (error) {
+        console.error('Password change error:', error);
+        NeuroLens.showToast(error.message || 'Failed to change password', 'error');
+    }
+}
+
+function toggleToken() {
+    const tokenInput = document.getElementById('apiToken');
+    const toggleBtn = document.getElementById('toggleTokenBtn');
+    
+    if (tokenInput.type === 'password') {
+        tokenInput.type = 'text';
+        tokenInput.value = NeuroLens.TokenManager.getAccess() || 'No token available';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+    } else {
+        tokenInput.type = 'password';
+        tokenInput.value = '••••••••••••••••••••••••••••••••';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    }
+}
+
+function copyToken() {
+    const token = NeuroLens.TokenManager.getAccess();
+    if (token) {
+        navigator.clipboard.writeText(token).then(() => {
+            NeuroLens.showToast('Token copied to clipboard', 'success');
+        }).catch(() => {
+            NeuroLens.showToast('Failed to copy token', 'error');
+        });
+    } else {
+        NeuroLens.showToast('No token available', 'warning');
+    }
+}
+
+async function regenerateToken() {
+    if (!confirm('Regenerating your token will invalidate the current one. Continue?')) {
+        return;
+    }
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/auth/token/refresh/', {
+            method: 'POST',
+            body: JSON.stringify({
+                refresh: NeuroLens.TokenManager.getRefresh()
+            })
+        });
+        
+        if (response && response.ok) {
+            const data = await response.json();
+            NeuroLens.TokenManager.setTokens(data.access, data.refresh);
+            NeuroLens.showToast('Token regenerated successfully', 'success');
+        } else {
+            throw new Error('Failed to regenerate token');
+        }
+    } catch (error) {
+        console.error('Token regeneration error:', error);
+        NeuroLens.showToast('Failed to regenerate token', 'error');
+    }
+}
+
+async function handleDeleteData() {
+    if (!confirm('Are you sure you want to delete ALL your data? This cannot be undone.')) {
+        return;
+    }
+    
+    if (!confirm('This will permanently delete all your datasets and inference results. Type "DELETE" in the next prompt to confirm.')) {
+        return;
+    }
+    
+    const confirmation = prompt('Type "DELETE" to confirm:');
+    if (confirmation !== 'DELETE') {
+        NeuroLens.showToast('Deletion cancelled', 'info');
+        return;
+    }
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/user/data/', {
+            method: 'DELETE'
+        });
+        
+        if (response && (response.ok || response.status === 204)) {
+            NeuroLens.showToast('All data deleted successfully', 'success');
+            await loadProfileStats();
+        } else {
+            throw new Error('Failed to delete data');
+        }
+    } catch (error) {
+        console.error('Delete data error:', error);
+        NeuroLens.showToast('Failed to delete data', 'error');
+    }
+}
+
+async function handleDeleteAccount() {
+    if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
+        return;
+    }
+    
+    const confirmation = prompt('Type your username to confirm account deletion:');
+    const userData = NeuroLens.UserManager.getData();
+    
+    if (confirmation !== userData?.username) {
+        NeuroLens.showToast('Username does not match. Deletion cancelled.', 'warning');
+        return;
+    }
+    
+    try {
+        const response = await NeuroLens.apiRequest('/v1/auth/account/', {
+            method: 'DELETE'
+        });
+        
+        if (response && (response.ok || response.status === 204)) {
+            NeuroLens.showToast('Account deleted. Redirecting...', 'success');
+            NeuroLens.TokenManager.clearTokens();
+            setTimeout(() => {
+                window.location.href = '/ui/login/';
+            }, 1500);
+        } else {
+            throw new Error('Failed to delete account');
+        }
+    } catch (error) {
+        console.error('Delete account error:', error);
+        NeuroLens.showToast('Failed to delete account', 'error');
+    }
+}
+</script>
+{% endblock %}
