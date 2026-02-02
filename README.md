@@ -185,6 +185,12 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 Django REST backend initialized.
 Phase 1 complete: Core architecture & health API.
 
+## Security Status
+
+JWT authentication enabled.
+Role-based API access enforced.
+Phase 2 complete.
+
 ---
 
 <div align="center">
@@ -200,4 +206,4 @@ Phase 1 complete: Core architecture & health API.
 ## Project Status
 
 Django REST rebuild in progress.  
-Current phase: **Phase 0 — Foundation**
+Current phase: **Phase 2 — Authentication & Security**
