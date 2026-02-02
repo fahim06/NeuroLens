@@ -1,22 +1,15 @@
 # NeuroLens — AI-Powered Image Classification
 
-*Deep learning–based image classifier*
-
-<p align="center">
-  <img src="assets/logo.png" alt="NeuroLens Logo" width="180"/>
-</p>
+*Deep learning–based image classifier with Django REST API*
 
 <p align="center">
   AI-powered image classification using convolutional neural networks
 </p>
 
 <p align="center">
-  <a href="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml">
-    <img src="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml/badge.svg" />
-  </a>
-  <img src="https://img.shields.io/badge/version-3.0.0--dev.1-blue" />
-  <img src="https://img.shields.io/badge/python-3.10 | 3.11-green" />
-  <img src="https://img.shields.io/badge/framework-FastAPI | React-purple" />
+  <img src="https://img.shields.io/badge/version-4.0.0--alpha-blue" />
+  <img src="https://img.shields.io/badge/python-3.12-green" />
+  <img src="https://img.shields.io/badge/framework-Django 6.0 | DRF-purple" />
   <img src="https://img.shields.io/badge/license-MIT-orange" />
 </p>
 
@@ -24,192 +17,165 @@
 
 ## 🎯 Overview
 
-NeuroLens is a production-ready AI platform for medical image analysis, featuring:
+NeuroLens is an AI platform for image classification, featuring:
 
-- **FastAPI Backend** — High-performance async API with comprehensive security
-- **React Frontend** — Modern, responsive user interface
-- **ML Pipeline** — Transfer learning–based models with automated training
-- **MLOps Automation** — CI/CD, model registry, validation gates
-- **Enterprise Security** — RBAC, JWT auth, audit logging, compliance readiness
+- **Django REST Backend** — Production-ready API with DRF
+- **JWT Authentication** — Secure token-based auth with roles
+- **ML Integration** — TensorFlow-based CNN with service isolation
+- **Role-Based Access** — Admin, Beta User, and Viewer roles
+- **Clean Architecture** — Service layer pattern for ML isolation
 
 ## 🏗️ Architecture
 
 ```
 neurolens/
-├── backend/           # FastAPI application
-│   ├── app/
-│   │   ├── api/       # REST API endpoints (v1)
-│   │   ├── core/      # Security, config, logging
-│   │   ├── models/    # Database models
-│   │   ├── services/  # Business logic
-│   │   └── schemas/   # Pydantic schemas
-│   └── tests/
-├── frontend/          # React application
-│   └── src/
-├── ml/                # Machine learning core
-│   ├── core/          # Interfaces, schemas, registry
-│   ├── training/      # Trainers, augmentations, configs
-│   ├── inference/     # Engine, batching, explainability
-│   ├── pipelines/     # Train, evaluate, infer workflows
-│   └── ops/           # Validation gates, retraining triggers
-├── infra/             # Infrastructure
-│   ├── docker/        # Dockerfiles
-│   ├── compose/       # Docker Compose configs
-│   ├── observability/ # Metrics, tracing, logging
-│   ├── dashboards/    # Grafana dashboards
-│   └── alerts/        # Prometheus alert rules
-├── docs/              # Documentation
-└── tests/             # Integration tests
+├── core/              # Health checks, base utilities
+├── users/             # User profiles, roles, permissions
+├── datasets/          # Dataset management
+├── inference/         # Prediction API, service layer
+├── ml/                # ML runtime (isolated from Django)
+│   └── runtime/       # Model loader, predictor engine
+├── neurolens/         # Django settings
+├── assets/            # Model weights, static files
+└── envs/              # Conda environment files
 ```
 
 ## ⚙️ Quick Start
 
 ### Prerequisites
 
-- Python 3.11+
-- Conda (recommended for environment management)
-- Node.js 18+ (for frontend)
+- Python 3.12+
+- Conda (for environment management)
 
 ### Environment Setup
 
 ```bash
-# Clone the repository
+# Clone and checkout rebuild branch
 git clone https://github.com/fahim06/NeuroLens.git
 cd NeuroLens
+git checkout django-rebuild
 
-# Create and activate conda environment
-conda env create -f envs/neurolens-dev.yml
-conda activate neurolens-dev
+# Create Django environment
+conda env create -f envs/neurolens-django.yml
+conda activate neurolens-django
 
-# Install Python dependencies
-pip install -e .
+# Run migrations
+python manage.py migrate
 
-# Start the backend
-cd backend
-uvicorn app.main:app --reload
+# Create superuser
+python manage.py createsuperuser
 
-# In another terminal, start the frontend
-cd frontend
-npm install
-npm run dev
+# Start the server
+python manage.py runserver
 ```
 
-## 📦 Components
+### ML Environment (Optional)
 
-### Backend API
+For real ML inference (not mock mode):
 
-| Endpoint Group      | Description                       |
-|---------------------|-----------------------------------|
-| `/api/v1/auth`      | Authentication & token management |
-| `/api/v1/users`     | User management                   |
-| `/api/v1/orgs`      | Organization management           |
-| `/api/v1/models`    | Model registry & versioning       |
-| `/api/v1/datasets`  | Dataset management                |
-| `/api/v1/inference` | Prediction endpoints              |
-| `/api/v1/health`    | Health checks & readiness         |
+```bash
+# Create ML environment with TensorFlow
+conda env create -f envs/neurolens-ml.yml
+conda activate neurolens-ml
 
-### ML Pipeline
+# Test model loading
+python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.health_check())"
+```
 
-- **Training**: Keras-based trainers with augmentation pipelines
-- **Inference**: Batched processing with confidence calibration
-- **Explainability**: GradCAM visualizations
-- **Model Registry**: Version control with validation gates
+## 📡 API Endpoints
 
-### Security Features
+### Authentication
 
-- PBKDF2-SHA256 password hashing (100k iterations)
-- JWT tokens with JTI for revocation
-- Role-based access control (RBAC)
-- Rate limiting (sliding window + token bucket)
-- Input validation (SQL injection, XSS, path traversal)
-- Audit logging with tamper detection
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/token/` | POST | Get JWT access/refresh tokens |
+| `/api/auth/token/refresh/` | POST | Refresh access token |
+
+### Health Checks
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/health/` | GET | System health check |
+| `/api/inference/health/` | GET | ML predictor health |
+
+### Datasets
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/api/datasets/` | GET | JWT | List user datasets |
+| `/api/datasets/` | POST | JWT | Create dataset |
+| `/api/datasets/<id>/` | GET | JWT | Get dataset details |
+| `/api/datasets/<id>/` | DELETE | JWT | Delete dataset |
+
+### Inference
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/api/inference/predict/` | POST | JWT | Run prediction |
+| `/api/inference/history/` | GET | JWT | View prediction history |
+
+### Example Prediction Request
+
+```bash
+curl -X POST http://localhost:8000/api/inference/predict/ \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"image_data": "<base64_encoded_image>"}'
+```
+
+## 🔐 Roles & Permissions
+
+| Role | Permissions |
+|------|-------------|
+| `admin` | Full access to all resources |
+| `beta_user` | Access to beta features, own datasets |
+| `viewer` | Read-only access to own datasets |
+
+## 📦 Conda Environments
+
+| Environment | Purpose |
+|-------------|---------|
+| `neurolens-django` | Django API runtime |
+| `neurolens-ml` | ML inference with TensorFlow |
+| `neurolens-dev` | Development tools (pytest, ruff) |
 
 ## 🧪 Testing
 
 ```bash
-# Run all tests
-pytest tests/
+# Run Django tests
+conda activate neurolens-django
+python manage.py test
 
-# Run security tests
-python tests/test_security_standalone.py
-
-# Run with coverage
-pytest --cov=backend tests/
+# Run ML tests
+conda activate neurolens-ml
+python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.health_check())"
 ```
 
-## 📊 Observability
+## 📄 License
 
-- **Metrics**: Prometheus-compatible metrics
-- **Tracing**: OpenTelemetry integration
-- **Logging**: Structured JSON logging
-- **Dashboards**: Grafana dashboards included
-- **Alerts**: SLO-based alerting rules
-
-## 📋 Development Status
-
-| Phase | Component             | Status     |
-|-------|-----------------------|------------|
-| 1     | Platform Core         | ✅ Complete |
-| 2     | Backend API           | ✅ Complete |
-| 3     | Frontend React        | ✅ Complete |
-| 4     | ML Core               | ✅ Complete |
-| 5     | Training System       | ✅ Complete |
-| 6     | Inference System      | ✅ Complete |
-| 7     | Data Pipeline         | ✅ Complete |
-| 8     | MLOps Automation      | ✅ Complete |
-| 9     | Product Layer         | ✅ Complete |
-| 10    | Monitoring & Scaling  | ✅ Complete |
-| 11    | Security & Compliance | ✅ Complete |
-| 12    | Dev Release           | ✅ Complete |
-
-## 📄 Documentation
-
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [API Design Guide](docs/API_DESIGN.md)
-- [ML Contracts](docs/ML_CONTRACTS.md)
-- [Compliance & Security](docs/COMPLIANCE.md)
-- [Scaling Guide](docs/SCALING.md)
-
-## 🔒 Security
-
-For security issues, please see [SECURITY.md](SECURITY.md).
-
-## 📝 License
-
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
-## Backend Status
+## 📋 Django Rebuild Status
 
-Django REST backend initialized.
-Phase 1 complete: Core architecture & health API.
-
-## Security Status
-
-JWT authentication enabled.
-Role-based API access enforced.
-Phase 2 complete.
-
-## API Status
-
-Core REST APIs implemented.
-Inference endpoint stubbed via service layer.
-Phase 3 complete.
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 0 | Reset & Foundation | ✅ Complete |
+| 1 | Core Architecture | ✅ Complete |
+| 2 | JWT Authentication | ✅ Complete |
+| 3 | Core REST APIs | ✅ Complete |
+| 4 | ML Integration | ✅ Complete |
+| 5 | Beta Stabilization | 🔄 Next |
+| 6 | Beta Release | ⏳ Pending |
+| 7 | Final Release | ⏳ Pending |
 
 ---
 
 <div align="center">
 
-**NeuroLens v3.0.0-dev.1** — Pre-Production Release
+**NeuroLens v4.0.0-alpha** — Django REST Rebuild
 
 *Built for reliability, scalability, and security*
 
 </div>
-
----
-
-## Project Status
-
-Django REST rebuild in progress.  
-Current phase: **Phase 3 — Core REST APIs**

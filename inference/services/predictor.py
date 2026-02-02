@@ -2,29 +2,55 @@
 Predictor Service — ML Inference Interface
 
 This service provides the interface for ML predictions.
-Currently returns mocked data. Will be replaced with real ML
-integration in Phase 4.
+It bridges the Django API layer with the ML runtime.
 
-IMPORTANT: This file should contain NO TensorFlow/ML imports.
-All ML code will be injected via dependency injection later.
+IMPORTANT: This file should contain NO TensorFlow/ML imports directly.
+All ML code is accessed through the ml.runtime module.
 """
-import random
+import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, Dict
+import random
+
+logger = logging.getLogger(__name__)
 
 
 class PredictorService:
     """
     Service class for handling prediction requests.
     Abstracts ML implementation from API layer.
+    
+    This service acts as a bridge between Django views and the ML runtime.
+    It handles errors gracefully to ensure API stability.
     """
     
     def __init__(self):
         """Initialize the predictor service."""
-        self._model_loaded = False
-        self._model_name = "mock_model_v1"
+        self._ml_predictor = None
+        self._ml_available = False
+        self._init_error = None
+        self._initialize_ml()
     
-    def predict(self, payload: dict) -> dict:
+    def _initialize_ml(self):
+        """
+        Attempt to initialize the ML runtime.
+        Falls back to mock mode if ML is not available.
+        """
+        try:
+            from ml.runtime import ml_predictor
+            self._ml_predictor = ml_predictor
+            self._ml_available = True
+            logger.info("ML runtime initialized successfully")
+        except ImportError as e:
+            self._init_error = f"ML runtime not available: {e}"
+            logger.warning(self._init_error)
+            self._ml_available = False
+        except Exception as e:
+            self._init_error = f"ML initialization failed: {e}"
+            logger.error(self._init_error)
+            self._ml_available = False
+    
+    def predict(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Execute a prediction based on the input payload.
         
@@ -39,59 +65,63 @@ class PredictorService:
         if not payload:
             raise ValueError("Empty payload provided")
         
-        # Mock prediction logic (to be replaced in Phase 4)
-        prediction_result = self._mock_predict(payload)
+        # Try ML prediction if available
+        if self._ml_available and self._ml_predictor:
+            try:
+                result = self._ml_predictor.predict(payload)
+                return result
+            except Exception as e:
+                logger.error(f"ML prediction failed, falling back to mock: {e}")
+                # Fall through to mock prediction
+        
+        # Fallback to mock prediction
+        return self._mock_predict(payload)
+    
+    def _mock_predict(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate mock prediction results.
+        Used when ML runtime is not available.
+        """
+        main_confidence = random.uniform(0.75, 0.98)
         
         return {
             "success": True,
-            "model": self._model_name,
-            "prediction": prediction_result,
+            "model": "mock_model_v1",
+            "prediction": {
+                "predicted_class": "healthy",
+                "confidence": round(main_confidence, 4),
+                "all_classes": [
+                    {"label": "healthy", "confidence": round(main_confidence, 4)},
+                    {"label": "abnormal", "confidence": round(1 - main_confidence, 4)}
+                ]
+            },
             "timestamp": datetime.utcnow().isoformat(),
             "metadata": {
                 "model_version": "1.0.0-mock",
                 "inference_time_ms": random.randint(50, 200),
-                "is_mock": True
+                "is_mock": True,
+                "reason": self._init_error or "ML runtime not initialized"
             }
         }
     
-    def _mock_predict(self, payload: dict) -> dict:
-        """
-        Generate mock prediction results.
-        
-        This method will be replaced with actual ML inference
-        when TensorFlow is integrated in Phase 4.
-        """
-        # Mock class predictions for image classification
-        classes = [
-            {"label": "healthy", "confidence": 0.85},
-            {"label": "abnormal", "confidence": 0.12},
-            {"label": "uncertain", "confidence": 0.03}
-        ]
-        
-        # Add some randomness to make it realistic
-        main_confidence = random.uniform(0.75, 0.98)
-        classes[0]["confidence"] = round(main_confidence, 4)
-        classes[1]["confidence"] = round((1 - main_confidence) * 0.8, 4)
-        classes[2]["confidence"] = round((1 - main_confidence) * 0.2, 4)
-        
-        return {
-            "predicted_class": classes[0]["label"],
-            "confidence": classes[0]["confidence"],
-            "all_classes": classes
-        }
-    
-    def health_check(self) -> dict:
+    def health_check(self) -> Dict[str, Any]:
         """
         Check if the predictor service is healthy.
         
         Returns:
             Dictionary with service health status.
         """
+        if self._ml_available and self._ml_predictor:
+            try:
+                return self._ml_predictor.health_check()
+            except Exception as e:
+                logger.error(f"ML health check failed: {e}")
+        
         return {
-            "status": "healthy",
-            "model_loaded": self._model_loaded,
-            "model_name": self._model_name,
-            "is_mock": True
+            "status": "degraded" if self._init_error else "healthy",
+            "model_loaded": False,
+            "is_mock": True,
+            "error": self._init_error
         }
 
 
