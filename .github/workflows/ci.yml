@@ -40,8 +40,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          environment-file: envs/neurolens-dev.yml
-          activate-environment: neurolens-dev
+          environment-file: envs/neurolens-api.yml
+          activate-environment: neurolens-api
+      - name: Install Test Dependencies
+        shell: bash -el {0}
+        run: pip install pytest pytest-asyncio httpx
       - name: Run Tests
         shell: bash -el {0}
         run: python -m pytest tests/ -v --ignore=tests/__pycache__
