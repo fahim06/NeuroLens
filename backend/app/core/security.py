@@ -1,22 +1,43 @@
 """
 NeuroLens Security Module
 
-Security utilities and configurations.
-
-Rules:
-- No hardcoded secrets
-- All secrets from environment
-- Prepare for JWT auth (Phase 2 stub, implementation in later phases)
+Security utilities for authentication and authorization.
+JWT-based auth with password hashing.
 """
 
 from datetime import datetime, timedelta, timezone
 from typing import Any
+import hashlib
+import secrets
+
+from jose import jwt, JWTError
 
 from app.core.config import settings
 
 
 # =============================================================================
-# JWT Configuration (Stub - Full implementation in Phase 9: Security)
+# Password Hashing (using hashlib for compatibility)
+# =============================================================================
+
+def hash_password(password: str) -> str:
+    """Hash a password using SHA256 with salt."""
+    salt = secrets.token_hex(16)
+    password_hash = hashlib.sha256((password + salt).encode()).hexdigest()
+    return f"{salt}${password_hash}"
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against its hash."""
+    try:
+        salt, stored_hash = hashed_password.split("$")
+        password_hash = hashlib.sha256((plain_password + salt).encode()).hexdigest()
+        return password_hash == stored_hash
+    except (ValueError, AttributeError):
+        return False
+
+
+# =============================================================================
+# JWT Token Management
 # =============================================================================
 
 JWT_SECRET_KEY = settings.secret_key
@@ -31,9 +52,6 @@ def create_access_token(
     """
     Create a JWT access token.
     
-    Stub implementation for Phase 2.
-    Full implementation with jose/jwt in Phase 9.
-    
     Args:
         data: Payload data to encode
         expires_delta: Optional custom expiration time
@@ -41,21 +59,43 @@ def create_access_token(
     Returns:
         str: Encoded JWT token
     """
-    # TODO Phase 9: Implement with python-jose
-    # from jose import jwt
-    # to_encode = data.copy()
-    # expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=JWT_EXPIRE_MINUTES))
-    # to_encode.update({"exp": expire})
-    # return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-    raise NotImplementedError("JWT authentication not yet implemented. See Phase 9.")
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=JWT_EXPIRE_MINUTES))
+    to_encode.update({
+        "exp": expire,
+        "iat": datetime.now(timezone.utc),
+        "type": "access",
+    })
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+
+def create_refresh_token(
+    data: dict[str, Any],
+    expires_delta: timedelta | None = None,
+) -> str:
+    """
+    Create a JWT refresh token.
+    
+    Args:
+        data: Payload data to encode
+        expires_delta: Optional custom expiration time (default 7 days)
+    
+    Returns:
+        str: Encoded JWT refresh token
+    """
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(days=7))
+    to_encode.update({
+        "exp": expire,
+        "iat": datetime.now(timezone.utc),
+        "type": "refresh",
+    })
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
 def verify_token(token: str) -> dict[str, Any] | None:
     """
     Verify and decode a JWT token.
-    
-    Stub implementation for Phase 2.
-    Full implementation in Phase 9.
     
     Args:
         token: JWT token to verify
@@ -63,76 +103,48 @@ def verify_token(token: str) -> dict[str, Any] | None:
     Returns:
         dict | None: Decoded payload or None if invalid
     """
-    # TODO Phase 9: Implement with python-jose
-    # from jose import jwt, JWTError
-    # try:
-    #     payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-    #     return payload
-    # except JWTError:
-    #     return None
-    raise NotImplementedError("JWT verification not yet implemented. See Phase 9.")
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        return payload
+    except JWTError:
+        return None
 
 
-# =============================================================================
-# Password Hashing (Stub - Full implementation in Phase 9)
-# =============================================================================
-
-
-def hash_password(password: str) -> str:
+def decode_token(token: str) -> dict[str, Any]:
     """
-    Hash a password using bcrypt.
-    
-    Stub implementation for Phase 2.
+    Decode a JWT token without verification (for debugging).
     
     Args:
-        password: Plain text password
+        token: JWT token to decode
     
     Returns:
-        str: Hashed password
-    """
-    # TODO Phase 9: Implement with passlib
-    # from passlib.context import CryptContext
-    # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    # return pwd_context.hash(password)
-    raise NotImplementedError("Password hashing not yet implemented. See Phase 9.")
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Verify a password against its hash.
+        dict: Decoded payload
     
-    Stub implementation for Phase 2.
-    
-    Args:
-        plain_password: Plain text password to verify
-        hashed_password: Stored hash to compare against
-    
-    Returns:
-        bool: True if password matches
+    Raises:
+        JWTError: If token is invalid
     """
-    # TODO Phase 9: Implement with passlib
-    # from passlib.context import CryptContext
-    # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    # return pwd_context.verify(plain_password, hashed_password)
-    raise NotImplementedError("Password verification not yet implemented. See Phase 9.")
+    return jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
 
 # =============================================================================
-# API Key Validation (Stub - Full implementation in Phase 9)
+# API Key Validation
 # =============================================================================
+
+
+def generate_api_key() -> str:
+    """Generate a new API key."""
+    import secrets
+    return f"nl_{secrets.token_urlsafe(32)}"
 
 
 def validate_api_key(api_key: str) -> bool:
     """
-    Validate an API key.
-    
-    Stub implementation for Phase 2.
+    Validate an API key format.
     
     Args:
         api_key: API key to validate
     
     Returns:
-        bool: True if valid
+        bool: True if valid format
     """
-    # TODO Phase 9: Implement API key validation
-    raise NotImplementedError("API key validation not yet implemented. See Phase 9.")
+    return api_key.startswith("nl_") and len(api_key) > 10
