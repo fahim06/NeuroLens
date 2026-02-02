@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.0.0-dev.1] - 2026-02-02
+
+### 🚀 Major Platform Rebuild
+
+This is the pre-production development release of NeuroLens v3.0 — a complete platform rebuild.
+
+### Added (3.0.0)
+
+#### Backend
+- **FastAPI Backend** — Complete API with async support
+- **JWT Authentication** — Secure token-based auth with refresh tokens
+- **RBAC System** — Role-based access control (Admin, Owner, Member, Viewer)
+- **User & Org Management** — Multi-tenant organization support
+- **Model Registry** — Version-controlled model management
+- **Dataset Management** — CRUD operations for training datasets
+- **Inference API** — Single and batch prediction endpoints
+
+#### Machine Learning
+- **ML Core Architecture** — Modular interfaces for models, trainers, evaluators
+- **Training System** — Keras-based trainers with configurable augmentations
+- **Inference Engine** — Batched processing with confidence calibration
+- **Explainability** — GradCAM integration for model interpretability
+- **Model Registry** — Metadata tracking and version control
+- **MLOps Automation** — Validation gates, retraining triggers
+
+#### Infrastructure
+- **Docker Support** — Production-ready Dockerfiles
+- **CI/CD Pipelines** — GitHub Actions for dev, feature, and main branches
+- **Observability Stack** — Prometheus metrics, OpenTelemetry tracing
+- **Grafana Dashboards** — Pre-built monitoring dashboards
+- **Alert Rules** — SLO-based alerting configuration
+
+#### Security
+- **Password Security** — PBKDF2-SHA256 with 100k iterations
+- **Token Security** — JWT with JTI for revocation
+- **Rate Limiting** — Sliding window + token bucket algorithms
+- **Input Validation** — SQL injection, XSS, path traversal detection
+- **Audit Logging** — Tamper-resistant event chain
+- **Secrets Management** — Environment validation, secrets scanning
+- **Data Protection** — AES-256-GCM encryption, PII detection
+
+#### Documentation
+- Architecture overview
+- API design guide
+- ML contracts specification
+- Compliance & security guide
+- Scaling documentation
+
+### Changed (3.0.0)
+
+- Complete architecture redesign from monolith to modular platform
+- New React frontend replacing Taipy
+- Professional-grade codebase structure
+
+### Removed (3.0.0)
+
+- Legacy Taipy-based frontend
+- Old classifier.py single-file application
+- Jupyter notebooks (moved to separate research repo)
+
+---
+
 ## [2.1.0] - 2026-01-26
 
 ### Added (2.1.0)
