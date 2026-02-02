@@ -1,0 +1,162 @@
+# ============================================================
+# NeuroLens — Docker Compose (Local & CI)
+# ============================================================
+# Services: backend, frontend, redis, postgres
+# Usage: docker-compose up -d
+# ============================================================
+
+services:
+  # ============================================================
+  # POSTGRES DATABASE
+  # ============================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: neurolens-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-neurolens}
+      POSTGRES_USER: ${POSTGRES_USER:-neurolens}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-neurolens_secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-neurolens} -d ${POSTGRES_DB:-neurolens}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ============================================================
+  # REDIS CACHE/BROKER
+  # ============================================================
+  redis:
+    image: redis:7-alpine
+    container_name: neurolens-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ============================================================
+  # BACKEND (Django)
+  # ============================================================
+  backend:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+      args:
+        ENVIRONMENT: ${ENVIRONMENT:-development}
+    container_name: neurolens-backend
+    environment:
+      - DEBUG=${DEBUG:-True}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
+      - DATABASE_URL=postgres://${POSTGRES_USER:-neurolens}:${POSTGRES_PASSWORD:-neurolens_secret}@postgres:5432/${POSTGRES_DB:-neurolens}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      # Dev only: mount source for hot reload
+      - .:/app:cached
+      - /app/__pycache__
+      - /app/.pytest_cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # ============================================================
+  # FRONTEND (React)
+  # ============================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infra/docker/frontend.Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
+        ENVIRONMENT: ${ENVIRONMENT:-development}
+    container_name: neurolens-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  # ============================================================
+  # CELERY WORKER (Background Tasks)
+  # ============================================================
+  celery-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    container_name: neurolens-celery-worker
+    command: celery -A neurolens worker -l INFO
+    environment:
+      - DEBUG=${DEBUG:-False}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - DATABASE_URL=postgres://${POSTGRES_USER:-neurolens}:${POSTGRES_PASSWORD:-neurolens_secret}@postgres:5432/${POSTGRES_DB:-neurolens}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    volumes:
+      - .:/app:cached
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ============================================================
+  # CELERY BEAT (Scheduled Tasks)
+  # ============================================================
+  celery-beat:
+    build:
+      context: .
+      dockerfile: infra/docker/backend.Dockerfile
+    container_name: neurolens-celery-beat
+    command: celery -A neurolens beat -l INFO
+    environment:
+      - DEBUG=${DEBUG:-False}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - DATABASE_URL=postgres://${POSTGRES_USER:-neurolens}:${POSTGRES_PASSWORD:-neurolens_secret}@postgres:5432/${POSTGRES_DB:-neurolens}
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: neurolens-network

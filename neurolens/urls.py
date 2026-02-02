@@ -16,14 +16,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect
+from django.http import JsonResponse
+
+
+def api_root(request):
+    """API root endpoint."""
+    return JsonResponse({
+        'name': 'NeuroLens API',
+        'version': '1.0.0',
+        'docs': '/api/docs/',
+        'health': '/api/health/',
+    })
+
 
 urlpatterns = [
-    path('', lambda request: redirect('ui:login')),
+    path('', api_root, name='api-root'),
     path('admin/', admin.site.urls),
     path('api/', include('core.urls')),
     path('api/auth/', include('users.urls')),
     path('api/datasets/', include('datasets.urls')),
     path('api/inference/', include('inference.urls')),
-    path('ui/', include('ui.urls')),
+    # UI routes removed: React frontend serves UI (Phase 8)
 ]

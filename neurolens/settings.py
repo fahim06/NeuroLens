@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'users',
     'datasets',
     'inference',
-    'ui',
+    # 'ui',  # Removed: Replaced by React frontend (Phase 8)
 ]
 
 MIDDLEWARE = [
