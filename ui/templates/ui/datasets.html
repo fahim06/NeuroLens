@@ -1,0 +1,117 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Datasets - NeuroLens{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <span class="logo-text">NeuroLens</span>
+        </div>
+
+        <nav>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'ui:dashboard' %}" class="nav-link">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'ui:datasets' %}" class="nav-link active">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Datasets</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'ui:inference' %}" class="nav-link">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Inference</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-role" id="userRole">Member</div>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Datasets</h1>
+            <p class="page-subtitle">Manage your image datasets for analysis</p>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Upload New Dataset</h2>
+            </div>
+            <form id="uploadForm">
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <input type="text" id="datasetName" name="name" placeholder=" " required>
+                    <label for="datasetName">Dataset Name</label>
+                    <span class="error-message" id="nameError"></span>
+                </div>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div class="upload-text">Drag & drop images here or click to browse</div>
+                    <div class="upload-hint">Supports: PNG, JPG, JPEG (max 10MB)</div>
+                    <input type="file" id="fileInput" name="file" accept="image/*" hidden>
+                </div>
+                <div class="upload-preview" id="uploadPreview">
+                    <p style="margin-bottom: 10px; font-size: 14px; color: var(--nl-secondary);">Selected file:</p>
+                    <img class="preview-image" id="previewImage" src="" alt="Preview">
+                    <p id="fileName" style="margin-top: 10px; font-size: 12px; color: var(--nl-outline);"></p>
+                </div>
+                <button type="submit" class="btn" id="uploadBtn" style="margin-top: 20px;">
+                    <span class="btn-text">Upload Dataset</span>
+                    <span class="btn-loader"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Datasets List -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Your Datasets</h2>
+                <button class="btn btn-secondary" id="refreshBtn" style="padding: 8px 16px; font-size: 12px;">
+                    <i class="fa-solid fa-refresh"></i>
+                </button>
+            </div>
+            <div id="datasetsContainer">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <h3 class="empty-title">No datasets yet</h3>
+                    <p class="empty-text">Upload your first dataset to get started</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'ui/js/datasets.js' %}"></script>
+{% endblock %}

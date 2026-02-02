@@ -1,0 +1,56 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Login - NeuroLens{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <span class="logo-text">NeuroLens</span>
+        </div>
+
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Sign in to continue to your dashboard</p>
+
+        <!-- Login Form -->
+        <form id="loginForm" novalidate>
+            <div class="input-group">
+                <input type="text" id="username" name="username" placeholder=" " required autocomplete="username">
+                <label for="username">Username</label>
+                <span class="error-message" id="usernameError"></span>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder=" " required autocomplete="current-password">
+                <label for="password">Password</label>
+                <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+                <span class="error-message" id="passwordError"></span>
+            </div>
+
+            <button type="submit" class="btn" id="loginBtn">
+                <span class="btn-text">Sign In</span>
+                <span class="btn-loader"><i class="fa-solid fa-spinner fa-spin"></i></span>
+            </button>
+        </form>
+
+        <!-- Beta Notice -->
+        <div style="margin-top: 30px; padding: 15px; background: var(--nl-primary-container); border-radius: 12px; text-align: center;">
+            <p style="font-size: 12px; color: var(--nl-on-primary-container); margin: 0;">
+                <i class="fa-solid fa-flask" style="margin-right: 8px;"></i>
+                <strong>Beta v4.0.0</strong> - For testing purposes only
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'ui/js/auth.js' %}"></script>
+{% endblock %}

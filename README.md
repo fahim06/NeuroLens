@@ -116,6 +116,37 @@ python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.hea
 | `/api/inference/<id>/status/` | GET | JWT | Check async request status |
 | `/api/inference/history/` | GET | JWT | View prediction history |
 
+## 🖥️ Web Interface (Beta Testing UI)
+
+NeuroLens includes a simple HTML/CSS web interface for beta testing:
+
+### UI Pages
+
+| URL | Description |
+|-----|-------------|
+| `/ui/login/` | Login page with animated design |
+| `/ui/dashboard/` | Main dashboard with stats |
+| `/ui/datasets/` | Dataset upload and management |
+| `/ui/inference/` | Image upload and AI analysis |
+
+### Features
+
+- **Animated Login** — Modern glassmorphism design inspired by [AnimatedLoginPage](https://github.com/fahim06/AnimatedLoginPage)
+- **Dark Mode** — Toggle between light and dark themes
+- **JWT Auth** — Vanilla JS token management (no React)
+- **Responsive** — Works on desktop and tablet devices
+- **Toast Notifications** — User feedback for all actions
+
+### Running the UI
+
+```bash
+# Start Django server
+python manage.py runserver
+
+# Open in browser
+open http://localhost:8000/ui/login/
+```
+
 ### Example Prediction Request
 
 ```bash
@@ -188,14 +219,17 @@ MIT License - see [LICENSE](LICENSE)
 | 3     | Core REST APIs     | ✅ Complete |
 | 4     | ML Integration     | ✅ Complete |
 | 5     | Beta Stabilization | ✅ Complete |
-| 6     | Beta Release       | 🔄 Next    |
-| 7     | Final Release      | ⏳ Pending  |
+| 6     | Beta Release       | ✅ Complete |
+| 7     | Simple UI          | ✅ Complete |
+| 8     | Final Release      | ⏳ Pending  |
 
 ## Beta Readiness
 
-Asynchronous inference enabled.
-System stabilized for beta users.
-Phase 5 complete.
+- ✅ Asynchronous inference enabled
+- ✅ System stabilized for beta users
+- ✅ Simple HTML/CSS UI for testing
+- ✅ Dark mode support
+- ✅ JWT auth via vanilla JS
 
 ---
 

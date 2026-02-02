@@ -1,0 +1,144 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Inference - NeuroLens{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <span class="logo-text">NeuroLens</span>
+        </div>
+
+        <nav>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'ui:dashboard' %}" class="nav-link">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'ui:datasets' %}" class="nav-link">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Datasets</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'ui:inference' %}" class="nav-link active">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Inference</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-role" id="userRole">Member</div>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Image Inference</h1>
+            <p class="page-subtitle">Analyze medical images using AI-powered classification</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+            <!-- Upload Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Upload Image</h2>
+                </div>
+                <form id="inferenceForm">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fa-solid fa-image"></i>
+                        </div>
+                        <div class="upload-text">Drop image here or click to browse</div>
+                        <div class="upload-hint">Supports: PNG, JPG (32x32 recommended)</div>
+                        <input type="file" id="imageInput" name="image" accept="image/*" hidden>
+                    </div>
+                    <div class="upload-preview" id="uploadPreview">
+                        <p style="margin-bottom: 10px; font-size: 14px; color: var(--nl-secondary);">Image Preview:</p>
+                        <img class="preview-image" id="previewImage" src="" alt="Preview">
+                    </div>
+                    <button type="submit" class="btn" id="analyzeBtn" style="margin-top: 20px;" disabled>
+                        <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 8px;"></i>Analyze Image</span>
+                        <span class="btn-loader"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Analysis Results</h2>
+                </div>
+                <div id="resultsPlaceholder">
+                    <div class="empty-state" style="padding: 40px 20px;">
+                        <div class="empty-icon">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <h3 class="empty-title">No results yet</h3>
+                        <p class="empty-text">Upload an image to see predictions</p>
+                    </div>
+                </div>
+                <div class="result-container" id="resultsContainer">
+                    <div class="result-card">
+                        <div class="result-label">Predicted Class</div>
+                        <div class="result-value" id="predictedClass">-</div>
+                        <div class="result-confidence" id="confidenceScore">Confidence: -</div>
+                    </div>
+                    <div class="predictions-list" id="predictionsList">
+                        <!-- Predictions will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Card -->
+        <div class="card" style="margin-top: 25px;">
+            <div class="card-header">
+                <h2 class="card-title">Recent Inferences</h2>
+            </div>
+            <div id="historyContainer">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <h3 class="empty-title">No history yet</h3>
+                    <p class="empty-text">Your inference history will appear here</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    @media (max-width: 1000px) {
+        .main-content > div:first-of-type {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'ui/js/inference.js' %}"></script>
+{% endblock %}

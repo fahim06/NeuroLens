@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'users',
     'datasets',
     'inference',
+    'ui',
 ]
 
 MIDDLEWARE = [
