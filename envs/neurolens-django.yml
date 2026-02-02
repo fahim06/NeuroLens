@@ -1,0 +1,12 @@
+name: neurolens-django
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - django
+  - djangorestframework
+  - python-dotenv
+  - psycopg2
+  - gunicorn

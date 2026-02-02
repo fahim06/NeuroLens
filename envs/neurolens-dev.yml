@@ -10,6 +10,3 @@ dependencies:
   - mypy
   - pytest
   - pre-commit
-  - commitizen
-  - tox
-  - rich

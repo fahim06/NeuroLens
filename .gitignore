@@ -230,7 +230,6 @@ registry.json
 *~
 
 # Emacs
-*~
 \#*\#
 /.emacs.desktop
 /.emacs.desktop.lock
@@ -260,8 +259,6 @@ Desktop.ini
 $RECYCLE.BIN/
 *.lnk
 
-# Linux
-*~
 
 # =============================================================================
 # Backend / FastAPI

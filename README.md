@@ -98,15 +98,15 @@ npm run dev
 
 ### Backend API
 
-| Endpoint Group | Description |
-|----------------|-------------|
-| `/api/v1/auth` | Authentication & token management |
-| `/api/v1/users` | User management |
-| `/api/v1/orgs` | Organization management |
-| `/api/v1/models` | Model registry & versioning |
-| `/api/v1/datasets` | Dataset management |
-| `/api/v1/inference` | Prediction endpoints |
-| `/api/v1/health` | Health checks & readiness |
+| Endpoint Group      | Description                       |
+|---------------------|-----------------------------------|
+| `/api/v1/auth`      | Authentication & token management |
+| `/api/v1/users`     | User management                   |
+| `/api/v1/orgs`      | Organization management           |
+| `/api/v1/models`    | Model registry & versioning       |
+| `/api/v1/datasets`  | Dataset management                |
+| `/api/v1/inference` | Prediction endpoints              |
+| `/api/v1/health`    | Health checks & readiness         |
 
 ### ML Pipeline
 
@@ -147,20 +147,20 @@ pytest --cov=backend tests/
 
 ## 📋 Development Status
 
-| Phase | Component | Status |
-|-------|-----------|--------|
-| 1 | Platform Core | ✅ Complete |
-| 2 | Backend API | ✅ Complete |
-| 3 | Frontend React | ✅ Complete |
-| 4 | ML Core | ✅ Complete |
-| 5 | Training System | ✅ Complete |
-| 6 | Inference System | ✅ Complete |
-| 7 | Data Pipeline | ✅ Complete |
-| 8 | MLOps Automation | ✅ Complete |
-| 9 | Product Layer | ✅ Complete |
-| 10 | Monitoring & Scaling | ✅ Complete |
-| 11 | Security & Compliance | ✅ Complete |
-| 12 | Dev Release | ✅ Complete |
+| Phase | Component             | Status     |
+|-------|-----------------------|------------|
+| 1     | Platform Core         | ✅ Complete |
+| 2     | Backend API           | ✅ Complete |
+| 3     | Frontend React        | ✅ Complete |
+| 4     | ML Core               | ✅ Complete |
+| 5     | Training System       | ✅ Complete |
+| 6     | Inference System      | ✅ Complete |
+| 7     | Data Pipeline         | ✅ Complete |
+| 8     | MLOps Automation      | ✅ Complete |
+| 9     | Product Layer         | ✅ Complete |
+| 10    | Monitoring & Scaling  | ✅ Complete |
+| 11    | Security & Compliance | ✅ Complete |
+| 12    | Dev Release           | ✅ Complete |
 
 ## 📄 Documentation
 
@@ -187,3 +187,10 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 *Built for reliability, scalability, and security*
 
 </div>
+
+---
+
+## Project Status
+
+Django REST rebuild in progress.  
+Current phase: **Phase 0 — Foundation**
