@@ -1,6 +1,6 @@
 # NeuroLens — AI-Powered Image Classification
 
-*Deep learning–based image classifier with Django REST API*
+*Deep learning–based image classifier with Django REST API & React Frontend*
 
 <p align="center">
   AI-powered image classification using convolutional neural networks
@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/version-4.0.0--alpha-blue" />
   <img src="https://img.shields.io/badge/python-3.12-green" />
   <img src="https://img.shields.io/badge/framework-Django 6.0 | DRF-purple" />
+  <img src="https://img.shields.io/badge/frontend-React 18 | Vite-cyan" />
   <img src="https://img.shields.io/badge/license-MIT-orange" />
 </p>
 
@@ -20,6 +21,7 @@
 NeuroLens is an AI platform for image classification, featuring:
 
 - **Django REST Backend** — Production-ready API with DRF
+- **React Frontend** — Modern TypeScript SPA with Vite
 - **JWT Authentication** — Secure token-based auth with roles
 - **ML Integration** — TensorFlow-based CNN with service isolation
 - **Role-Based Access** — Admin, Beta User, and Viewer roles
@@ -29,6 +31,12 @@ NeuroLens is an AI platform for image classification, featuring:
 
 ```
 neurolens/
+├── frontend/          # React SPA (Vite + TypeScript)
+│   ├── src/
+│   │   ├── components/  # Reusable UI components
+│   │   ├── pages/       # Route pages
+│   │   ├── services/    # API client
+│   │   └── styles/      # CSS with theming
 ├── core/              # Health checks, base utilities
 ├── users/             # User profiles, roles, permissions
 ├── datasets/          # Dataset management
@@ -81,6 +89,21 @@ conda activate neurolens-ml
 # Test model loading
 python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.health_check())"
 ```
+
+### Frontend Setup
+
+```bash
+# Navigate to frontend
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start dev server (proxies to Django backend)
+npm run dev
+```
+
+Frontend will be available at `http://localhost:5173`
 
 ## 📡 API Endpoints
 

@@ -1,0 +1,46 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="60" cy="60" r="56" fill="url(#gradient)" stroke="url(#gradient)" stroke-width="4"/>
+  
+  <!-- Eye Shape -->
+  <ellipse cx="60" cy="60" rx="32" ry="24" fill="white" opacity="0.95"/>
+  
+  <!-- Iris -->
+  <circle cx="60" cy="60" r="16" fill="url(#irisGradient)"/>
+  
+  <!-- Pupil -->
+  <circle cx="60" cy="60" r="7" fill="#1C1B1F"/>
+  
+  <!-- Light Reflection -->
+  <circle cx="55" cy="55" r="3" fill="white" opacity="0.8"/>
+  <circle cx="65" cy="58" r="1.5" fill="white" opacity="0.5"/>
+  
+  <!-- Neural Network Lines -->
+  <g stroke="#D0BCFF" stroke-width="1.5" opacity="0.6">
+    <path d="M20 40 L35 50" stroke-linecap="round"/>
+    <path d="M20 80 L35 70" stroke-linecap="round"/>
+    <path d="M100 40 L85 50" stroke-linecap="round"/>
+    <path d="M100 80 L85 70" stroke-linecap="round"/>
+    <path d="M25 60 L35 60" stroke-linecap="round"/>
+    <path d="M95 60 L85 60" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Neural Nodes -->
+  <circle cx="20" cy="40" r="4" fill="#D0BCFF"/>
+  <circle cx="20" cy="80" r="4" fill="#D0BCFF"/>
+  <circle cx="20" cy="60" r="3" fill="#D0BCFF"/>
+  <circle cx="100" cy="40" r="4" fill="#D0BCFF"/>
+  <circle cx="100" cy="80" r="4" fill="#D0BCFF"/>
+  <circle cx="100" cy="60" r="3" fill="#D0BCFF"/>
+  
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6750A4"/>
+      <stop offset="100%" style="stop-color:#4F378B"/>
+    </linearGradient>
+    <linearGradient id="irisGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7E67C7"/>
+      <stop offset="100%" style="stop-color:#6750A4"/>
+    </linearGradient>
+  </defs>
+</svg>
