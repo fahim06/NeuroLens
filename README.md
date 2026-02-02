@@ -1,17 +1,24 @@
-# NeuroLens v3.0
+# NeuroLens — AI-Powered Image Classification
 
-<div align="center">
+*Deep learning–based image classifier*
 
-![Version](https://img.shields.io/badge/version-3.0.0--dev.1-blue)
-![Status](https://img.shields.io/badge/status-pre--production-orange)
-![Python](https://img.shields.io/badge/python-3.11+-green)
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
+<p align="center">
+  <img src="assets/logo.png" alt="NeuroLens Logo" width="180"/>
+</p>
 
-**AI-Powered Medical Image Analysis Platform**
+<p align="center">
+  AI-powered image classification using convolutional neural networks
+</p>
 
-*Enterprise-grade infrastructure for brain tumor detection and classification*
-
-</div>
+<p align="center">
+  <a href="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml">
+    <img src="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml/badge.svg" />
+  </a>
+  <img src="https://img.shields.io/badge/version-3.0.0--dev.1-blue" />
+  <img src="https://img.shields.io/badge/python-3.10 | 3.11-green" />
+  <img src="https://img.shields.io/badge/framework-FastAPI | React-purple" />
+  <img src="https://img.shields.io/badge/license-MIT-orange" />
+</p>
 
 ---
 
