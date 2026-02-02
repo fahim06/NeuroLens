@@ -15,7 +15,10 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: envs/neurolens-api.yml
-      - run: python -m compileall backend
+          activate-environment: neurolens-api
+      - name: Validate Backend
+        shell: bash -el {0}
+        run: python -m compileall backend
 
   ml:
     name: ML Checks
@@ -25,17 +28,20 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: envs/neurolens-ml.yml
-      - run: python -m compileall ml
+          activate-environment: neurolens-ml
+      - name: Validate ML
+        shell: bash -el {0}
+        run: python -m compileall ml
 
-  frontend:
-    name: Frontend Checks
+  tests:
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
-          node-version: 18
-      - run: |
-          cd frontend
-          npm install
-          npm run build
+          environment-file: envs/neurolens-dev.yml
+          activate-environment: neurolens-dev
+      - name: Run Tests
+        shell: bash -el {0}
+        run: python -m pytest tests/ -v --ignore=tests/__pycache__
