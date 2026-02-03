@@ -1,16 +1,16 @@
 import logging
+
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from datasets.models import Dataset
 from .models import InferenceRequest
 from .serializers import (
     InferenceRequestSerializer,
     PredictRequestSerializer,
-    PredictResponseSerializer,
     DetectRequestSerializer,
     AutoAnalyzeRequestSerializer
 )
@@ -26,9 +26,9 @@ class DetectionTypesView(APIView):
     """
     authentication_classes = []
     permission_classes = []
-    
+
     def get(self, request):
-        """Return list of available detection types for UI dropdown."""
+        """Return the list of available detection types for the UI dropdown."""
         detection_types = predictor_service.get_detection_types()
         return Response({
             "success": True,
@@ -46,7 +46,7 @@ class DetectView(APIView):
     # Allow unauthenticated access for demo/testing
     authentication_classes = []
     permission_classes = []
-    
+
     def post(self, request):
         """
         Process a detection request.
@@ -59,17 +59,17 @@ class DetectView(APIView):
         """
         user_id = getattr(request.user, 'id', 'anonymous')
         logger.info(f"Detection request from user {user_id}")
-        
+
         # Validate input
         serializer = DetectRequestSerializer(data=request.data)
         if not serializer.is_valid():
             logger.warning(f"Invalid detection request: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
         validated_data = serializer.validated_data
         detection_type = validated_data.get('detection_type')
-        
-        # Create inference request record (handle anonymous users)
+
+        # Create an inference request record (handle anonymous users)
         user = request.user if request.user.is_authenticated else None
         inference_request = InferenceRequest.objects.create(
             requested_by=user,
@@ -81,9 +81,9 @@ class DetectView(APIView):
                 "image_url": validated_data.get('image_url')
             }
         )
-        
+
         logger.info(f"Created detection request {inference_request.id} for type: {detection_type}")
-        
+
         try:
             # Call the predictor service with detection_type
             prediction_result = predictor_service.predict({
@@ -91,43 +91,43 @@ class DetectView(APIView):
                 "image_data": validated_data.get('image_data'),
                 "image_url": validated_data.get('image_url')
             })
-            
+
             # Update inference request with results
             inference_request.status = InferenceRequest.Status.SUCCESS
             inference_request.result = prediction_result
             inference_request.completed_at = timezone.now()
             inference_request.save()
-            
+
             # Add request ID to response
             prediction_result['request_id'] = str(inference_request.id)
-            
+
             logger.info(f"Detection completed for request {inference_request.id}")
-            
+
             return Response(prediction_result, status=status.HTTP_200_OK)
-            
+
         except ValueError as e:
             # Handle validation errors
             logger.warning(f"Validation error for request {inference_request.id}: {e}")
-            
+
             inference_request.status = InferenceRequest.Status.FAILED
             inference_request.error_message = str(e)
             inference_request.completed_at = timezone.now()
             inference_request.save()
-            
+
             return Response(
                 {"success": False, "error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
+
         except Exception as e:
             # Handle prediction failure
             logger.exception(f"Detection failed for request {inference_request.id}: {e}")
-            
+
             inference_request.status = InferenceRequest.Status.FAILED
             inference_request.error_message = str(e)
             inference_request.completed_at = timezone.now()
             inference_request.save()
-            
+
             return Response(
                 {
                     "success": False,
@@ -148,27 +148,27 @@ class AutoAnalyzeView(APIView):
     """
     authentication_classes = []
     permission_classes = []
-    
+
     def post(self, request):
         """
         Process an auto-analysis request.
         
         The system automatically:
         1. Detects image domain (human/animal/plant/medical)
-        2. Selects appropriate model
+        2. Selects the appropriate model
         3. Returns structured scientific output
         """
         logger.info("Auto-analyze request received")
-        
+
         # Validate input
         serializer = AutoAnalyzeRequestSerializer(data=request.data)
         if not serializer.is_valid():
             logger.warning(f"Invalid auto-analyze request: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
         validated_data = serializer.validated_data
-        
-        # Create inference request record
+
+        # Create an inference request record
         user = request.user if request.user.is_authenticated else None
         inference_request = InferenceRequest.objects.create(
             requested_by=user,
@@ -180,37 +180,37 @@ class AutoAnalyzeView(APIView):
                 "image_url": validated_data.get('image_url')
             }
         )
-        
+
         logger.info(f"Created auto-analyze request {inference_request.id}")
-        
+
         try:
             # Call the predictor service in auto mode
             analysis_result = predictor_service.auto_analyze({
                 "image_data": validated_data.get('image_data'),
                 "image_url": validated_data.get('image_url')
             })
-            
+
             # Update inference request with results
             inference_request.status = InferenceRequest.Status.SUCCESS
             inference_request.result = analysis_result
             inference_request.completed_at = timezone.now()
             inference_request.save()
-            
+
             # Add request ID to response
             analysis_result['request_id'] = str(inference_request.id)
-            
+
             logger.info(f"Auto-analyze completed for request {inference_request.id}")
-            
+
             return Response(analysis_result, status=status.HTTP_200_OK)
-            
+
         except Exception as e:
             logger.exception(f"Auto-analyze failed for request {inference_request.id}: {e}")
-            
+
             inference_request.status = InferenceRequest.Status.FAILED
             inference_request.error_message = str(e)
             inference_request.completed_at = timezone.now()
             inference_request.save()
-            
+
             return Response(
                 {
                     "success": False,
@@ -228,7 +228,7 @@ class PredictView(APIView):
     POST: Submit an image for prediction (sync mode)
     """
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request):
         """
         Process a prediction request synchronously.
@@ -236,15 +236,15 @@ class PredictView(APIView):
         Accepts image data and returns prediction results.
         """
         logger.info(f"Prediction request from user {request.user.id}")
-        
+
         # Validate input
         serializer = PredictRequestSerializer(data=request.data)
         if not serializer.is_valid():
             logger.warning(f"Invalid prediction request: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
         validated_data = serializer.validated_data
-        
+
         # Get optional dataset
         dataset = None
         if validated_data.get('dataset_id'):
@@ -252,8 +252,8 @@ class PredictView(APIView):
                 dataset = Dataset.objects.get(pk=validated_data['dataset_id'])
             except Dataset.DoesNotExist:
                 pass
-        
-        # Create inference request record
+
+        # Create an inference request record
         inference_request = InferenceRequest.objects.create(
             requested_by=request.user,
             dataset=dataset,
@@ -264,38 +264,38 @@ class PredictView(APIView):
                 "image_url": validated_data.get('image_url')
             }
         )
-        
+
         logger.info(f"Created inference request {inference_request.id}")
-        
+
         try:
             # Call the predictor service
             prediction_result = predictor_service.predict({
                 "image_data": validated_data.get('image_data'),
                 "image_url": validated_data.get('image_url')
             })
-            
+
             # Update inference request with results
             inference_request.status = InferenceRequest.Status.SUCCESS
             inference_request.result = prediction_result
             inference_request.completed_at = timezone.now()
             inference_request.save()
-            
+
             # Add request ID to response
             prediction_result['request_id'] = str(inference_request.id)
-            
+
             logger.info(f"Prediction completed for request {inference_request.id}")
-            
+
             return Response(prediction_result, status=status.HTTP_200_OK)
-            
+
         except Exception as e:
             # Handle prediction failure
             logger.exception(f"Prediction failed for request {inference_request.id}: {e}")
-            
+
             inference_request.status = InferenceRequest.Status.FAILED
             inference_request.error_message = str(e)
             inference_request.completed_at = timezone.now()
             inference_request.save()
-            
+
             return Response(
                 {
                     "success": False,
@@ -314,7 +314,7 @@ class AsyncPredictView(APIView):
     Returns immediately with request ID, processes in background.
     """
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request):
         """
         Enqueue a prediction request for async processing.
@@ -322,17 +322,17 @@ class AsyncPredictView(APIView):
         Returns request ID immediately. Use /api/inference/{id}/status/ to check progress.
         """
         from .tasks import run_inference
-        
+
         logger.info(f"Async prediction request from user {request.user.id}")
-        
+
         # Validate input
         serializer = PredictRequestSerializer(data=request.data)
         if not serializer.is_valid():
             logger.warning(f"Invalid async prediction request: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
         validated_data = serializer.validated_data
-        
+
         # Get optional dataset
         dataset = None
         if validated_data.get('dataset_id'):
@@ -340,8 +340,8 @@ class AsyncPredictView(APIView):
                 dataset = Dataset.objects.get(pk=validated_data['dataset_id'])
             except Dataset.DoesNotExist:
                 pass
-        
-        # Create inference request record
+
+        # Create an inference request record
         inference_request = InferenceRequest.objects.create(
             requested_by=request.user,
             dataset=dataset,
@@ -351,23 +351,23 @@ class AsyncPredictView(APIView):
                 "image_url": validated_data.get('image_url')
             }
         )
-        
+
         logger.info(f"Created async inference request {inference_request.id}")
-        
-        # Prepare payload for task
+
+        # Prepare payload for a task
         payload = {
             "image_data": validated_data.get('image_data'),
             "image_url": validated_data.get('image_url')
         }
-        
+
         # Enqueue the task
         try:
             task = run_inference.delay(str(inference_request.id), payload)
             inference_request.celery_task_id = task.id
             inference_request.save()
-            
+
             logger.info(f"Enqueued task {task.id} for request {inference_request.id}")
-            
+
             return Response({
                 "success": True,
                 "message": "Prediction request queued",
@@ -376,15 +376,15 @@ class AsyncPredictView(APIView):
                 "status": "pending",
                 "status_url": f"/api/inference/{inference_request.id}/status/"
             }, status=status.HTTP_202_ACCEPTED)
-            
+
         except Exception as e:
             logger.exception(f"Failed to enqueue task for request {inference_request.id}: {e}")
-            
+
             # If Redis/Celery is down, fall back to sync processing
             inference_request.status = InferenceRequest.Status.FAILED
             inference_request.error_message = f"Queue unavailable: {e}"
             inference_request.save()
-            
+
             return Response({
                 "success": False,
                 "error": "Task queue unavailable",
@@ -394,13 +394,13 @@ class AsyncPredictView(APIView):
 
 class InferenceStatusView(APIView):
     """
-    Check status of an inference request.
+    Check the status of an inference request.
     """
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, request_id):
         """
-        Get status and results of an inference request.
+        Get the status and results of an inference request.
         """
         try:
             inference_request = InferenceRequest.objects.get(
@@ -412,25 +412,25 @@ class InferenceStatusView(APIView):
                 {"error": "Inference request not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         response = {
             "request_id": str(inference_request.id),
             "status": inference_request.status,
             "created_at": inference_request.created_at.isoformat(),
         }
-        
+
         if inference_request.started_at:
             response["started_at"] = inference_request.started_at.isoformat()
-        
+
         if inference_request.completed_at:
             response["completed_at"] = inference_request.completed_at.isoformat()
-        
+
         if inference_request.status == InferenceRequest.Status.SUCCESS:
             response["result"] = inference_request.result
-            
+
         elif inference_request.status == InferenceRequest.Status.FAILED:
             response["error"] = inference_request.error_message
-        
+
         return Response(response)
 
 
@@ -439,7 +439,7 @@ class InferenceHistoryView(APIView):
     View inference request history.
     """
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request):
         """List inference requests for the current user."""
         requests = InferenceRequest.objects.filter(requested_by=request.user)[:50]
@@ -456,7 +456,7 @@ class PredictorHealthView(APIView):
     """
     authentication_classes = []
     permission_classes = []
-    
+
     def get(self, request):
         """Return predictor service health status."""
         health = predictor_service.health_check()

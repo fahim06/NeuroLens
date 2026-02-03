@@ -336,10 +336,6 @@ envs/
 !docker-compose.yml
 !.github/**/*.yml
 
-# IDE folders
-.idea/
-.vscode/
-
 # Profiling
 *.prof
 *.lprof

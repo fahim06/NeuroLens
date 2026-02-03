@@ -1,9 +1,6 @@
 # ============================================================
 # NeuroLens — Unified CI Workflow
 # ============================================================
-# Runs on all branches: django-rebuild, dev, main
-# Must fail on ANY error per canvas specification
-# ============================================================
 
 name: CI
 
@@ -41,15 +38,15 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: pip-${{ runner.os }}-${{ hashFiles('requirements*.txt') }}
@@ -59,11 +56,22 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt 2>/dev/null || pip install django djangorestframework djangorestframework-simplejwt django-celery-results celery redis
-          pip install ruff black pytest pytest-django
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "requirements.txt not found; aborting."
+            exit 1
+          fi
+          pip install ruff black pytest pytest-django bandit safety
 
       - name: Django System Check
         run: python manage.py check --fail-level WARNING
+        env:
+          SECRET_KEY: "ci-test-secret-key"
+          DEBUG: "False"
+
+      - name: Check Migrations
+        run: python manage.py makemigrations --check --dry-run
         env:
           SECRET_KEY: "ci-test-secret-key"
           DEBUG: "False"
@@ -74,6 +82,10 @@ jobs:
 
       - name: Lint - Black
         run: black --check --diff .
+
+      - name: Security Analysis - Bandit
+        run: bandit -r . -f json -o bandit-report.json || true
+        continue-on-error: true
 
       - name: Run Tests
         run: |
@@ -90,20 +102,21 @@ jobs:
     name: Security
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Dependency Scan (Python)
         run: |
-          pip install safety pip-audit
+          pip install safety pip-audit bandit
           if [ -f requirements.txt ]; then
-            pip-audit -r requirements.txt || echo "Vulnerabilities found"
+            safety check --file requirements.txt --output json || echo "Safety vulnerabilities found"
+            pip-audit -r requirements.txt --format json || echo "Pip-audit vulnerabilities found"
           fi
         continue-on-error: true
 
