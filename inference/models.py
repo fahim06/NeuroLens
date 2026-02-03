@@ -24,7 +24,9 @@ class InferenceRequest(models.Model):
     requested_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='inference_requests'
+        related_name='inference_requests',
+        null=True,
+        blank=True
     )
     dataset = models.ForeignKey(
         Dataset,

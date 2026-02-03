@@ -1,4 +1,4 @@
 # inference/services/__init__.py
-from .predictor import PredictorService
+from .predictor import MultiDomainPredictorService
 
-__all__ = ['PredictorService']
+__all__ = ['MultiDomainPredictorService']

@@ -1,16 +1,16 @@
-# NeuroLens — AI-Powered Image Classification
+# NeuroLens — Multi-Domain AI Detection Platform
 
-*Deep learning–based image classifier with Django REST API & React Frontend*
+*Deep learning–based multi-domain detection with Django REST API & Tailwind UI*
 
 <p align="center">
-  AI-powered image classification using convolutional neural networks
+  AI-powered detection for humans, animals, biological classification, medical imaging, and plant analysis
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.0.0--alpha-blue" />
+  <img src="https://img.shields.io/badge/version-5.0.0--alpha-blue" />
   <img src="https://img.shields.io/badge/python-3.12-green" />
   <img src="https://img.shields.io/badge/framework-Django 6.0 | DRF-purple" />
-  <img src="https://img.shields.io/badge/frontend-React 18 | Vite-cyan" />
+  <img src="https://img.shields.io/badge/frontend-Django Templates | Tailwind-cyan" />
   <img src="https://img.shields.io/badge/license-MIT-orange" />
 </p>
 
@@ -18,34 +18,47 @@
 
 ## 🎯 Overview
 
-NeuroLens is an AI platform for image classification, featuring:
+NeuroLens is an AI platform for multi-domain image detection and classification, featuring:
 
 - **Django REST Backend** — Production-ready API with DRF
-- **React Frontend** — Modern TypeScript SPA with Vite
+- **Django Templates + Tailwind** — Zero-build CSS UI
 - **JWT Authentication** — Secure token-based auth with roles
-- **ML Integration** — TensorFlow-based CNN with service isolation
+- **Multi-Domain Detection** — 5 detection types with unified API
 - **Role-Based Access** — Admin, Beta User, and Viewer roles
-- **Clean Architecture** — Service layer pattern for ML isolation
+- **Model Registry** — Extensible model architecture for new detection types
+
+## 🧠 Supported Detection Types
+
+| Detection Type | Description | Model |
+|---------------|-------------|-------|
+| 🧑 Human vs Animal | Binary detection | Custom CNN |
+| 🐾 Animal Category | Species classification | Custom CNN |
+| 🧬 Biological | Kingdom → Species taxonomy | Hierarchical |
+| 🧠 Brain Tumor | Medical MRI analysis | VGG16 (95.21% acc) |
+| 🍊 Citrus | Plant genus identification | MobileNet (99.85% acc) |
 
 ## 🏗️ Architecture
 
 ```
 neurolens/
-├── frontend/          # React SPA (Vite + TypeScript)
-│   ├── src/
-│   │   ├── components/  # Reusable UI components
-│   │   ├── pages/       # Route pages
-│   │   ├── services/    # API client
-│   │   └── styles/      # CSS with theming
+├── ui/                # Django Templates + Tailwind CSS
+│   ├── templates/     # HTML templates
+│   ├── static/        # CSS, JS assets
+│   └── views.py       # View functions
 ├── core/              # Health checks, base utilities
 ├── users/             # User profiles, roles, permissions
 ├── datasets/          # Dataset management
 ├── inference/         # Prediction API, service layer
 ├── ml/                # ML runtime (isolated from Django)
-│   └── runtime/       # Model loader, predictor engine
+│   ├── registry.py    # Model registry for detection types
+│   ├── models/        # Detection model implementations
+│   │   ├── animal_detector/
+│   │   ├── bio_classifier/
+│   │   ├── brain_tumor/
+│   │   └── citrus_classifier/
+│   └── inference_engine.py  # Unified inference interface
 ├── neurolens/         # Django settings
-├── assets/            # Model weights, static files
-└── envs/              # Conda environment files
+└── assets/            # Model weights, static files
 ```
 
 ## ⚙️ Quick Start

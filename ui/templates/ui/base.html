@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NeuroLens - AI-Powered Retinal Disease Detection">
+    <meta name="description" content="NeuroLens - Intelligent Multi-Domain Image Analysis Platform">
     <title>{% block title %}NeuroLens{% endblock %}</title>
+    
+    <!-- Favicon using logo.svg -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'ui/images/logo.svg' %}">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -56,9 +59,7 @@
                 <div class="flex items-center">
                     <!-- Logo -->
                     <a href="{% url 'ui:dashboard' %}" class="flex items-center">
-                        <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-eye text-white text-lg"></i>
-                        </div>
+                        <img src="{% static 'ui/images/logo.svg' %}" alt="NeuroLens" class="w-10 h-10">
                         <span class="ml-3 text-xl font-bold text-gray-900">NeuroLens</span>
                     </a>
                     

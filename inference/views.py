@@ -10,11 +10,215 @@ from .models import InferenceRequest
 from .serializers import (
     InferenceRequestSerializer,
     PredictRequestSerializer,
-    PredictResponseSerializer
+    PredictResponseSerializer,
+    DetectRequestSerializer,
+    AutoAnalyzeRequestSerializer
 )
 from .services.predictor import predictor_service
 
 logger = logging.getLogger(__name__)
+
+
+class DetectionTypesView(APIView):
+    """
+    Get available detection types.
+    Phase 10: Multi-domain detection support.
+    """
+    authentication_classes = []
+    permission_classes = []
+    
+    def get(self, request):
+        """Return list of available detection types for UI dropdown."""
+        detection_types = predictor_service.get_detection_types()
+        return Response({
+            "success": True,
+            "detection_types": detection_types
+        })
+
+
+class DetectView(APIView):
+    """
+    Multi-domain detection endpoint.
+    Phase 10: POST /api/inference/detect/
+    
+    Replaces single-purpose DR detection with multi-domain support.
+    """
+    # Allow unauthenticated access for demo/testing
+    authentication_classes = []
+    permission_classes = []
+    
+    def post(self, request):
+        """
+        Process a detection request.
+        
+        Payload:
+        {
+            "detection_type": "human_animal | animal_category | biological | brain_tumor | citrus",
+            "image_data": "<base64>" or "image_url": "<url>"
+        }
+        """
+        user_id = getattr(request.user, 'id', 'anonymous')
+        logger.info(f"Detection request from user {user_id}")
+        
+        # Validate input
+        serializer = DetectRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            logger.warning(f"Invalid detection request: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        validated_data = serializer.validated_data
+        detection_type = validated_data.get('detection_type')
+        
+        # Create inference request record (handle anonymous users)
+        user = request.user if request.user.is_authenticated else None
+        inference_request = InferenceRequest.objects.create(
+            requested_by=user,
+            status=InferenceRequest.Status.PROCESSING,
+            started_at=timezone.now(),
+            input_data={
+                "detection_type": detection_type,
+                "has_image_data": bool(validated_data.get('image_data')),
+                "image_url": validated_data.get('image_url')
+            }
+        )
+        
+        logger.info(f"Created detection request {inference_request.id} for type: {detection_type}")
+        
+        try:
+            # Call the predictor service with detection_type
+            prediction_result = predictor_service.predict({
+                "detection_type": detection_type,
+                "image_data": validated_data.get('image_data'),
+                "image_url": validated_data.get('image_url')
+            })
+            
+            # Update inference request with results
+            inference_request.status = InferenceRequest.Status.SUCCESS
+            inference_request.result = prediction_result
+            inference_request.completed_at = timezone.now()
+            inference_request.save()
+            
+            # Add request ID to response
+            prediction_result['request_id'] = str(inference_request.id)
+            
+            logger.info(f"Detection completed for request {inference_request.id}")
+            
+            return Response(prediction_result, status=status.HTTP_200_OK)
+            
+        except ValueError as e:
+            # Handle validation errors
+            logger.warning(f"Validation error for request {inference_request.id}: {e}")
+            
+            inference_request.status = InferenceRequest.Status.FAILED
+            inference_request.error_message = str(e)
+            inference_request.completed_at = timezone.now()
+            inference_request.save()
+            
+            return Response(
+                {"success": False, "error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        except Exception as e:
+            # Handle prediction failure
+            logger.exception(f"Detection failed for request {inference_request.id}: {e}")
+            
+            inference_request.status = InferenceRequest.Status.FAILED
+            inference_request.error_message = str(e)
+            inference_request.completed_at = timezone.now()
+            inference_request.save()
+            
+            return Response(
+                {
+                    "success": False,
+                    "error": str(e),
+                    "request_id": str(inference_request.id)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class AutoAnalyzeView(APIView):
+    """
+    Auto-analyze endpoint.
+    Phase 10: POST /api/inference/analyze/
+    
+    The user never selects the model — the system does.
+    This endpoint auto-detects the image domain and routes to appropriate model.
+    """
+    authentication_classes = []
+    permission_classes = []
+    
+    def post(self, request):
+        """
+        Process an auto-analysis request.
+        
+        The system automatically:
+        1. Detects image domain (human/animal/plant/medical)
+        2. Selects appropriate model
+        3. Returns structured scientific output
+        """
+        logger.info("Auto-analyze request received")
+        
+        # Validate input
+        serializer = AutoAnalyzeRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            logger.warning(f"Invalid auto-analyze request: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        validated_data = serializer.validated_data
+        
+        # Create inference request record
+        user = request.user if request.user.is_authenticated else None
+        inference_request = InferenceRequest.objects.create(
+            requested_by=user,
+            status=InferenceRequest.Status.PROCESSING,
+            started_at=timezone.now(),
+            input_data={
+                "mode": "auto_analyze",
+                "has_image_data": bool(validated_data.get('image_data')),
+                "image_url": validated_data.get('image_url')
+            }
+        )
+        
+        logger.info(f"Created auto-analyze request {inference_request.id}")
+        
+        try:
+            # Call the predictor service in auto mode
+            analysis_result = predictor_service.auto_analyze({
+                "image_data": validated_data.get('image_data'),
+                "image_url": validated_data.get('image_url')
+            })
+            
+            # Update inference request with results
+            inference_request.status = InferenceRequest.Status.SUCCESS
+            inference_request.result = analysis_result
+            inference_request.completed_at = timezone.now()
+            inference_request.save()
+            
+            # Add request ID to response
+            analysis_result['request_id'] = str(inference_request.id)
+            
+            logger.info(f"Auto-analyze completed for request {inference_request.id}")
+            
+            return Response(analysis_result, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.exception(f"Auto-analyze failed for request {inference_request.id}: {e}")
+            
+            inference_request.status = InferenceRequest.Status.FAILED
+            inference_request.error_message = str(e)
+            inference_request.completed_at = timezone.now()
+            inference_request.save()
+            
+            return Response(
+                {
+                    "success": False,
+                    "error": str(e),
+                    "request_id": str(inference_request.id)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class PredictView(APIView):

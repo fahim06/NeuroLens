@@ -9,14 +9,15 @@
     <div class="md:flex md:items-center md:justify-between">
         <div class="flex-1 min-w-0">
             <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                Datasets
+                Dataset Management
             </h1>
             <p class="mt-1 text-sm text-gray-500">
-                Manage your retinal image datasets
+                Upload, manage, and assign datasets to detection domains
             </p>
         </div>
         <div class="mt-4 flex md:mt-0 md:ml-4">
             <button type="button" 
+                    id="newDatasetBtn"
                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                 <i class="fa-solid fa-plus mr-2"></i>
                 New Dataset
@@ -24,103 +25,448 @@
         </div>
     </div>
 
+    <!-- Domain Filter -->
+    <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-4">
+        <div class="flex flex-wrap gap-2">
+            <span class="text-sm font-medium text-gray-700 mr-2 py-2">Filter by domain:</span>
+            <button class="domain-filter active px-4 py-2 rounded-lg text-sm font-medium bg-primary-100 text-primary-700" data-domain="all">
+                All Domains
+            </button>
+            <button class="domain-filter px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200" data-domain="human">
+                <i class="fa-solid fa-user mr-1"></i> Human
+            </button>
+            <button class="domain-filter px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200" data-domain="animal">
+                <i class="fa-solid fa-paw mr-1"></i> Animal
+            </button>
+            <button class="domain-filter px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200" data-domain="plant">
+                <i class="fa-solid fa-leaf mr-1"></i> Plant
+            </button>
+            <button class="domain-filter px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200" data-domain="medical">
+                <i class="fa-solid fa-brain mr-1"></i> Medical
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-4">
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-database text-primary-600"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-500">Total Datasets</p>
+                    <p id="totalDatasets" class="text-xl font-bold text-gray-900">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-images text-green-600"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-500">Total Images</p>
+                    <p id="totalImages" class="text-xl font-bold text-gray-900">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-check-circle text-blue-600"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-500">Active</p>
+                    <p id="activeDatasets" class="text-xl font-bold text-gray-900">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 p-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-clock text-yellow-600"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-500">Processing</p>
+                    <p id="processingDatasets" class="text-xl font-bold text-gray-900">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Dataset Grid -->
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <!-- Dataset Card 1 -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-folder text-primary-600 text-xl"></i>
-                    </div>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Active
-                    </span>
-                </div>
-                <h3 class="mt-4 text-lg font-semibold text-gray-900">Training Set A</h3>
-                <p class="mt-1 text-sm text-gray-500">Primary training dataset for DR detection</p>
-                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                    <span><i class="fa-solid fa-image mr-1"></i> 2,450 images</span>
-                    <span><i class="fa-solid fa-clock mr-1"></i> Updated 2d ago</span>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
-                <button class="text-sm text-gray-600 hover:text-gray-900">
-                    <i class="fa-solid fa-eye mr-1"></i> View
-                </button>
-                <button class="text-sm text-primary-600 hover:text-primary-800">
-                    <i class="fa-solid fa-download mr-1"></i> Export
-                </button>
-            </div>
+    <div id="datasetGrid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Loading State -->
+        <div id="loadingState" class="col-span-full text-center py-12">
+            <i class="fa-solid fa-spinner fa-spin text-primary-600 text-2xl"></i>
+            <p class="mt-4 text-gray-500">Loading datasets...</p>
         </div>
+    </div>
 
-        <!-- Dataset Card 2 -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-folder text-blue-600 text-xl"></i>
-                    </div>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Active
-                    </span>
-                </div>
-                <h3 class="mt-4 text-lg font-semibold text-gray-900">Validation Set</h3>
-                <p class="mt-1 text-sm text-gray-500">Model validation dataset</p>
-                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                    <span><i class="fa-solid fa-image mr-1"></i> 612 images</span>
-                    <span><i class="fa-solid fa-clock mr-1"></i> Updated 5d ago</span>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
-                <button class="text-sm text-gray-600 hover:text-gray-900">
-                    <i class="fa-solid fa-eye mr-1"></i> View
-                </button>
-                <button class="text-sm text-primary-600 hover:text-primary-800">
-                    <i class="fa-solid fa-download mr-1"></i> Export
-                </button>
-            </div>
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden bg-white rounded-xl border border-gray-100 p-12 text-center">
+        <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <i class="fa-solid fa-folder-open text-gray-400 text-2xl"></i>
         </div>
+        <h3 class="text-lg font-medium text-gray-900">No datasets found</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by creating a new dataset.</p>
+        <button type="button" 
+                id="emptyStateCreateBtn"
+                class="mt-4 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
+            <i class="fa-solid fa-plus mr-2"></i>
+            Create Dataset
+        </button>
+    </div>
+</div>
 
-        <!-- Dataset Card 3 -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                        <i class="fa-solid fa-folder text-yellow-600 text-xl"></i>
+<!-- New Dataset Modal -->
+<div id="newDatasetModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" id="modalBackdrop"></div>
+        
+        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-xl shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="px-6 pt-5 pb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Create New Dataset</h3>
+                
+                <form id="newDatasetForm" class="mt-6 space-y-4">
+                    <div>
+                        <label for="datasetName" class="block text-sm font-medium text-gray-700">Dataset Name</label>
+                        <input type="text" id="datasetName" name="name" required
+                               class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                               placeholder="e.g., Brain MRI Training Set">
                     </div>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        Processing
-                    </span>
-                </div>
-                <h3 class="mt-4 text-lg font-semibold text-gray-900">October Batch</h3>
-                <p class="mt-1 text-sm text-gray-500">New images pending validation</p>
-                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                    <span><i class="fa-solid fa-image mr-1"></i> 156 images</span>
-                    <span><i class="fa-solid fa-clock mr-1"></i> Uploaded yesterday</span>
-                </div>
+                    
+                    <div>
+                        <label for="datasetDomain" class="block text-sm font-medium text-gray-700">Domain</label>
+                        <select id="datasetDomain" name="domain" required
+                                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">Select domain...</option>
+                            <option value="human">Human</option>
+                            <option value="animal">Animal</option>
+                            <option value="plant">Plant / Citrus</option>
+                            <option value="medical">Medical (MRI/X-Ray)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="datasetDescription" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea id="datasetDescription" name="description" rows="3"
+                                  class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                                  placeholder="Describe the dataset content and purpose..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Images</label>
+                        <div id="uploadDropzone" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors cursor-pointer">
+                            <i class="fa-solid fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
+                            <p class="text-sm text-gray-600">Drop images here or click to browse</p>
+                            <p class="text-xs text-gray-400 mt-1">Supports ZIP, TAR, or multiple images</p>
+                            <input type="file" id="fileUpload" class="hidden" multiple accept="image/*,.zip,.tar,.tar.gz">
+                        </div>
+                        <div id="uploadProgress" class="hidden mt-2">
+                            <div class="flex items-center justify-between text-sm text-gray-600">
+                                <span id="uploadFileName"></span>
+                                <span id="uploadPercent">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                <div id="uploadBar" class="bg-primary-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
-                <button class="text-sm text-gray-600 hover:text-gray-900">
-                    <i class="fa-solid fa-eye mr-1"></i> View
+            
+            <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+                <button type="button" id="cancelModalBtn"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
                 </button>
-                <button class="text-sm text-primary-600 hover:text-primary-800">
-                    <i class="fa-solid fa-download mr-1"></i> Export
+                <button type="submit" form="newDatasetForm" id="createDatasetBtn"
+                        class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+                    Create Dataset
                 </button>
-            </div>
-        </div>
-
-        <!-- Upload New Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-xl border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors cursor-pointer">
-            <div class="p-6 h-full flex flex-col items-center justify-center text-center">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <i class="fa-solid fa-cloud-upload-alt text-gray-400 text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900">Upload Dataset</h3>
-                <p class="mt-1 text-sm text-gray-500">Drag and drop or click to upload</p>
-                <p class="mt-2 text-xs text-gray-400">Supports ZIP, TAR, or folder upload</p>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // DOM Elements
+    const datasetGrid = document.getElementById('datasetGrid');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const newDatasetModal = document.getElementById('newDatasetModal');
+    const domainFilters = document.querySelectorAll('.domain-filter');
+    
+    let datasets = [];
+    let currentFilter = 'all';
+
+    // Domain icons and colors
+    const domainConfig = {
+        human: { icon: 'fa-user', bgColor: 'bg-blue-100', textColor: 'text-blue-600' },
+        animal: { icon: 'fa-paw', bgColor: 'bg-green-100', textColor: 'text-green-600' },
+        plant: { icon: 'fa-leaf', bgColor: 'bg-lime-100', textColor: 'text-lime-600' },
+        medical: { icon: 'fa-brain', bgColor: 'bg-purple-100', textColor: 'text-purple-600' }
+    };
+
+    // Load datasets from API
+    async function loadDatasets() {
+        try {
+            const response = await fetch('/api/datasets/');
+            if (response.ok) {
+                const data = await response.json();
+                datasets = data.results || data || [];
+            } else {
+                // Use demo data if API not available
+                datasets = getDemoDatasets();
+            }
+        } catch (error) {
+            console.error('Error loading datasets:', error);
+            datasets = getDemoDatasets();
+        }
+        
+        renderDatasets();
+        updateStats();
+    }
+
+    function getDemoDatasets() {
+        return [
+            {
+                id: 1,
+                name: 'Brain MRI Training Set',
+                domain: 'medical',
+                description: 'High-quality brain MRI scans for tumor detection training',
+                image_count: 2450,
+                status: 'active',
+                updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                id: 2,
+                name: 'Citrus Classification',
+                domain: 'plant',
+                description: 'Citrus fruit images from 8 different genera',
+                image_count: 1280,
+                status: 'active',
+                updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                id: 3,
+                name: 'Wildlife Categories',
+                domain: 'animal',
+                description: 'Mixed animal images for category classification',
+                image_count: 3200,
+                status: 'active',
+                updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                id: 4,
+                name: 'New Upload Batch',
+                domain: 'medical',
+                description: 'Recent MRI uploads pending validation',
+                image_count: 156,
+                status: 'processing',
+                updated_at: new Date().toISOString()
+            }
+        ];
+    }
+
+    function renderDatasets() {
+        loadingState.classList.add('hidden');
+        
+        const filtered = currentFilter === 'all' 
+            ? datasets 
+            : datasets.filter(d => d.domain === currentFilter);
+        
+        if (filtered.length === 0) {
+            datasetGrid.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        emptyState.classList.add('hidden');
+        
+        let html = filtered.map(dataset => {
+            const config = domainConfig[dataset.domain] || domainConfig.animal;
+            const statusBadge = dataset.status === 'active' 
+                ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>'
+                : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Processing</span>';
+            
+            const updatedAt = new Date(dataset.updated_at);
+            const daysAgo = Math.floor((Date.now() - updatedAt) / (1000 * 60 * 60 * 24));
+            const timeAgo = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo}d ago`;
+            
+            return `
+                <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="w-12 h-12 ${config.bgColor} rounded-xl flex items-center justify-center">
+                                <i class="fa-solid ${config.icon} ${config.textColor} text-xl"></i>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <h3 class="mt-4 text-lg font-semibold text-gray-900">${dataset.name}</h3>
+                        <p class="mt-1 text-sm text-gray-500 line-clamp-2">${dataset.description || 'No description'}</p>
+                        <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                            <span><i class="fa-solid fa-images mr-1"></i> ${dataset.image_count.toLocaleString()} images</span>
+                            <span><i class="fa-solid fa-clock mr-1"></i> ${timeAgo}</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
+                        <button class="text-sm text-gray-600 hover:text-gray-900" onclick="viewDataset(${dataset.id})">
+                            <i class="fa-solid fa-eye mr-1"></i> View
+                        </button>
+                        <button class="text-sm text-primary-600 hover:text-primary-800" onclick="exportDataset(${dataset.id})">
+                            <i class="fa-solid fa-download mr-1"></i> Export
+                        </button>
+                        <button class="text-sm text-red-600 hover:text-red-800" onclick="deleteDataset(${dataset.id})">
+                            <i class="fa-solid fa-trash mr-1"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add upload card
+        html += `
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors cursor-pointer"
+                 onclick="openModal()">
+                <div class="p-6 h-full flex flex-col items-center justify-center text-center min-h-[250px]">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-cloud-upload-alt text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Upload Dataset</h3>
+                    <p class="mt-1 text-sm text-gray-500">Drag and drop or click to upload</p>
+                    <p class="mt-2 text-xs text-gray-400">Supports ZIP, TAR, or folder upload</p>
+                </div>
+            </div>
+        `;
+        
+        datasetGrid.innerHTML = html;
+    }
+
+    function updateStats() {
+        document.getElementById('totalDatasets').textContent = datasets.length;
+        document.getElementById('totalImages').textContent = 
+            datasets.reduce((sum, d) => sum + d.image_count, 0).toLocaleString();
+        document.getElementById('activeDatasets').textContent = 
+            datasets.filter(d => d.status === 'active').length;
+        document.getElementById('processingDatasets').textContent = 
+            datasets.filter(d => d.status === 'processing').length;
+    }
+
+    // Filter handling
+    domainFilters.forEach(btn => {
+        btn.addEventListener('click', () => {
+            domainFilters.forEach(b => {
+                b.classList.remove('active', 'bg-primary-100', 'text-primary-700');
+                b.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            btn.classList.add('active', 'bg-primary-100', 'text-primary-700');
+            btn.classList.remove('bg-gray-100', 'text-gray-600');
+            
+            currentFilter = btn.dataset.domain;
+            renderDatasets();
+        });
+    });
+
+    // Modal handling
+    function openModal() {
+        newDatasetModal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        newDatasetModal.classList.add('hidden');
+        document.getElementById('newDatasetForm').reset();
+    }
+
+    document.getElementById('newDatasetBtn').addEventListener('click', openModal);
+    document.getElementById('emptyStateCreateBtn')?.addEventListener('click', openModal);
+    document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+    document.getElementById('modalBackdrop').addEventListener('click', closeModal);
+
+    // File upload handling
+    const uploadDropzone = document.getElementById('uploadDropzone');
+    const fileUpload = document.getElementById('fileUpload');
+    
+    uploadDropzone.addEventListener('click', () => fileUpload.click());
+    uploadDropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadDropzone.classList.add('border-primary-500', 'bg-primary-50');
+    });
+    uploadDropzone.addEventListener('dragleave', () => {
+        uploadDropzone.classList.remove('border-primary-500', 'bg-primary-50');
+    });
+    uploadDropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadDropzone.classList.remove('border-primary-500', 'bg-primary-50');
+        handleFiles(e.dataTransfer.files);
+    });
+    fileUpload.addEventListener('change', (e) => handleFiles(e.target.files));
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            document.getElementById('uploadProgress').classList.remove('hidden');
+            document.getElementById('uploadFileName').textContent = 
+                files.length === 1 ? files[0].name : `${files.length} files selected`;
+            // Simulate progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                document.getElementById('uploadPercent').textContent = `${progress}%`;
+                document.getElementById('uploadBar').style.width = `${progress}%`;
+                if (progress >= 100) clearInterval(interval);
+            }, 200);
+        }
+    }
+
+    // Form submission
+    document.getElementById('newDatasetForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        
+        // Add to demo datasets
+        datasets.push({
+            id: datasets.length + 1,
+            name: data.name,
+            domain: data.domain,
+            description: data.description,
+            image_count: 0,
+            status: 'processing',
+            updated_at: new Date().toISOString()
+        });
+        
+        closeModal();
+        renderDatasets();
+        updateStats();
+        
+        // Show success message
+        alert('Dataset created successfully! Upload processing in background.');
+    });
+
+    // Dataset actions
+    function viewDataset(id) {
+        const dataset = datasets.find(d => d.id === id);
+        alert(`Viewing dataset: ${dataset.name}\n\nImages: ${dataset.image_count}\nDomain: ${dataset.domain}\nStatus: ${dataset.status}`);
+    }
+
+    function exportDataset(id) {
+        alert('Dataset export started. You will receive a download link when ready.');
+    }
+
+    function deleteDataset(id) {
+        if (confirm('Are you sure you want to delete this dataset? This action cannot be undone.')) {
+            datasets = datasets.filter(d => d.id !== id);
+            renderDatasets();
+            updateStats();
+        }
+    }
+
+    // Initial load
+    loadDatasets();
+</script>
 {% endblock %}
