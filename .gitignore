@@ -188,6 +188,7 @@ checkpoints/
 ml/datasets/raw/
 ml/datasets/processed/
 data/
+datasets/
 *.csv
 *.tsv
 *.parquet

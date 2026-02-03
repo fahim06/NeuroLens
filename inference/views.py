@@ -10,6 +10,7 @@ from .models import InferenceRequest
 from .serializers import (
     InferenceRequestSerializer,
     PredictRequestSerializer,
+    PredictResponseSerializer
 )
 from .services.predictor import predictor_service
 
