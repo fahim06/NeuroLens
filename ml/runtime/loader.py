@@ -7,7 +7,6 @@ Models are loaded once and reused across inference requests.
 IMPORTANT: This module should be imported by the ML runtime only,
 not directly by Django views.
 """
-import os
 import logging
 from pathlib import Path
 from typing import Optional, Any
@@ -92,7 +91,7 @@ class ModelLoader:
                     # Weights-only files have 'model_weights' but no 'model_config'
                     if 'model_weights' in keys and 'model_config' not in keys:
                         is_weights_only = True
-                        logger.warning(f"File appears to be weights-only (no model config)")
+                        logger.warning("File appears to be weights-only (no model config)")
             except Exception:
                 pass
             
@@ -153,7 +152,7 @@ class ModelLoader:
             tf.keras.layers.Dense(10, activation='softmax', name='dense_1')
         ])
         
-        logger.info(f"Built default model architecture: input_shape=(32, 32, 3), output_classes=10")
+        logger.info("Built default model architecture: input_shape=(32, 32, 3), output_classes=10")
         return model
 
     def _load_weights_from_hdf5(self, model_path: str) -> None:

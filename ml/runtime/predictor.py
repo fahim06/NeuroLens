@@ -11,7 +11,7 @@ import logging
 import base64
 import io
 from datetime import datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 import numpy as np
 
 logger = logging.getLogger(__name__)
