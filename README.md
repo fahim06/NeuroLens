@@ -12,6 +12,10 @@
   <img src="https://img.shields.io/badge/framework-Django 6.0 | DRF-purple" />
   <img src="https://img.shields.io/badge/frontend-Django Templates | Tailwind-cyan" />
   <img src="https://img.shields.io/badge/license-MIT-orange" />
+  <!-- GitHub Actions workflow status badge -->
+  <a href="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml">
+    <img src="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" />
+  </a>
 </p>
 
 ---
