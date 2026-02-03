@@ -1,0 +1,77 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache
+.mypy_cache
+.ruff_cache
+htmlcov
+.coverage
+.coverage.*
+*.egg-info
+dist
+build
+eggs
+*.egg
+
+# Virtual environments
+.venv
+venv
+env
+.conda
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Node (for frontend)
+node_modules
+npm-debug.log*
+
+# Local files
+.env
+.env.local
+.env.*.local
+*.log
+logs
+
+# Database
+*.sqlite3
+db.sqlite3
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Documentation
+docs
+*.md
+!README.md
+!requirements.txt
+!requirements*.txt
+
+# Tests (exclude from production)
+tests
+test_*.py
+
+# Demo files
+demo_images
+
+# ML models (large files)
+*.keras
+*.h5
+*.pkl
+*.joblib
+
+# Misc
+.DS_Store
+Thumbs.db

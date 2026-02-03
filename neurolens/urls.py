@@ -30,11 +30,15 @@ def api_root(request):
 
 
 urlpatterns = [
-    path('', api_root, name='api-root'),
+    # Admin
     path('admin/', admin.site.urls),
+    
+    # UI Routes (Django templates + Tailwind) - Phase 9
+    path('', include('ui.urls')),
+    
+    # API Routes
     path('api/', include('core.urls')),
     path('api/auth/', include('users.urls')),
     path('api/datasets/', include('datasets.urls')),
     path('api/inference/', include('inference.urls')),
-    # UI routes removed: React frontend serves UI (Phase 8)
 ]

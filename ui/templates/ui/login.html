@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NeuroLens - AI-Powered Retinal Disease Detection">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'ui/css/login.css' %}">
+    <title>NeuroLens - Login</title>
+</head>
+
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Floating Particles Background -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="container" id="container">
+        <!-- Sign Up Form -->
+        <div class="form-container sign-up">
+            <form id="signUpForm" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="signup">
+                <h1>Create Account</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon" aria-label="Sign up with Google"><i class="fa-brands fa-google"></i></a>
+                    <a href="#" class="icon" aria-label="Sign up with Facebook"><i
+                            class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon" aria-label="Sign up with GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon" aria-label="Sign up with LinkedIn"><i
+                            class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your email for registration</span>
+
+                <div class="input-group">
+                    <input type="text" id="signUpName" name="name" placeholder=" " required />
+                    <label for="signUpName">Name</label>
+                    <span class="error-message" id="signUpNameError"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="signUpUsername" name="username" placeholder=" " required />
+                    <label for="signUpUsername">Username</label>
+                    <span class="error-message" id="signUpUsernameError"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="email" id="signUpEmail" name="email" placeholder=" " required />
+                    <label for="signUpEmail">Email</label>
+                    <span class="error-message" id="signUpEmailError"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="signUpPassword" name="password" placeholder=" " required />
+                    <label for="signUpPassword">Password</label>
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <span class="error-message" id="signUpPasswordError"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="signUpConfirmPassword" name="confirm_password" placeholder=" " required />
+                    <label for="signUpConfirmPassword">Confirm Password</label>
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <span class="error-message" id="signUpConfirmPasswordError"></span>
+                </div>
+
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <span class="strength-text" id="strengthText"></span>
+                </div>
+
+                <button type="submit" class="btn-primary" id="signUpBtn">
+                    <span class="btn-text">Sign Up</span>
+                    <span class="btn-loader"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Sign In Form -->
+        <div class="form-container sign-in">
+            <form id="signInForm" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="signin">
+                <h1>Sign In</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon" aria-label="Sign in with Google"><i class="fa-brands fa-google"></i></a>
+                    <a href="#" class="icon" aria-label="Sign in with Facebook"><i
+                            class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon" aria-label="Sign in with GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon" aria-label="Sign in with LinkedIn"><i
+                            class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your email and password</span>
+
+                <div class="input-group">
+                    <input type="email" id="signInEmail" name="email" placeholder=" " required />
+                    <label for="signInEmail">Email</label>
+                    <span class="error-message" id="signInEmailError"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="signInPassword" name="password" placeholder=" " required />
+                    <label for="signInPassword">Password</label>
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <span class="error-message" id="signInPasswordError"></span>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="rememberMe" name="remember_me">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" id="forgotPassword">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary" id="signInBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Toggle Panels -->
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Enter your details and start your journey with us</p>
+                    <button class="hidden" id="login">Sign In</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Register your details and start your journey with us</p>
+                    <button class="hidden" id="register">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'ui/js/login.js' %}"></script>
+</body>
+
+</html>

@@ -1,8 +1,9 @@
 # ============================================================
 # NeuroLens — Docker Compose (Local & CI)
 # ============================================================
-# Services: backend, frontend, redis, postgres
-# Usage: docker-compose up -d
+# Phase 9: React Removal — Django-Only Architecture
+# Services: backend (Django + Tailwind UI), postgres, redis
+# Usage: docker compose up -d
 # ============================================================
 
 services:
@@ -84,28 +85,6 @@ services:
     restart: unless-stopped
 
   # ============================================================
-  # FRONTEND (React)
-  # ============================================================
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: ../infra/docker/frontend.Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL:-/api}
-        ENVIRONMENT: ${ENVIRONMENT:-development}
-    container_name: neurolens-frontend
-    ports:
-      - "${FRONTEND_PORT:-3000}:80"
-    depends_on:
-      - backend
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-    restart: unless-stopped
-
-  # ============================================================
   # CELERY WORKER (Background Tasks)
   # ============================================================
   celery-worker:
@@ -128,6 +107,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      disable: true
     restart: unless-stopped
 
   # ============================================================
@@ -138,7 +119,7 @@ services:
       context: .
       dockerfile: infra/docker/backend.Dockerfile
     container_name: neurolens-celery-beat
-    command: celery -A neurolens beat -l INFO
+    command: celery -A neurolens beat -l INFO --schedule=/tmp/celerybeat-schedule
     environment:
       - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
@@ -151,6 +132,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      disable: true
     restart: unless-stopped
 
 volumes:

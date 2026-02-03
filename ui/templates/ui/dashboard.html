@@ -1,0 +1,222 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - NeuroLens{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="md:flex md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                Welcome back, {{ user.first_name|default:user.username }}!
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+                AI-Powered Retinal Disease Detection Dashboard
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Total Scans -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-eye text-primary-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Scans</dt>
+                            <dd class="text-2xl font-bold text-gray-900">1,247</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accuracy -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-bullseye text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Model Accuracy</dt>
+                            <dd class="text-2xl font-bold text-gray-900">94.2%</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Datasets -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-database text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Active Datasets</dt>
+                            <dd class="text-2xl font-bold text-gray-900">3</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-clock text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Pending Analysis</dt>
+                            <dd class="text-2xl font-bold text-gray-900">12</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white shadow-sm rounded-xl border border-gray-100">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <a href="{% url 'ui:inference' %}" 
+                   class="relative group bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl p-6 text-white hover:shadow-lg transition-all duration-200">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-upload text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg">New Scan</h3>
+                            <p class="text-white/80 text-sm">Upload retinal image for analysis</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+
+                <a href="{% url 'ui:datasets' %}" 
+                   class="relative group bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary-300 hover:shadow-md transition-all duration-200">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-folder-plus text-blue-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg text-gray-900">Manage Datasets</h3>
+                            <p class="text-gray-500 text-sm">Upload and organize datasets</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+
+                <a href="#" 
+                   class="relative group bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary-300 hover:shadow-md transition-all duration-200">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-chart-bar text-green-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg text-gray-900">View Reports</h3>
+                            <p class="text-gray-500 text-sm">Analyze previous scans</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white shadow-sm rounded-xl border border-gray-100">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+            <div class="flow-root">
+                <ul role="list" class="-mb-8">
+                    <li>
+                        <div class="relative pb-8">
+                            <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                            <div class="relative flex items-start space-x-3">
+                                <div class="relative">
+                                    <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fa-solid fa-check text-green-600"></i>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Scan completed</p>
+                                        <p class="mt-0.5 text-sm text-gray-900 font-medium">Retinal scan #1247 - No abnormalities detected</p>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-500">
+                                        <span>2 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="relative pb-8">
+                            <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                            <div class="relative flex items-start space-x-3">
+                                <div class="relative">
+                                    <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fa-solid fa-exclamation text-yellow-600"></i>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Review required</p>
+                                        <p class="mt-0.5 text-sm text-gray-900 font-medium">Retinal scan #1246 - Potential DR markers detected</p>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-500">
+                                        <span>5 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="relative">
+                            <div class="relative flex items-start space-x-3">
+                                <div class="relative">
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fa-solid fa-upload text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Dataset uploaded</p>
+                                        <p class="mt-0.5 text-sm text-gray-900 font-medium">New dataset "October Batch" - 156 images</p>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-500">
+                                        <span>Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

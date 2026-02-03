@@ -1,0 +1,219 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Inference - NeuroLens{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="md:flex md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                Retinal Analysis
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+                Upload retinal images for AI-powered disease detection
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Upload Section -->
+        <div class="bg-white shadow-sm rounded-xl border border-gray-100">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Image</h2>
+                
+                <!-- Upload Zone -->
+                <div id="dropZone" 
+                     class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary-400 transition-colors cursor-pointer">
+                    <div class="space-y-4">
+                        <div class="w-16 h-16 mx-auto bg-primary-100 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-cloud-upload-alt text-primary-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-lg font-medium text-gray-900">Drop your retinal image here</p>
+                            <p class="text-sm text-gray-500 mt-1">or click to browse</p>
+                        </div>
+                        <p class="text-xs text-gray-400">Supports: JPEG, PNG, TIFF (max 10MB)</p>
+                    </div>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*">
+                </div>
+
+                <!-- Preview -->
+                <div id="previewSection" class="hidden mt-6">
+                    <div class="relative">
+                        <img id="previewImage" class="w-full rounded-xl" alt="Preview">
+                        <button id="removeImage" 
+                                class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                    <button id="analyzeBtn" 
+                            class="mt-4 w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <i class="fa-solid fa-brain mr-2"></i>
+                        Analyze Image
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white shadow-sm rounded-xl border border-gray-100">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Analysis Results</h2>
+                
+                <!-- Placeholder -->
+                <div id="resultsPlaceholder" class="text-center py-12">
+                    <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-microscope text-gray-400 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-500">Upload an image to see analysis results</p>
+                </div>
+
+                <!-- Results Content (hidden by default) -->
+                <div id="resultsContent" class="hidden space-y-6">
+                    <!-- Diagnosis -->
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <i class="fa-solid fa-check text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-semibold text-green-800">No Diabetic Retinopathy Detected</h3>
+                                <p class="text-sm text-green-600">Confidence: 94.2%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Results -->
+                    <div class="space-y-3">
+                        <h4 class="font-medium text-gray-900">Detection Probabilities</h4>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">No DR</span>
+                                <span class="text-sm font-medium text-gray-900">94.2%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 94.2%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Mild DR</span>
+                                <span class="text-sm font-medium text-gray-900">3.1%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 3.1%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Moderate DR</span>
+                                <span class="text-sm font-medium text-gray-900">1.8%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-orange-500 h-2 rounded-full" style="width: 1.8%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Severe DR</span>
+                                <span class="text-sm font-medium text-gray-900">0.6%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 0.6%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Proliferative DR</span>
+                                <span class="text-sm font-medium text-gray-900">0.3%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-700 h-2 rounded-full" style="width: 0.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex space-x-3 pt-4 border-t border-gray-200">
+                        <button class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50">
+                            <i class="fa-solid fa-download mr-2"></i>
+                            Download Report
+                        </button>
+                        <button class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700">
+                            <i class="fa-solid fa-save mr-2"></i>
+                            Save to Dataset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Simple file upload handling
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewSection = document.getElementById('previewSection');
+    const previewImage = document.getElementById('previewImage');
+    const removeImage = document.getElementById('removeImage');
+    const resultsPlaceholder = document.getElementById('resultsPlaceholder');
+    const resultsContent = document.getElementById('resultsContent');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-primary-500', 'bg-primary-50');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-primary-500', 'bg-primary-50');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-primary-500', 'bg-primary-50');
+        handleFile(e.dataTransfer.files[0]);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        handleFile(e.target.files[0]);
+    });
+    
+    function handleFile(file) {
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewSection.classList.remove('hidden');
+                dropZone.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    removeImage.addEventListener('click', () => {
+        previewSection.classList.add('hidden');
+        dropZone.classList.remove('hidden');
+        fileInput.value = '';
+        resultsContent.classList.add('hidden');
+        resultsPlaceholder.classList.remove('hidden');
+    });
+    
+    document.getElementById('analyzeBtn')?.addEventListener('click', () => {
+        // Simulate analysis
+        resultsPlaceholder.classList.add('hidden');
+        resultsContent.classList.remove('hidden');
+    });
+</script>
+{% endblock %}

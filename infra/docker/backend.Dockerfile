@@ -8,7 +8,7 @@
 # =====================================================
 # Stage 1: Builder
 # =====================================================
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
@@ -19,14 +19,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt requirements-dev.txt* ./
+COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip wheel \
     && pip wheel --no-cache-dir --wheel-dir /app/wheels -r requirements.txt
 
 # =====================================================
 # Stage 2: Production
 # =====================================================
-FROM python:3.12-slim as production
+FROM python:3.12-slim AS production
 
 # Build arguments
 ARG ENVIRONMENT=production
@@ -58,8 +58,11 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy application code
 COPY --chown=appuser:appuser . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput 2>/dev/null || true
+# Create logs directory
+RUN mkdir -p /app/logs && chown appuser:appuser /app/logs
+
+# Collect static files (ignore errors if Django not fully configured)
+RUN python manage.py collectstatic --noinput 2>/dev/null || echo "Static collection skipped"
 
 # Switch to non-root user
 USER appuser

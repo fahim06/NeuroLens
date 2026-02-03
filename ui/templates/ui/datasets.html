@@ -1,0 +1,126 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Datasets - NeuroLens{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="md:flex md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                Datasets
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+                Manage your retinal image datasets
+            </p>
+        </div>
+        <div class="mt-4 flex md:mt-0 md:ml-4">
+            <button type="button" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <i class="fa-solid fa-plus mr-2"></i>
+                New Dataset
+            </button>
+        </div>
+    </div>
+
+    <!-- Dataset Grid -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Dataset Card 1 -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-folder text-primary-600 text-xl"></i>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Active
+                    </span>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-gray-900">Training Set A</h3>
+                <p class="mt-1 text-sm text-gray-500">Primary training dataset for DR detection</p>
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                    <span><i class="fa-solid fa-image mr-1"></i> 2,450 images</span>
+                    <span><i class="fa-solid fa-clock mr-1"></i> Updated 2d ago</span>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
+                <button class="text-sm text-gray-600 hover:text-gray-900">
+                    <i class="fa-solid fa-eye mr-1"></i> View
+                </button>
+                <button class="text-sm text-primary-600 hover:text-primary-800">
+                    <i class="fa-solid fa-download mr-1"></i> Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Dataset Card 2 -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-folder text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Active
+                    </span>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-gray-900">Validation Set</h3>
+                <p class="mt-1 text-sm text-gray-500">Model validation dataset</p>
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                    <span><i class="fa-solid fa-image mr-1"></i> 612 images</span>
+                    <span><i class="fa-solid fa-clock mr-1"></i> Updated 5d ago</span>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
+                <button class="text-sm text-gray-600 hover:text-gray-900">
+                    <i class="fa-solid fa-eye mr-1"></i> View
+                </button>
+                <button class="text-sm text-primary-600 hover:text-primary-800">
+                    <i class="fa-solid fa-download mr-1"></i> Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Dataset Card 3 -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-folder text-yellow-600 text-xl"></i>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Processing
+                    </span>
+                </div>
+                <h3 class="mt-4 text-lg font-semibold text-gray-900">October Batch</h3>
+                <p class="mt-1 text-sm text-gray-500">New images pending validation</p>
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                    <span><i class="fa-solid fa-image mr-1"></i> 156 images</span>
+                    <span><i class="fa-solid fa-clock mr-1"></i> Uploaded yesterday</span>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
+                <button class="text-sm text-gray-600 hover:text-gray-900">
+                    <i class="fa-solid fa-eye mr-1"></i> View
+                </button>
+                <button class="text-sm text-primary-600 hover:text-primary-800">
+                    <i class="fa-solid fa-download mr-1"></i> Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Upload New Card -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-xl border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors cursor-pointer">
+            <div class="p-6 h-full flex flex-col items-center justify-center text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-cloud-upload-alt text-gray-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Upload Dataset</h3>
+                <p class="mt-1 text-sm text-gray-500">Drag and drop or click to upload</p>
+                <p class="mt-2 text-xs text-gray-400">Supports ZIP, TAR, or folder upload</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
