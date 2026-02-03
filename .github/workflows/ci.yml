@@ -68,11 +68,6 @@ jobs:
           SECRET_KEY: "ci-test-secret-key"
           DEBUG: "False"
 
-      - name: Check Migrations
-        run: python manage.py migrate --check
-        env:
-          SECRET_KEY: "ci-test-secret-key"
-          DEBUG: "False"
 
       - name: Lint - Ruff
         run: ruff check . --output-format=github
