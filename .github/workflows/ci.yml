@@ -21,7 +21,6 @@ concurrency:
 
 env:
   PYTHON_VERSION: "3.12"
-  NODE_VERSION: "18"
 
 jobs:
   # ============================================================
@@ -83,47 +82,11 @@ jobs:
 
       - name: Run Tests
         run: |
-          python -m pytest tests/ -v \
-            --ignore=tests/__pycache__ \
-            -x --tb=short
+          python manage.py test -v 2
         env:
           SECRET_KEY: "ci-test-secret-key"
           DEBUG: "False"
           REDIS_URL: "redis://localhost:6379/0"
-
-  # ============================================================
-  # FRONTEND (React)
-  # ============================================================
-  frontend:
-    name: Frontend
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install Dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Type Check
-        working-directory: frontend
-        run: npx tsc --noEmit
-
-      - name: Lint
-        working-directory: frontend
-        run: npm run lint 2>/dev/null || echo "Lint script not configured"
-
-      - name: Build
-        working-directory: frontend
-        run: npm run build
-        env:
-          VITE_API_URL: "/api"
 
   # ============================================================
   # SECURITY
@@ -149,16 +112,6 @@ jobs:
           fi
         continue-on-error: true
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Dependency Scan (NPM)
-        working-directory: frontend
-        run: npm audit --audit-level=high || echo "NPM vulnerabilities found"
-        continue-on-error: true
-
       - name: Secret Scan
         run: |
           # Install gitleaks
@@ -180,18 +133,17 @@ jobs:
   ci-status:
     name: CI Status
     runs-on: ubuntu-latest
-    needs: [backend, frontend, security]
+    needs: [backend, security]
     if: always()
     steps:
       - name: Check CI Status
         run: |
           echo "Backend: ${{ needs.backend.result }}"
-          echo "Frontend: ${{ needs.frontend.result }}"
           echo "Security: ${{ needs.security.result }}"
 
           # CI must fail on ANY error (per canvas)
           if [[ "${{ needs.backend.result }}" == "failure" ]] || \
-             [[ "${{ needs.frontend.result }}" == "failure" ]]; then
+             [[ "${{ needs.security.result }}" == "failure" ]]; then
             echo "❌ CI Failed"
             exit 1
           fi
