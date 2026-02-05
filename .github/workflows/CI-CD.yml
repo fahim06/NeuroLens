@@ -330,7 +330,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
-        continue-on-error: true#
+        continue-on-error: true
       # Backend Build
       - name: Backend Image Metadata
         id: backend-meta
