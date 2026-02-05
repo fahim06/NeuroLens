@@ -21,8 +21,6 @@ NeuroLens v3.0 includes comprehensive security hardening:
 - **Audit Logging**: Tamper-resistant event chain
 - **Data Protection**: AES-256-GCM encryption, PII detection
 
-For detailed security documentation, see [docs/COMPLIANCE.md](docs/COMPLIANCE.md).
-
 ## Reporting a Vulnerability
 
 We take security vulnerabilities seriously. If you discover a security issue, please follow these steps to report it

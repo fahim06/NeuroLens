@@ -31,8 +31,14 @@
                         Refresh
                     </button>
                     <div class="hidden md:block">
-                        <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-brain text-3xl text-white"></i>
+                        <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center overflow-hidden">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}"
+                                     alt="Profile Picture"
+                                     class="w-full h-full object-cover rounded-full">
+                            {% else %}
+                                <i class="fa-solid fa-user text-3xl text-white"></i>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -23,12 +23,14 @@
 
 NeuroLens is an AI platform for multi-domain image detection and classification, featuring:
 
-- **Django REST Backend** — Production-ready API with DRF
-- **Django Templates + Tailwind** — Zero-build CSS UI
-- **JWT Authentication** — Secure token-based auth with roles
-- **Multi-Domain Detection** — 5 detection types with unified API
-- **Role-Based Access** — Admin, Beta User, and Viewer roles
-- **Model Registry** — Extensible model architecture for new detection types
+- 🏗️ **Django REST Backend** — Production-ready API with DRF
+- 🎨 **Django Templates + Tailwind** — Zero-build CSS UI
+- 🔐 **JWT Authentication** — Secure token-based auth with roles
+- 🧠 **Multi-Domain Detection** — 5 detection types with unified API
+- 📚 **Model Registry** — Extensible model architecture for new detection types
+- 🔍 **Auto-domain detection** — Automatically identifies image domain
+- 🤖 **Auto-model selection** — Selects appropriate ML model per domain
+- 🧬 **Biological classification output** — Hierarchical taxonomy for bio samples
 
 ## 🧠 Supported Detection Types
 
@@ -42,84 +44,245 @@ NeuroLens is an AI platform for multi-domain image detection and classification,
 
 ## 🏗️ Architecture
 
+### High-Level Architecture
+
 ```
-neurolens/
-├── ui/                # Django Templates + Tailwind CSS
-│   ├── templates/     # HTML templates
-│   ├── static/        # CSS, JS assets
-│   └── views.py       # View functions
-├── core/              # Health checks, base utilities
-├── users/             # User profiles, roles, permissions
-├── datasets/          # Dataset management
-├── inference/         # Prediction API, service layer
-├── ml/                # ML runtime (isolated from Django)
-│   ├── registry.py    # Model registry for detection types
-│   ├── models/        # Detection model implementations
-│   │   ├── animal_detector/
-│   │   ├── bio_classifier/
-│   │   ├── brain_tumor/
-│   │   └── citrus_classifier/
-│   └── inference_engine.py  # Unified inference interface
-├── neurolens/         # Django settings
-└── assets/            # Model weights, static files
+┌─────────┐     ┌─────────────────────────────┐     ┌─────────────────┐     ┌─────────────────────────────────────────┐
+│ Browser │ ──► │ Django Templates + Tailwind │ ──► │ Django REST API │ ──► │ Service Layer                          │
+│         │     │ UI                          │     │                 │     │ (Router, Registry, Taxonomy)           │
+└─────────┘     └─────────────────────────────┘     └─────────────────┘     └─────────────────────────────────────────┘
+                                                                                      │
+                                                                                      ▼
+┌─────────────────────┐     ┌─────────────────────────────┐
+│ Async Worker        │ ──► │ ML Runtime                  │
+│ (Celery + Redis)    │     │ (Isolated Models)           │
+└─────────────────────┘     └─────────────────────────────┘
+```
+
+#### Sequence Diagram (Inference Request)
+
+```
+User                    Controller                Service             ML Runtime      Database
+  │                         │                        │                     │              │
+  │───POST /api/inference──►│                        │                     │              │
+  │                         │                        │                     │              │
+  │                         │───validate_request()──►│                     │              │
+  │                         │                        │                     │              │
+  │                         │                        │───process_image()──►│              │
+  │                         │                        │                     │              │
+  │                         │                        │                     │◄───result────│
+  │                         │                        │                     │              │
+  │                         │                        │◄───save_result()────│              │
+  │                         │                        │                     │              │
+  │                         │◄───response────────────│                     │              │
+  │                         │                        │                     │              │
+  │◄───JSON Response───────►│                        │◄────────────────────│              │
+```
+
+### Website & User Experience (UX) Diagrams
+
+#### User Flow Diagram
+
+```
+┌─────────────┐
+│   Landing   │
+│   Page      │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐     ┌─────────────┐
+│   Login     │◄────┤  Register   │
+│   Page      │     │   Page      │
+└──────┬──────┘     └─────────────┘
+       │
+       ▼
+┌─────────────┐
+│  Dashboard  │ ◄─────────────────┐
+│  (Stats)    │                   │
+└──────┬──────┘                   │
+       │                          │
+       ├─────────────┐            │
+       │             ▼            │
+       │    ┌─────────────┐       │
+       │    │  Datasets   │       │
+       │    │ Management  │ ──────┘
+       │    └──────┬──────┘
+       │           │
+       ▼           ▼
+┌─────────────┐    ┌─────────────┐
+│  Inference  │    │   Upload    │
+│   Results   │    │   Dataset   │
+└─────────────┘    └─────────────┘
+```
+
+#### Wireframe Sketch (Dashboard)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ NeuroLens                    [Profile] [Logout]             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Welcome back, [User]!              [Upload Dataset]        │
+│                                                             │
+├─────────────────┬─────────────────┬─────────────────┬───────┤
+│ Total Datasets  │ Active Models   │ Today's         │ Health│
+│       12        │       5         │ Predictions     │  ✅   │
+│                 │                 │      47         │       │
+├─────────────────┬─────────────────┬─────────────────┬───────┤
+│                                                             │
+│ Recent Activity:                                            │
+│ • Dataset "cats_vs_dogs" uploaded 2h ago                    │
+│ • Inference completed on "medical_scan_001" 1h ago          │
+│ • Model "brain_tumor_v2" deployed 30m ago                   │
+│                                                             │
+│ [View All Activity]                                         │
+├─────────────────────────────────────────────────────────────┤
+│ Quick Actions: [New Inference] [Manage Datasets] [Settings] │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Data & System Architecture Diagrams
+
+#### Database Schema Overview
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    PostgreSQL Database              │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ┌─────────────────┐  ┌──────────────────┐          │
+│  │   auth_user     │  │  users_profile   │          │
+│  │                 │  │                  │          │
+│  │ - id (PK)       │  │ - user_id (FK)   │          │
+│  │ - username      │  │ - role           │          │
+│  │ - email         │  │ - profile_pic    │          │
+│  └─────────────────┘  └──────────────────┘          │
+│           │                       │                 │
+│           │ 1:N                   1:1               │
+│           ▼                       │                 │
+│  ┌─────────────────┐              │                 │
+│  │   datasets      │◄─────────────┘                 │
+│  │                 │                                │
+│  │ - id (PK)       │                                │
+│  │ - name          │                                │
+│  │ - owner_id (FK) │                                │
+│  └─────────────────┘                                │
+│           │                                         │
+│           │ 1:N                                     │
+│           ▼                                         │
+│  ┌─────────────────┐                                │
+│  │ inference_req   │                                │
+│  │                 │                                │
+│  │ - id (PK)       │                                │
+│  │ - user_id (FK)  │                                │
+│  │ - dataset_id(FK)│                                │
+│  │ - status        │                                │
+│  └─────────────────┘                                │
+└─────────────────────────────────────────────────────┘
+```
+
+#### System Deployment Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Docker Compose                           │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐  │
+│  │   Frontend      │  │   Backend       │  │   Redis     │  │
+│  │   (Nginx)       │  │   (Django)      │  │   Cache     │  │
+│  │                 │  │                 │  │             │  │
+│  │ - Static files  │  │ - API           │  │ - Sessions  │  │
+│  │ - Templates     │  │ - Business logic│  │ - Tasks     │  │
+│  │ - Routing       │  └─────────────────┘  └─────────────┘  │
+│  └─────────────────┘                                        │
+│           │                                                 │
+│           │ HTTP                                            │
+│           ▼                                                 │
+│  ┌─────────────────┐  ┌─────────────────┐                   │
+│  │   PostgreSQL    │  │   ML Models     │                   │
+│  │   Database      │  │   (Volume)      │                   │
+│  │                 │  │                 │                   │
+│  │ - User data     │  │ - Pre-trained   │                   │
+│  │ - Datasets      │  │ - Checkpoints   │                   │
+│  │ - Results       │  │ - Configs       │                   │
+│  └─────────────────┘  └─────────────────┘                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Project Structure
+
+```
+NeuroLens/
+├── .env.example            # Environment template
+├── docker-compose.yml      # Docker services configuration
+├── manage.py               # Django management script
+├── requirements.txt        # Python dependencies
+├── dump.rdb                # Redis database dump
+├── core/                   # Health checks, base utilities
+├── users/                  # User profiles, roles, permissions
+├── datasets/               # Dataset management
+├── inference/              # Prediction API, service layer
+│   └── services/           # Prediction services
+├── ui/                     # Django Templates + Tailwind CSS
+│   ├── templates/ui/       # HTML templates
+│   └── static/ui/          # CSS, JS assets
+├── ml/                     # ML runtime (isolated from Django)
+│   ├── registry.py         # Model registry for detection types
+│   ├── inference_engine.py # Unified inference interface
+│   ├── models/             # Detection model implementations
+│   ├── runtime/            # ML runtime components
+│   └── services/           # ML services
+├── neurolens/              # Django project settings
+├── infra/                  # Infrastructure configs
+├── media/                  # User uploaded media
+├── staticfiles/            # Collected static files
+├── logs/                   # Application logs
+├── demo_images/            # Sample images for testing
+└── tests/                  # Test suite
 ```
 
 ## ⚙️ Quick Start
 
-### Prerequisites
-
-- Python 3.12+
-- Conda (for environment management)
-
-### Environment Setup
-
 ```bash
-# Clone and checkout rebuild branch
+# Clone repository
 git clone https://github.com/fahim06/NeuroLens.git
 cd NeuroLens
-git checkout django-rebuild
 
-# Create Django environment
-conda env create -f envs/neurolens-django.yml
-conda activate neurolens-django
+# Setup environment
+cp .env.example .env
 
+# Build and run with Docker
+docker compose build
+docker compose up
+```
+
+### Post-Setup Steps
+
+After containers are running:
+
+```bash
 # Run migrations
-python manage.py migrate
+docker compose exec backend python manage.py migrate
 
 # Create superuser
-python manage.py createsuperuser
-
-# Start the server
-python manage.py runserver
+docker compose exec backend python manage.py createsuperuser
 ```
 
-### ML Environment (Optional)
+### Access URLs
 
-For real ML inference (not mock mode):
+- **UI**: http://localhost:8000/
+- **Admin**: http://localhost:8000/admin/
 
-```bash
-# Create ML environment with TensorFlow
-conda env create -f envs/neurolens-ml.yml
-conda activate neurolens-ml
+## 🌐 Pages
 
-# Test model loading
-python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.health_check())"
-```
+The NeuroLens UI provides a complete web interface built with Django Templates and Tailwind CSS:
 
-### Frontend Setup
+- 🔐 **Login** — Animated login page with Tailwind + custom CSS
+- 📊 **Dashboard** — System overview with stats and health status
+- 📁 **Dataset Management** — Fully functional upload, CRUD operations, and file management
+- 🤖 **Inference** — Auto-detection and classification interface
 
-```bash
-# Navigate to frontend
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start dev server (proxies to Django backend)
-npm run dev
-```
-
-Frontend will be available at `http://localhost:5173`
+> The system does **not** require users to select models; detection is fully automated.
 
 ## 📡 API Endpoints
 
@@ -183,39 +346,25 @@ brew services start redis
 celery -A neurolens worker --loglevel=info
 ```
 
-## 🔐 Roles & Permissions
+## 🎨 Branding
 
-| Role        | Permissions                           |
-|-------------|---------------------------------------|
-| `admin`     | Full access to all resources          |
-| `beta_user` | Access to beta features, own datasets |
-| `viewer`    | Read-only access to own datasets      |
-
-## 📦 Conda Environments
-
-| Environment        | Purpose                          |
-|--------------------|----------------------------------|
-| `neurolens-django` | Django API runtime               |
-| `neurolens-ml`     | ML inference with TensorFlow     |
-| `neurolens-dev`    | Development tools (pytest, ruff) |
+- `logo.svg` is the single source of brand identity
+- Used for:
+  - navbar
+  - login page
+  - dashboard
+  - dataset page
+  - favicon
 
 ## 🧪 Testing
 
 ```bash
 # Run Django tests
-conda activate neurolens-django
-python manage.py test
+docker compose exec backend python manage.py test
 
 # Run ML tests
-conda activate neurolens-ml
-python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.health_check())"
+docker compose exec backend python -c "from ml.runtime.predictor import ml_predictor; print(ml_predictor.health_check())"
 ```
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE)
-
----
 
 ## 📋 Django Rebuild Status
 
@@ -229,62 +378,14 @@ MIT License - see [LICENSE](LICENSE)
 | 5     | Beta Stabilization    | ✅ Complete |
 | 6     | Beta Release          | ✅ Complete |
 | 7     | Full Responsive UI/UX | ✅ Complete |
-| 8     | React Migration       | ✅ Complete |
+| 8     | Django UI Completion  | ✅ Complete |
 | 9     | CI/CD Implementation  | ✅ Complete |
 
 ---
 
-## 🎨 React Frontend (Phase 8)
+## 📄 License
 
-NeuroLens includes a modern React SPA for the production interface.
-
-### Features
-
-- **Animated Login/Signup** — Glassmorphism design, password strength meter
-- **Responsive Dashboard** — Stats cards, health status, quick actions
-- **Dataset Management** — Upload modal, CRUD operations, file list
-- **AI Inference** — Run analysis with polling for status updates
-- **JWT Authentication** — Axios interceptors, token refresh, protected routes
-
-### Technology Stack
-
-- **React 18+** with TypeScript
-- **Vite** for fast builds
-- **React Router** for navigation
-- **Axios** for API calls with JWT interceptors
-- **CSS3** with modular architecture
-
-### Access the Frontend
-
-```bash
-# Start backend
-python manage.py runserver
-
-# Start frontend (development)
-cd frontend
-npm run dev
-
-# Open browser to:
-# http://localhost:5173/
-```
-
-### Pages
-
-| Route        | Description                         |
-|--------------|-------------------------------------|
-| `/login`     | Animated login with JWT auth        |
-| `/signup`    | Registration with password strength |
-| `/dashboard` | Overview stats and quick actions    |
-| `/datasets`  | Upload and manage datasets          |
-| `/inference` | Run AI analysis with polling        |
-
----
-
-## Beta Readiness
-
-Asynchronous inference enabled.
-System stabilized for beta users.
-Phase 5 complete.
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
