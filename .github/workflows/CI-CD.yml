@@ -402,4 +402,4 @@ jobs:
           # Add deployment logic here based on your infrastructure
           # This could be kubectl, helm, docker-compose, etc.
 
-          echo "✅ Deployment completed"
+          echo "✅ Deployment completed :) "
