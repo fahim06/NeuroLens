@@ -3,6 +3,10 @@
 *Deep learning–based multi-domain detection with Django REST API & Tailwind UI*
 
 <p align="center">
+  <img src="logo.svg" alt="NeuroLens Logo" width="120" height="120" />
+</p>
+
+<p align="center">
   AI-powered detection for humans, animals, biological classification, medical imaging, and plant analysis
 </p>
 

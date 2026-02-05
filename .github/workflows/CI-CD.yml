@@ -316,7 +316,7 @@ jobs:
     outputs:
       backend-image-tag: ${{ steps.backend-meta.outputs.tags }}
       frontend-image-tag: ${{ steps.frontend-meta.outputs.tags }}
-
+#
     steps:
       - uses: actions/checkout@v4
 
@@ -324,12 +324,13 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Container Registry
+        id: login
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
-
+        continue-on-error: true#
       # Backend Build
       - name: Backend Image Metadata
         id: backend-meta
@@ -344,6 +345,7 @@ jobs:
 
       - name: Build & Push Backend
         uses: docker/build-push-action@v5
+        if: steps.login.outcome == 'success'
         with:
           context: .
           file: infra/docker/backend.Dockerfile
@@ -354,7 +356,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             ENVIRONMENT=${{ github.ref == 'refs/heads/django-rebuild' && 'beta' || github.ref == 'refs/heads/dev' && 'staging' || 'production' }}
-
+#
       # Frontend Build
       - name: Frontend Image Metadata
         id: frontend-meta
@@ -369,6 +371,7 @@ jobs:
 
       - name: Build & Push Frontend
         uses: docker/build-push-action@v5
+        if: steps.login.outcome == 'success'
         with:
           context: .
           file: infra/docker/frontend.Dockerfile
@@ -378,28 +381,32 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ============================================================
-  # DEPLOY - Conditional based on branch/tag
-  # ============================================================
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    if: (github.ref == 'refs/heads/django-rebuild' || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/v')) && !cancelled()
-    environment:
-      name: ${{ github.ref == 'refs/heads/django-rebuild' && 'beta' || github.ref == 'refs/heads/dev' && 'staging' || 'production' }}
-      url: ${{ github.ref == 'refs/heads/django-rebuild' && 'https://beta.neurolens.example.com' || github.ref == 'refs/heads/dev' && 'https://staging.neurolens.example.com' || 'https://neurolens.example.com' }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to ${{ github.ref == 'refs/heads/django-rebuild' && 'Beta' || github.ref == 'refs/heads/dev' && 'Staging' || 'Production' }}
-        run: |
-          echo "🚀 Deploying to ${{ github.ref == 'refs/heads/django-rebuild' && 'beta' || github.ref == 'refs/heads/dev' && 'staging' || 'production' }} environment"
-          echo "Backend image: ${{ needs.build.outputs.backend-image-tag }}"
-          echo "Frontend image: ${{ needs.build.outputs.frontend-image-tag }}"
-
-          # Add deployment logic here based on your infrastructure
-          # This could be kubectl, helm, docker-compose, etc.
-
-          echo "✅ Deployment completed :) "
+      - name: Skip Build Notice
+        if: steps.login.outcome != 'success'
+        run: echo "⚠️ Skipping Docker build due to registry authentication failure"
+#
+#  # ============================================================
+#  # DEPLOY - Conditional based on branch/tag
+#  # ============================================================
+#  deploy:
+#    name: Deploy
+#    runs-on: ubuntu-latest
+#    needs: [ build ]
+#    if: (github.ref == 'refs/heads/django-rebuild' || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/v')) && !cancelled()
+#    environment:
+#      name: ${{ github.ref == 'refs/heads/django-rebuild' && 'beta' || github.ref == 'refs/heads/dev' && 'staging' || 'production' }}
+#      url: ${{ github.ref == 'refs/heads/django-rebuild' && 'https://beta.neurolens.example.com' || github.ref == 'refs/heads/dev' && 'https://staging.neurolens.example.com' || 'https://neurolens.example.com' }}
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Deploy to ${{ github.ref == 'refs/heads/django-rebuild' && 'Beta' || github.ref == 'refs/heads/dev' && 'Staging' || 'Production' }}
+#        run: |
+#          echo "🚀 Deploying to ${{ github.ref == 'refs/heads/django-rebuild' && 'beta' || github.ref == 'refs/heads/dev' && 'staging' || 'production' }} environment"
+#          echo "Backend image: ${{ needs.build.outputs.backend-image-tag }}"
+#          echo "Frontend image: ${{ needs.build.outputs.frontend-image-tag }}"
+#
+#          # Add deployment logic here based on your infrastructure
+#          # This could be kubectl, helm, docker-compose, etc.
+#
+#          echo "✅ Deployment completed :) "
