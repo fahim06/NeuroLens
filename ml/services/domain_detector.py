@@ -231,7 +231,7 @@ class DomainDetectorService:
         return properties
 
     def _classify_from_properties(
-            self, properties: Dict[str, Any]
+        self, properties: Dict[str, Any]
     ) -> tuple[PrimaryDomain, SubCategory, float]:
         """
         Classify domain based on image properties.
@@ -262,7 +262,7 @@ class DomainDetectorService:
         return PrimaryDomain.ANIMAL, SubCategory.UNKNOWN, 0.60
 
     def _get_model_for_domain(
-            self, domain: PrimaryDomain, category: SubCategory
+        self, domain: PrimaryDomain, category: SubCategory
     ) -> str:
         """Get the recommended model for a domain/category combination."""
         domain_models = DOMAIN_MODEL_MAPPING.get(domain, {})

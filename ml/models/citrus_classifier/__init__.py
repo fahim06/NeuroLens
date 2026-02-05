@@ -90,7 +90,7 @@ class CitrusClassifier:
         return self._format_result(predicted_idx, confidence, predictions[0])
 
     def _format_result(
-            self, predicted_idx: int, confidence: float, all_probs: np.ndarray
+        self, predicted_idx: int, confidence: float, all_probs: np.ndarray
     ) -> Dict[str, Any]:
         """Format prediction result."""
         labels = self.config.class_labels

@@ -165,7 +165,7 @@ class MLPredictor:
             raise RuntimeError(f"Prediction failed: {e}")
 
     def _format_predictions(
-            self, predictions: np.ndarray, start_time: datetime
+        self, predictions: np.ndarray, start_time: datetime
     ) -> Dict[str, Any]:
         """Format model predictions into response structure."""
 

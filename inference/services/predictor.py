@@ -444,7 +444,7 @@ class MultiDomainPredictorService:
             "model_used": model_used,
             "prediction": prediction,
             "biological_classification": prediction.get("biological_classification")
-                                         or prediction.get("hierarchy"),
+            or prediction.get("hierarchy"),
             "timestamp": datetime.utcnow().isoformat(),
             "metadata": {
                 "is_mock": True,

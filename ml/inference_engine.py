@@ -46,7 +46,7 @@ class MultiDomainInferenceEngine:
         logger.info("MultiDomainInferenceEngine initialized")
 
     def predict(
-            self, image_data: Union[str, bytes], detection_type: str
+        self, image_data: Union[str, bytes], detection_type: str
     ) -> Dict[str, Any]:
         """
         Execute prediction for the specified detection type.
@@ -131,7 +131,7 @@ class MultiDomainInferenceEngine:
         return detector
 
     def _preprocess_image(
-            self, image_data: Union[str, bytes], target_size: tuple, preprocessing: str
+        self, image_data: Union[str, bytes], target_size: tuple, preprocessing: str
     ) -> np.ndarray:
         """
         Preprocess image for model input.

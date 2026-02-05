@@ -129,7 +129,7 @@ class ModelRouterService:
             )
 
     def _run_prediction(
-            self, model_name: str, image_data: bytes, domain_result: DomainDetectionResult
+        self, model_name: str, image_data: bytes, domain_result: DomainDetectionResult
     ) -> Dict[str, Any]:
         """Run prediction with the specified model."""
         try:
@@ -143,8 +143,8 @@ class ModelRouterService:
 
             # Add biological classification if applicable
             if domain_result.primary_domain in (
-                    PrimaryDomain.ANIMAL,
-                    PrimaryDomain.PLANT,
+                PrimaryDomain.ANIMAL,
+                PrimaryDomain.PLANT,
             ):
                 result["biological_classification"] = self._get_taxonomy(
                     result, domain_result.primary_domain
@@ -157,7 +157,7 @@ class ModelRouterService:
             return self._mock_prediction(model_name, domain_result)
 
     def _mock_prediction(
-            self, model_name: str, domain_result: DomainDetectionResult
+        self, model_name: str, domain_result: DomainDetectionResult
     ) -> Dict[str, Any]:
         """Generate mock prediction when model unavailable."""
         import random
@@ -232,7 +232,7 @@ class ModelRouterService:
         return base_result
 
     def _get_taxonomy(
-            self, prediction: Dict[str, Any], domain: PrimaryDomain
+        self, prediction: Dict[str, Any], domain: PrimaryDomain
     ) -> Dict[str, str]:
         """Extract or generate biological taxonomy from prediction."""
         if "biological_classification" in prediction:

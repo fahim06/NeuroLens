@@ -151,7 +151,7 @@ def dashboard_view(request):
         "medical": InferenceRequest.objects.filter(status="success").count() // 3,
         "animal": InferenceRequest.objects.filter(status="success").count() // 3,
         "plant": InferenceRequest.objects.filter(status="success").count()
-                 - (InferenceRequest.objects.filter(status="success").count() // 3 * 2),
+        - (InferenceRequest.objects.filter(status="success").count() // 3 * 2),
     }
 
     return render(
