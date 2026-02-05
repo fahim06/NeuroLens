@@ -130,8 +130,16 @@
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Pending Analysis</dt>
                             <dd class="text-3xl font-bold text-gray-900 mt-1">{{ stats.pending_count|default:0 }}</dd>
-                            <dd class="text-sm text-yellow-600 font-medium mt-1">
-                                <i class="fa-solid fa-spinner fa-spin"></i> Processing
+                            <dd class="text-sm font-medium mt-1">
+                                {% if stats.pending_count > 0 %}
+                                    <span class="text-yellow-600">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> Processing
+                                    </span>
+                                {% else %}
+                                    <span class="text-green-600">
+                                        <i class="fa-solid fa-check-circle"></i> All caught up
+                                    </span>
+                                {% endif %}
                             </dd>
                         </dl>
                     </div>
