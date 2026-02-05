@@ -163,7 +163,7 @@ jobs:
               )
           
               with open(predictor_path, 'w') as f:
-                  f.write(new_content)
+                  f.write(content)
           
               print(f"Updated model versions in predictor.py to {base_version}")
           
