@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.17--beta-yellow" />
+  <img src="https://img.shields.io/badge/version-2.0.18--beta-yellow" />
   <a href="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml">
     <img src="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml/badge.svg?branch=django-rebuild" alt="CI/CD" />
   </a>
