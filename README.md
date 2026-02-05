@@ -8,7 +8,6 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.0.11--alpha-blue" />
-  <!-- GitHub Actions workflow status badge (moved to 2nd position) -->
   <a href="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml">
     <img src="https://github.com/fahim06/NeuroLens/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" />
   </a>
@@ -33,13 +32,13 @@ NeuroLens is an AI platform for multi-domain image detection and classification,
 
 ## 🧠 Supported Detection Types
 
-| Detection Type     | Description                | Model                  |
-|--------------------|----------------------------|------------------------|
-| 🧑 Human vs Animal | Binary detection           | Custom CNN             |
-| 🐾 Animal Category | Species classification     | Custom CNN             |
-| 🧬 Biological      | Kingdom → Species taxonomy | Hierarchical           |
-| 🧠 Brain Tumor     | Medical MRI analysis       | VGG16 (95.21% acc)     |
-| 🍊 Citrus          | Plant genus identification | MobileNet (99.85% acc) |
+| Detection Type     | Description                | Model        |
+|--------------------|----------------------------|--------------|
+| 🧑 Human vs Animal | Binary detection           | Custom CNN   |
+| 🐾 Animal Category | Species classification     | Custom CNN   |
+| 🧬 Biological      | Kingdom → Species taxonomy | Hierarchical |
+| 🧠 Brain Tumor     | Medical MRI analysis       | VGG16        |
+| 🍊 Citrus          | Plant genus identification | MobileNet    |
 
 ## 🏗️ Architecture
 
@@ -220,18 +219,18 @@ MIT License - see [LICENSE](LICENSE)
 
 ## 📋 Django Rebuild Status
 
-| Phase | Description            | Status     |
-|-------|------------------------|------------|
-| 0     | Reset & Foundation     | ✅ Complete |
-| 1     | Core Architecture      | ✅ Complete |
-| 2     | JWT Authentication     | ✅ Complete |
-| 3     | Core REST APIs         | ✅ Complete |
-| 4     | ML Integration         | ✅ Complete |
-| 5     | Beta Stabilization     | ✅ Complete |
-| 6     | Beta Release           | ✅ Complete |
-| 7     | Full Responsive UI/UX  | ✅ Complete |
-| 8     | React Migration        | ✅ Complete |
-| 9     | CI/CD Implementation   | ✅ Complete |
+| Phase | Description           | Status     |
+|-------|-----------------------|------------|
+| 0     | Reset & Foundation    | ✅ Complete |
+| 1     | Core Architecture     | ✅ Complete |
+| 2     | JWT Authentication    | ✅ Complete |
+| 3     | Core REST APIs        | ✅ Complete |
+| 4     | ML Integration        | ✅ Complete |
+| 5     | Beta Stabilization    | ✅ Complete |
+| 6     | Beta Release          | ✅ Complete |
+| 7     | Full Responsive UI/UX | ✅ Complete |
+| 8     | React Migration       | ✅ Complete |
+| 9     | CI/CD Implementation  | ✅ Complete |
 
 ---
 
@@ -291,8 +290,6 @@ Phase 5 complete.
 
 <div align="center">
 
-**NeuroLens v4.0.0-beta** — Django REST Rebuild
-
-*Built for reliability, scalability, and security*
+**Built for reliability, scalability, and security**
 
 </div>
