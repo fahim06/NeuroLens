@@ -6,6 +6,7 @@ Tasks are executed by Celery workers in the background.
 """
 
 import logging
+
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone

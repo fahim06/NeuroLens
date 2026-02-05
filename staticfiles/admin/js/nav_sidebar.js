@@ -74,6 +74,7 @@
             checkValue({target: nav, key: ''});
         }
     }
+
     window.initSidebarQuickFilter = initSidebarQuickFilter;
     initSidebarQuickFilter();
 }

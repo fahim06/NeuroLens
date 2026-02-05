@@ -4,12 +4,13 @@
 
 We are committed to ensuring the security of NeuroLens. Currently, we support the following versions:
 
-| Version | Supported          | Notes                       |
-|---------|--------------------|-----------------------------|
-| 3.0.x   | :white_check_mark: | Current Development Release |
-| 2.1.x   | :x:                | Deprecated                  |
-| 2.0.x   | :x:                | No longer supported         |
-| < 2.0   | :x:                | No longer supported         |
+| Version     | Supported          | Notes                      |
+|-------------|--------------------|----------------------------|
+| 2.0.21-beta | :white_check_mark: | Current Development (Beta) |
+| 3.0.x       | :white_check_mark: | Next Stable Release        |
+| 1.1.x       | :x:                | Deprecated                 |
+| 1.0.x       | :x:                | No longer supported        |
+| < 1.0       | :x:                | No longer supported        |
 
 ## Security Features (v3.0)
 
@@ -20,6 +21,8 @@ NeuroLens v3.0 includes comprehensive security hardening:
 - **API Security**: Rate limiting, input validation, security headers
 - **Audit Logging**: Tamper-resistant event chain
 - **Data Protection**: AES-256-GCM encryption, PII detection
+- **Container Security**: Docker hardening, non-root execution
+- **Database Security**: PostgreSQL with encrypted connections
 
 ## Reporting a Vulnerability
 

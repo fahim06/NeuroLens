@@ -82,17 +82,107 @@ jobs:
               sys.exit(1)
         shell: python
 
-      - name: Commit and Push
+      - name: Update Version in URLs
+        run: |
+          import re
+          import sys
+
+          urls_path = 'neurolens/urls.py'
+          
+          try:
+              with open(urls_path, 'r') as f:
+                  content = f.read()
+          
+              # Get the new version from README
+              readme_path = 'README.md'
+              with open(readme_path, 'r') as f:
+                  readme_content = f.read()
+          
+              # Extract version from README badge
+              version_pattern = r'<img src="https://img.shields.io/badge/version-(\d+\.\d+\.\d+--beta)-yellow" />'
+              version_match = re.search(version_pattern, readme_content)
+          
+              if not version_match:
+                  print("Version not found in README.md")
+                  sys.exit(1)
+          
+              new_version = version_match.group(1)
+          
+              # Update version in urls.py
+              urls_pattern = r'("version": ")[^"]*(")'
+              new_content = re.sub(urls_pattern, f'\\g<1>{new_version}\\g<2>', content)
+          
+              with open(urls_path, 'w') as f:
+                  f.write(new_content)
+          
+              print(f"Updated version in urls.py to {new_version}")
+          
+          except Exception as e:
+              print(f"Error updating urls.py: {e}")
+              sys.exit(1)
+        shell: python
+
+      - name: Update Model Version in Predictor
+        run: |
+          import re
+          import sys
+
+          predictor_path = 'ml/runtime/predictor.py'
+          
+          try:
+              with open(predictor_path, 'r') as f:
+                  content = f.read()
+          
+              # Get the new version from README
+              readme_path = 'README.md'
+              with open(readme_path, 'r') as f:
+                  readme_content = f.read()
+          
+              # Extract version from README badge
+              version_pattern = r'<img src="https://img.shields.io/badge/version-(\d+\.\d+\.\d+--beta)-yellow" />'
+              version_match = re.search(version_pattern, readme_content)
+          
+              if not version_match:
+                  print("Version not found in README.md")
+                  sys.exit(1)
+          
+              base_version = version_match.group(1).replace('--beta', '')
+          
+              # Update model_version in predictor.py (real predictions)
+              content = re.sub(
+                  r'("model_version": ")[^"]*(")',
+                  f'\\g<1>{base_version}\\g<2>',
+                  content
+              )
+          
+              # Update model_version in predictor.py (mock predictions)
+              content = re.sub(
+                  r'("model_version": ")[^"]*-mock(")',
+                  f'\\g<1>{base_version}-mock\\g<2>',
+                  content
+              )
+          
+              with open(predictor_path, 'w') as f:
+                  f.write(new_content)
+          
+              print(f"Updated model versions in predictor.py to {base_version}")
+          
+          except Exception as e:
+              print(f"Error updating predictor.py: {e}")
+              sys.exit(1)
+        shell: python
+
+      - name: Commit and Push All Changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Check if README.md was modified
-          if git diff --quiet README.md; then
+          # Check if any files were modified
+          if git diff --quiet README.md neurolens/urls.py ml/runtime/predictor.py; then
             echo "No changes to commit."
           else
-            git add README.md
-            git commit -m "chore: bump version in README [skip ci]"
+            git add README.md neurolens/urls.py ml/runtime/predictor.py
+            git commit -m "chore: bump version across all files [skip ci]"
             git push
           fi
 
@@ -157,7 +247,7 @@ jobs:
         run: ruff check . --output-format=github --ignore F401,E402,F541,F841
 
       - name: Lint - Black
-        run: black --check --diff .
+        run: cl --check --diff .
 
       - name: Security Analysis - Bandit
         run: bandit -r . -f json -o bandit-report.json || true

@@ -165,5 +165,6 @@
         s = s.substring(0, num_chars); // trim to first num_chars chars
         return s.replace(/-+$/g, ''); // trim any trailing hyphens
     }
+
     window.URLify = URLify;
 }

@@ -38,10 +38,13 @@ files** and **comments inside the files** to reflect the new version number and
 licensing URL accordingly. For example:
 
 * Original:
+
 ```xml
 <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
 ```
+
 * Updated:
+
 ```xml
 <!--!Font Awesome Free X.Y.Z by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright YYYY Fonticons, Inc.-->
 ```
@@ -52,11 +55,14 @@ licensing URL accordingly. For example:
 2. Save the icon as an .svg file in this directory.
 3. Include the following attribution comment at the top of the file (do not
    change it):
+
 ```xml
 <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
 ```
+
 4. Right before the `<path>` element, add the following metadata comment with
    the appropriate values:
+
 ```xml
 <!--
   Icon Name: [icon-name]

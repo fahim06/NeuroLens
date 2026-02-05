@@ -5,29 +5,16 @@
 'use strict';
 {
     const DateTimeShortcuts = {
-        calendars: [],
-        calendarInputs: [],
-        clockInputs: [],
-        clockHours: {
-            default_: [
-                [gettext_noop('Now'), -1],
-                [gettext_noop('Midnight'), 0],
-                [gettext_noop('6 a.m.'), 6],
-                [gettext_noop('Noon'), 12],
-                [gettext_noop('6 p.m.'), 18]
-            ]
-        },
-        dismissClockFunc: [],
-        dismissCalendarFunc: [],
-        calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
+        calendars: [], calendarInputs: [], clockInputs: [], clockHours: {
+            default_: [[gettext_noop('Now'), -1], [gettext_noop('Midnight'), 0], [gettext_noop('6 a.m.'), 6], [gettext_noop('Noon'), 12], [gettext_noop('6 p.m.'), 18]]
+        }, dismissClockFunc: [], dismissCalendarFunc: [], calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
         calendarDivName2: 'calendarin', // name of <div> that contains calendar
         calendarLinkName: 'calendarlink', // name of the link that is used to toggle
         clockDivName: 'clockbox', // name of clock <div> that gets toggled
         clockLinkName: 'clocklink', // name of the link that is used to toggle
         shortCutsClass: 'datetimeshortcuts', // class of the clock and cal shortcuts
         timezoneWarningClass: 'timezonewarning', // class of the warning for timezone mismatch
-        timezoneOffset: 0,
-        init: function () {
+        timezoneOffset: 0, init: function () {
             const serverOffset = document.body.dataset.adminUtcOffset;
             if (serverOffset) {
                 const localOffset = new Date().getTimezoneOffset() * -60;
@@ -43,8 +30,7 @@
                     DateTimeShortcuts.addTimezoneWarning(inp);
                 }
             }
-        },
-        // Return the current time while accounting for the server timezone.
+        }, // Return the current time while accounting for the server timezone.
         now: function () {
             const serverOffset = document.body.dataset.adminUtcOffset;
             if (serverOffset) {
@@ -55,8 +41,7 @@
             } else {
                 return new Date();
             }
-        },
-        // Add a warning when the time zone in the browser and backend do not match.
+        }, // Add a warning when the time zone in the browser and backend do not match.
         addTimezoneWarning: function (inp) {
             const warningClass = DateTimeShortcuts.timezoneWarningClass;
             let timezoneOffset = DateTimeShortcuts.timezoneOffset / 3600;
@@ -73,18 +58,10 @@
 
             let message;
             if (timezoneOffset > 0) {
-                message = ngettext(
-                    'Note: You are %s hour ahead of server time.',
-                    'Note: You are %s hours ahead of server time.',
-                    timezoneOffset
-                );
+                message = ngettext('Note: You are %s hour ahead of server time.', 'Note: You are %s hours ahead of server time.', timezoneOffset);
             } else {
                 timezoneOffset *= -1;
-                message = ngettext(
-                    'Note: You are %s hour behind server time.',
-                    'Note: You are %s hours behind server time.',
-                    timezoneOffset
-                );
+                message = ngettext('Note: You are %s hour behind server time.', 'Note: You are %s hours behind server time.', timezoneOffset);
             }
             message = interpolate(message, [timezoneOffset]);
 
@@ -95,8 +72,7 @@
             warning.id = `${field_id}_timezone_warning_helptext`;
             warning.textContent = message;
             inp.parentNode.appendChild(warning);
-        },
-        // Add clock widget to a given field
+        }, // Add clock widget to a given field
         addClock: function (inp) {
             const num = DateTimeShortcuts.clockInputs.length;
             DateTimeShortcuts.clockInputs[num] = inp;
@@ -127,11 +103,7 @@
                 DateTimeShortcuts.openClock(num);
             });
 
-            quickElement(
-                'span', clock_link, '',
-                'class', 'clock-icon',
-                'title', gettext('Choose a Time')
-            );
+            quickElement('span', clock_link, '', 'class', 'clock-icon', 'title', gettext('Choose a Time'));
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
             shortcuts_span.appendChild(now_link);
             shortcuts_span.appendChild(document.createTextNode('\u00A0|\u00A0'));
@@ -192,8 +164,7 @@
                     event.preventDefault();
                 }
             });
-        },
-        openClock: function (num) {
+        }, openClock: function (num) {
             const clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
             const clock_link = document.getElementById(DateTimeShortcuts.clockLinkName + num);
 
@@ -211,12 +182,10 @@
             // Show the clock box
             clock_box.style.display = 'block';
             document.addEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
-        },
-        dismissClock: function (num) {
+        }, dismissClock: function (num) {
             document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
             document.removeEventListener('click', DateTimeShortcuts.dismissClockFunc[num]);
-        },
-        handleClockQuicklink: function (num, val) {
+        }, handleClockQuicklink: function (num, val) {
             let d;
             if (val === -1) {
                 d = DateTimeShortcuts.now();
@@ -226,8 +195,7 @@
             DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
             DateTimeShortcuts.clockInputs[num].focus();
             DateTimeShortcuts.dismissClock(num);
-        },
-        // Add calendar widget to a given field.
+        }, // Add calendar widget to a given field.
         addCalendar: function (inp) {
             const num = DateTimeShortcuts.calendars.length;
 
@@ -258,11 +226,7 @@
                 e.stopPropagation();
                 DateTimeShortcuts.openCalendar(num);
             });
-            quickElement(
-                'span', cal_link, '',
-                'class', 'date-icon',
-                'title', gettext('Choose a Date')
-            );
+            quickElement('span', cal_link, '', 'class', 'date-icon', 'title', gettext('Choose a Date'));
             shortcuts_span.appendChild(document.createTextNode('\u00A0'));
             shortcuts_span.appendChild(today_link);
             shortcuts_span.appendChild(document.createTextNode('\u00A0|\u00A0'));
@@ -353,8 +317,7 @@
                     event.preventDefault();
                 }
             });
-        },
-        openCalendar: function (num) {
+        }, openCalendar: function (num) {
             const cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
             const cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName + num);
             const inp = DateTimeShortcuts.calendarInputs[num];
@@ -385,26 +348,21 @@
 
             cal_box.style.display = 'block';
             document.addEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
-        },
-        dismissCalendar: function (num) {
+        }, dismissCalendar: function (num) {
             document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
             document.removeEventListener('click', DateTimeShortcuts.dismissCalendarFunc[num]);
-        },
-        drawPrev: function (num) {
+        }, drawPrev: function (num) {
             DateTimeShortcuts.calendars[num].drawPreviousMonth();
-        },
-        drawNext: function (num) {
+        }, drawNext: function (num) {
             DateTimeShortcuts.calendars[num].drawNextMonth();
-        },
-        handleCalendarCallback: function (num) {
+        }, handleCalendarCallback: function (num) {
             const format = get_format('DATE_INPUT_FORMATS')[0];
             return function (y, m, d) {
                 DateTimeShortcuts.calendarInputs[num].value = new Date(y, m - 1, d).strftime(format);
                 DateTimeShortcuts.calendarInputs[num].focus();
                 document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
             };
-        },
-        handleCalendarQuickLink: function (num, offset) {
+        }, handleCalendarQuickLink: function (num, offset) {
             const d = DateTimeShortcuts.now();
             d.setDate(d.getDate() + offset);
             DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);

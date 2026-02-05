@@ -199,7 +199,7 @@ class MLPredictor:
             },
             "timestamp": datetime.utcnow().isoformat(),
             "metadata": {
-                "model_version": "1.0.0",
+                "model_version": "2.0.21-beta",
                 "inference_time_ms": round(inference_time, 2),
                 "input_size": IMAGE_SIZE,
                 "num_classes": NUM_CLASSES,
@@ -238,7 +238,7 @@ class MLPredictor:
             },
             "timestamp": datetime.utcnow().isoformat(),
             "metadata": {
-                "model_version": "1.0.0-mock",
+                "model_version": "2.0.21-beta-mock",
                 "inference_time_ms": round(inference_time + random.randint(50, 150), 2),
                 "input_size": IMAGE_SIZE,
                 "num_classes": NUM_CLASSES,

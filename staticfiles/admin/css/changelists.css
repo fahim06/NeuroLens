@@ -305,6 +305,7 @@
     #changelist tbody tr.selected {
         background-color: SelectedItem;
     }
+
     #changelist tbody tr:has(.action-select:checked) {
         background-color: SelectedItem;
     }

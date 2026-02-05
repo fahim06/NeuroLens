@@ -1,8 +1,3 @@
-// ========================================
-// Animated Login Page - Enhanced JavaScript
-// Adapted for Django Integration
-// ========================================
-
 // DOM Elements
 const container = document.getElementById("container");
 const loginBtn = document.getElementById("login");
@@ -61,11 +56,9 @@ function createRateLimiter(intervalMs = 2000) {
             }
             isLimited = true;
             return false;
-        },
-        isCurrentlyLimited() {
+        }, isCurrentlyLimited() {
             return isLimited;
-        },
-        getRemainingTime() {
+        }, getRemainingTime() {
             return Math.max(0, intervalMs - (Date.now() - lastCall));
         }
     };
@@ -183,9 +176,7 @@ function updatePasswordStrength(password) {
     strengthText.className = "strength-text " + strength;
 
     const labels = {
-        weak: "Weak password",
-        medium: "Medium strength",
-        strong: "Strong password"
+        weak: "Weak password", medium: "Medium strength", strong: "Strong password"
     };
 
     strengthText.textContent = labels[strength];
@@ -209,31 +200,26 @@ const validators = {
         if (!value.trim()) return "Name is required";
         if (value.trim().length < 2) return "Name must be at least 2 characters";
         return "";
-    },
-    username: (value) => {
+    }, username: (value) => {
         if (!value.trim()) return "Username is required";
         if (value.trim().length < 3) return "Username must be at least 3 characters";
         if (!/^[a-zA-Z0-9_]+$/.test(value)) return "Only letters, numbers, and underscores";
         return "";
-    },
-    email: (value) => {
+    }, email: (value) => {
         if (!value.trim()) return "Email is required";
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) return "Please enter a valid email";
         return "";
-    },
-    password: (value) => {
+    }, password: (value) => {
         if (!value) return "Password is required";
         if (value.length < 6) return "Password must be at least 6 characters";
         return "";
-    },
-    confirmPassword: (value) => {
+    }, confirmPassword: (value) => {
         if (!value) return "Please confirm your password";
         const password = document.getElementById("signUpPassword")?.value;
         if (value !== password) return "Passwords do not match";
         return "";
-    },
-    required: (value) => {
+    }, required: (value) => {
         if (!value.trim()) return "This field is required";
         return "";
     }
@@ -265,7 +251,7 @@ function validateField(input, validatorKey) {
 function validateForm(form, fields) {
     let isValid = true;
 
-    fields.forEach(({ id, validator }) => {
+    fields.forEach(({id, validator}) => {
         const input = form.querySelector(`#${id}`);
         if (input && !validateField(input, validator)) {
             isValid = false;
@@ -334,10 +320,7 @@ signInForm.addEventListener("submit", async (e) => {
         return;
     }
 
-    const fields = [
-        {id: "signInUsername", validator: "username"},
-        { id: "signInPassword", validator: "password" }
-    ];
+    const fields = [{id: "signInUsername", validator: "username"}, {id: "signInPassword", validator: "password"}];
 
     if (!validateForm(signInForm, fields)) {
         showToast("Please fix the errors above", "error");
@@ -350,11 +333,9 @@ signInForm.addEventListener("submit", async (e) => {
 
     try {
         const formData = new FormData(signInForm);
-        
+
         const response = await fetch('/login/', {
-            method: 'POST',
-            body: formData,
-            headers: {
+            method: 'POST', body: formData, headers: {
                 'X-CSRFToken': getCsrfToken()
             }
         });
@@ -374,7 +355,7 @@ signInForm.addEventListener("submit", async (e) => {
             localStorage.removeItem("systemInfoHidden");
 
             showToast("Welcome back! Signing you in...", "success");
-            
+
             // Redirect after success
             setTimeout(() => {
                 window.location.href = data.redirect || '/dashboard/';
@@ -420,14 +401,11 @@ signUpForm.addEventListener("submit", async (e) => {
         return;
     }
 
-    const fields = [
-        { id: "signUpName", validator: "name" },
-        { id: "signUpUsername", validator: "username" },
-        { id: "signUpEmail", validator: "email" },
-        { id: "signUpPassword", validator: "password" },
-        {id: "signUpConfirmPassword", validator: "confirmPassword"},
-        {id: "signUpTimezone", validator: "required"}
-    ];
+    const fields = [{id: "signUpName", validator: "name"}, {
+        id: "signUpUsername", validator: "username"
+    }, {id: "signUpEmail", validator: "email"}, {
+        id: "signUpPassword", validator: "password"
+    }, {id: "signUpConfirmPassword", validator: "confirmPassword"}, {id: "signUpTimezone", validator: "required"}];
 
     if (!validateForm(signUpForm, fields)) {
         showToast("Please fix the errors above", "error");
@@ -442,9 +420,7 @@ signUpForm.addEventListener("submit", async (e) => {
         const formData = new FormData(signUpForm);
 
         const response = await fetch('/login/', {
-            method: 'POST',
-            body: formData,
-            headers: {
+            method: 'POST', body: formData, headers: {
                 'X-CSRFToken': getCsrfToken()
             }
         });
@@ -504,9 +480,7 @@ function showToast(message, type = "info") {
     toast.className = `toast ${type}`;
 
     const icons = {
-        success: "fa-check-circle",
-        error: "fa-exclamation-circle",
-        info: "fa-info-circle"
+        success: "fa-check-circle", error: "fa-exclamation-circle", info: "fa-info-circle"
     };
 
     // Create elements safely to prevent XSS
