@@ -86,10 +86,17 @@
             <div class="lg:col-span-2 space-y-8">
                 <!-- Account Information -->
                 <div class="bg-white shadow-lg rounded-2xl border border-gray-100 card-hover p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                        <i class="fa-solid fa-user mr-3 text-primary-600"></i>
-                        Account Information
-                    </h2>
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                            <i class="fa-solid fa-user mr-3 text-primary-600"></i>
+                            Account Information
+                        </h2>
+                        <button onclick="openEditProfileModal()"
+                                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium">
+                            <i class="fa-solid fa-user-edit mr-2"></i>
+                            Edit Profile
+                        </button>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
@@ -183,11 +190,6 @@
                 <div class="bg-white shadow-lg rounded-2xl border border-gray-100 card-hover p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Settings</h3>
                     <div class="space-y-3">
-                        <button onclick="openEditProfileModal()"
-                                class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                            <i class="fa-solid fa-user-edit mr-3 text-gray-500"></i>
-                            Edit Profile
-                        </button>
                         <button onclick="openChangePasswordModal()"
                                 class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
                             <i class="fa-solid fa-key mr-3 text-gray-500"></i>
@@ -598,7 +600,7 @@
                     modal.classList.add('hidden');
                 }
             });
-        }
+        };
 
         // Password Visibility Toggle
         document.querySelectorAll('.password-toggle').forEach(toggle => {

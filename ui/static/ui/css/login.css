@@ -65,7 +65,8 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    overflow: hidden;
+    padding: 1rem;
+    overflow-x: hidden;
 }
 
 [data-theme="dark"] body {
@@ -291,11 +292,12 @@ body {
     border-radius: 30px;
     box-shadow: var(--shadow-lg);
     position: relative;
-    width: 850px;
-    max-width: 95%;
+    width: 100%;
+    max-width: 850px;
     min-height: 700px;
     overflow: hidden;
     z-index: 1;
+    margin: 0 auto;
 }
 
 [data-theme="dark"] .container {
@@ -811,20 +813,18 @@ body {
 }
 
 /* ========================================
-   Mobile Responsive
+   Responsive Adjustments
    ======================================== */
 
-@media (max-width: 850px) {
-    .container {
-        width: 95%;
-    }
-
+/* Hide particles on smaller screens for better performance */
+@media (max-width: 768px) {
     .particles {
         display: none;
     }
 }
 
-@media (max-width: 650px) {
+/* Adjust theme toggle position on smaller screens */
+@media (max-width: 480px) {
     .theme-toggle {
         top: 10px;
         right: 10px;
@@ -832,23 +832,135 @@ body {
         height: 40px;
         font-size: 16px;
     }
+}
 
+/* Large screens (desktop) - Original design */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 850px;
+        min-height: 700px;
+        margin: 2rem auto;
+    }
+}
+
+/* Medium screens (tablets) - Maintain side-by-side layout */
+@media (max-width: 1023px) and (min-width: 768px) {
+    .container {
+        max-width: 95%;
+        min-height: 600px;
+        margin: 1rem;
+        border-radius: 20px;
+    }
+
+    .container h1 {
+        font-size: 22px;
+    }
+
+    .form-container {
+        padding: 40px 30px;
+    }
+
+    .social-icons {
+        gap: 12px;
+    }
+
+    .social-icons a {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .input-group input,
+    .input-group label {
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        padding: 10px 30px;
+        font-size: 14px;
+    }
+
+    .toggle-panel h1 {
+        font-size: 20px;
+    }
+
+    .toggle-panel p {
+        font-size: 13px;
+    }
+}
+
+/* Small screens (large mobile) - Maintain side-by-side but compact */
+@media (max-width: 767px) and (min-width: 481px) {
+    .container {
+        max-width: 100%;
+        min-height: 550px;
+        margin: 0.5rem;
+        border-radius: 15px;
+    }
+
+    .container h1 {
+        font-size: 20px;
+    }
+
+    .form-container {
+        padding: 30px 20px;
+    }
+
+    .social-icons {
+        gap: 10px;
+    }
+
+    .social-icons a {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .input-group input,
+    .input-group label {
+        font-size: 13px;
+    }
+
+    .btn-primary {
+        padding: 8px 25px;
+        font-size: 13px;
+    }
+
+    .toggle-panel h1 {
+        font-size: 18px;
+    }
+
+    .toggle-panel p {
+        font-size: 12px;
+    }
+
+    .remember-forgot {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}
+
+/* Extra small screens (small mobile) - Switch to stacked layout */
+@media (max-width: 480px) {
     .container {
         width: 100%;
         min-height: 100vh;
         border-radius: 0;
         display: flex;
         flex-direction: column;
+        margin: 0;
     }
 
     .form-container {
         position: relative;
         width: 100% !important;
         height: auto;
-        min-height: 100vh;
+        min-height: calc(100vh - 70px);
         transform: none !important;
         opacity: 1 !important;
         z-index: 1 !important;
+        padding: 40px 20px;
     }
 
     .sign-in {
@@ -868,10 +980,43 @@ body {
         animation: none;
     }
 
-    .container form {
-        padding: 60px 25px;
-        padding-bottom: 100px;
-        justify-content: flex-start;
+    .container h1 {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .social-icons {
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .social-icons a {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .container span {
+        text-align: center;
+        display: block;
+        margin: 15px 0 20px 0;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+    }
+
+    .input-group input,
+    .input-group label {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        margin-top: 10px;
     }
 
     .toggle-container {
@@ -883,6 +1028,7 @@ body {
         height: 70px;
         border-radius: 25px 25px 0 0;
         transform: none !important;
+        margin: 0;
     }
 
     .toggle {
@@ -925,12 +1071,17 @@ body {
     .toggle-panel button {
         margin: 0;
         padding: 10px 25px;
+        font-size: 14px;
     }
 
     .remember-forgot {
         flex-direction: column;
         gap: 10px;
         align-items: flex-start;
+    }
+
+    .password-strength {
+        margin: 10px 0;
     }
 }
 

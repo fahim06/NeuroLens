@@ -18,7 +18,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-neurolens} -d ${POSTGRES_DB:-neurolens}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-neurolens} -d ${POSTGRES_DB:-neurolens}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +36,7 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -64,6 +64,8 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+      - "${UI_PORT:-80}:80"
+      - "8000:8000"
     volumes:
       # Dev only: mount source for hot reload
       - .:/app:cached
@@ -75,7 +77,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/health/" ]
       interval: 30s
       timeout: 10s
       retries: 3
