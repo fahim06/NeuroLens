@@ -14,7 +14,6 @@ from .serializers import (
     DetectRequestSerializer,
     AutoAnalyzeRequestSerializer
 )
-from .services.predictor import predictor_service
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +28,7 @@ class DetectionTypesView(APIView):
 
     def get(self, request):
         """Return the list of available detection types for the UI dropdown."""
+        from .services.predictor import predictor_service
         detection_types = predictor_service.get_detection_types()
         return Response({
             "success": True,
@@ -86,6 +86,7 @@ class DetectView(APIView):
 
         try:
             # Call the predictor service with detection_type
+            from .services.predictor import predictor_service
             prediction_result = predictor_service.predict({
                 "detection_type": detection_type,
                 "image_data": validated_data.get('image_data'),
@@ -185,6 +186,7 @@ class AutoAnalyzeView(APIView):
 
         try:
             # Call the predictor service in auto mode
+            from .services.predictor import predictor_service
             analysis_result = predictor_service.auto_analyze({
                 "image_data": validated_data.get('image_data'),
                 "image_url": validated_data.get('image_url')
@@ -269,6 +271,7 @@ class PredictView(APIView):
 
         try:
             # Call the predictor service
+            from .services.predictor import predictor_service
             prediction_result = predictor_service.predict({
                 "image_data": validated_data.get('image_data'),
                 "image_url": validated_data.get('image_url')
@@ -459,5 +462,6 @@ class PredictorHealthView(APIView):
 
     def get(self, request):
         """Return predictor service health status."""
+        from .services.predictor import predictor_service
         health = predictor_service.health_check()
         return Response(health)

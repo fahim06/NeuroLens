@@ -71,6 +71,13 @@ function createRateLimiter(intervalMs = 2000) {
     };
 }
 
+/**
+ * Convert snake_case to camelCase
+ */
+function snakeToCamel(str) {
+    return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
 // Create rate limiters for forms (2 second cooldown)
 const signInRateLimiter = createRateLimiter(2000);
 const signUpRateLimiter = createRateLimiter(2000);
@@ -290,8 +297,8 @@ document.querySelectorAll('.input-group input').forEach(input => {
     // Clear error on input
     input.addEventListener('input', () => {
         const inputGroup = input.closest('.input-group');
-        if (inputGroup.classList.contains('error')) {
-            inputGroup.classList.remove('error');
+        if (inputGroup.classList.contains('error') || inputGroup.classList.contains('success')) {
+            inputGroup.classList.remove('error', 'success');
             inputGroup.querySelector('.error-message').textContent = '';
         }
     });
@@ -324,7 +331,7 @@ signInForm.addEventListener("submit", async (e) => {
     }
 
     const fields = [
-        { id: "signInEmail", validator: "email" },
+        {id: "signInUsername", validator: "username"},
         { id: "signInPassword", validator: "password" }
     ];
 
@@ -359,6 +366,9 @@ signInForm.addEventListener("submit", async (e) => {
                 localStorage.removeItem("rememberMe");
             }
 
+            // Clear system info hidden preference on new login
+            localStorage.removeItem("systemInfoHidden");
+
             showToast("Welcome back! Signing you in...", "success");
             
             // Redirect after success
@@ -371,13 +381,15 @@ signInForm.addEventListener("submit", async (e) => {
                 if (data.errors.general) {
                     showToast(data.errors.general, "error");
                 }
-                if (data.errors.email) {
-                    const emailGroup = signInForm.querySelector('#signInEmail').closest('.input-group');
-                    emailGroup.classList.add('error');
-                    emailGroup.querySelector('.error-message').textContent = data.errors.email;
+                if (data.errors.username) {
+                    const usernameGroup = signInForm.querySelector('#signInUsername').closest('.input-group');
+                    usernameGroup.classList.remove('success'); // Remove success state
+                    usernameGroup.classList.add('error');
+                    usernameGroup.querySelector('.error-message').textContent = data.errors.username;
                 }
                 if (data.errors.password) {
                     const passwordGroup = signInForm.querySelector('#signInPassword').closest('.input-group');
+                    passwordGroup.classList.remove('success'); // Remove success state
                     passwordGroup.classList.add('error');
                     passwordGroup.querySelector('.error-message').textContent = data.errors.password;
                 }
@@ -435,6 +447,9 @@ signUpForm.addEventListener("submit", async (e) => {
         const data = await response.json();
 
         if (data.success) {
+            // Clear system info hidden preference for new user
+            localStorage.removeItem("systemInfoHidden");
+
             showToast("Account created successfully!", "success");
 
             // Switch to sign in after successful registration
@@ -450,10 +465,13 @@ signUpForm.addEventListener("submit", async (e) => {
                     if (field === 'general') {
                         showToast(message, "error");
                     } else {
-                        const inputId = 'signUp' + field.charAt(0).toUpperCase() + field.slice(1);
+                        // Convert field name to camelCase and create input ID
+                        const camelField = snakeToCamel(field);
+                        const inputId = 'signUp' + camelField.charAt(0).toUpperCase() + camelField.slice(1);
                         const inputElement = signUpForm.querySelector(`#${inputId}`);
                         if (inputElement) {
                             const inputGroup = inputElement.closest('.input-group');
+                            inputGroup.classList.remove('success'); // Remove success state
                             inputGroup.classList.add('error');
                             inputGroup.querySelector('.error-message').textContent = message;
                         }

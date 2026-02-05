@@ -1,0 +1,278 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Reports & Analytics - NeuroLens{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-8">
+        <!-- Header -->
+        <div class="md:flex md:items-center md:justify-between">
+            <div class="flex-1 min-w-0">
+                <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                    Reports & Analytics
+                </h1>
+                <p class="mt-1 text-sm text-gray-500">
+                    Comprehensive performance insights and analytics
+                </p>
+            </div>
+            <div class="mt-4 flex md:mt-0 md:ml-4">
+                <button onclick="exportReport()"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <i class="fa-solid fa-download mr-2"></i>
+                    Export Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
+                                <i class="fa-solid fa-chart-line text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Requests</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ analytics.total_requests }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
+                                <i class="fa-solid fa-check text-green-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Success Rate</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ analytics.success_rate }}%</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center">
+                                <i class="fa-solid fa-times text-red-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Failed Requests</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ analytics.failed_requests }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center">
+                                <i class="fa-solid fa-calendar text-purple-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">This Month</dt>
+                                <dd class="text-lg font-medium text-gray-900">{{ analytics.monthly_requests }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Daily Activity Chart -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Daily Activity (Last 7 Days)</h3>
+                <div class="h-64">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Domain Distribution -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Domain Distribution</h3>
+                <div class="h-64">
+                    <canvas id="domainChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Performance -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Model Performance</h3>
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">{{ model_stats.total_datasets }}</div>
+                        <div class="text-sm text-gray-500">Total Datasets</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">{{ model_stats.active_models }}</div>
+                        <div class="text-sm text-gray-500">Active Models</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">{{ model_stats.avg_processing_time }}</div>
+                        <div class="text-sm text-gray-500">Avg Processing Time</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">{{ model_stats.uptime }}</div>
+                        <div class="text-sm text-gray-500">System Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Requests Table -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Analysis Requests</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ID
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Domain
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Created
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Duration
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        {% for request in recent_requests %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ request.id|truncatechars:8 }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if request.status == 'success' %}bg-green-100 text-green-800{% elif request.status == 'failed' %}bg-red-100 text-red-800{% elif request.status == 'processing' %}bg-yellow-100 text-yellow-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ request.get_status_display }}
+                                </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ request.result.domain|default:"N/A"|title }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ request.created_at|date:"M j, Y g:i A" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {% if request.completed_at and request.started_at %}
+                                        {{ request.completed_at|timeuntil:request.started_at }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    No analysis requests found
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Daily Activity Chart
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: [{% for stat in daily_stats %}'{{ stat.day }}',{% endfor %}],
+                datasets: [{
+                    label: 'Requests',
+                    data: [{% for stat in daily_stats %}{{ stat.requests }}, {% endfor %}],
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Domain Distribution Chart
+        const domainCtx = document.getElementById('domainChart').getContext('2d');
+        new Chart(domainCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Medical', 'Animal', 'Plant'],
+                datasets: [{
+                    data: [{{ domain_stats.medical }}, {{ domain_stats.animal }}, {{ domain_stats.plant }}],
+                    backgroundColor: [
+                        '#8b5cf6',
+                        '#10b981',
+                        '#f59e0b'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        function exportReport() {
+            // Simple export functionality - could be enhanced
+            alert('Export functionality would generate a PDF/CSV report here');
+        }
+    </script>
+{% endblock %}

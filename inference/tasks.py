@@ -49,6 +49,7 @@ def run_inference(self, request_id: str, payload: dict) -> dict:
         logger.info(f"Processing inference request {request_id}")
         
         # Run prediction
+        from inference.services.predictor import PredictorService
         predictor = PredictorService()
         result = predictor.predict(payload)
         

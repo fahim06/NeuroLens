@@ -1,10 +1,6 @@
 # ============================================================
 # NeuroLens — Docker Compose (Local & CI)
 # ============================================================
-# Phase 9: React Removal — Django-Only Architecture
-# Services: backend (Django + Tailwind UI), postgres, redis
-# Usage: docker compose up -d
-# ============================================================
 
 services:
   # ============================================================
@@ -143,3 +139,8 @@ volumes:
 networks:
   default:
     name: neurolens-network
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16    # IPv4 subnet
+        - subnet: 2001:db8:1::/64   # IPv6 subnet

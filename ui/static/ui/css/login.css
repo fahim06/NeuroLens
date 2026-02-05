@@ -514,6 +514,18 @@ body {
     color: var(--md-error);
 }
 
+.input-group.error::after {
+    content: '\f00d';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 45px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--md-error);
+    font-size: 14px;
+}
+
 @keyframes shake {
 
     0%,

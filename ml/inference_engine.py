@@ -11,7 +11,16 @@ import base64
 import io
 from datetime import datetime
 from typing import Any, Dict, Optional, Union
-import numpy as np
+
+# Conditional numpy import
+try:
+    import numpy as np
+
+    NUMPY_AVAILABLE = True
+except ImportError:
+    np = None
+    NUMPY_AVAILABLE = False
+    logging.getLogger(__name__).warning("NumPy not available - ML functionality disabled")
 
 from ml.registry import DetectionType, model_registry, DETECTION_CONFIGS
 
@@ -122,6 +131,9 @@ class MultiDomainInferenceEngine:
         Returns:
             Preprocessed numpy array
         """
+        if not NUMPY_AVAILABLE:
+            raise ImportError("NumPy is required for image preprocessing but is not available")
+        
         try:
             from PIL import Image
         except ImportError:

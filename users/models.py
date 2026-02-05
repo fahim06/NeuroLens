@@ -2,6 +2,25 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import os
+
+
+def profile_picture_upload_path(instance, filename):
+    """
+    Generate upload path for profile pictures using username.
+    Format: profile_pictures/username.ext
+    """
+    # Get file extension
+    ext = filename.split('.')[-1] if '.' in filename else ''
+
+    # Create filename with username
+    if ext:
+        filename = f"{instance.user.username}.{ext}"
+    else:
+        filename = instance.user.username
+
+    # Return full path
+    return os.path.join('profile_pictures', filename)
 
 
 class UserProfile(models.Model):
@@ -24,6 +43,12 @@ class UserProfile(models.Model):
         max_length=20,
         choices=Role.choices,
         default=Role.VIEWER
+    )
+    profile_picture = models.ImageField(
+        upload_to=profile_picture_upload_path,
+        blank=True,
+        null=True,
+        help_text='Profile picture (max 5MB, recommended: 400x400px)'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

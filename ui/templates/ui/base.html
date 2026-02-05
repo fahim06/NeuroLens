@@ -47,6 +47,141 @@
     
     <style>
         body { font-family: 'Inter', sans-serif; }
+
+        /* CSS Variables for Theme Support */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --nav-bg: #ffffff;
+            --nav-text: #374151;
+            --nav-hover: #f3f4f6;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #374151;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --nav-bg: #1f2937;
+            --nav-text: #d1d5db;
+            --nav-hover: #374151;
+        }
+
+        /* Apply theme variables */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        nav {
+            background-color: var(--nav-bg) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        .bg-white {
+            background-color: var(--bg-primary) !important;
+        }
+
+        .bg-gray-50 {
+            background-color: var(--bg-secondary) !important;
+        }
+
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+
+        .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+
+        .text-gray-500 {
+            color: var(--text-secondary) !important;
+        }
+
+        .border-gray-200 {
+            border-color: var(--border-color) !important;
+        }
+
+        .border-gray-300 {
+            border-color: var(--border-color) !important;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 var(--shadow) !important;
+        }
+
+        /* Custom animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Card hover effects */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Pulse animation for pending items */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Theme toggle button styling */
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            color: var(--text-secondary);
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background-color: var(--nav-hover);
+            color: var(--text-primary);
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -65,26 +200,43 @@
                     
                     <!-- Navigation Links -->
                     <div class="hidden md:ml-10 md:flex md:space-x-8">
-                        <a href="{% url 'ui:dashboard' %}" 
-                           class="{% if request.path == '/dashboard/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        <a href="{% url 'ui:dashboard' %}"
+                           class="{% if request.path == '/dashboard/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
                             <i class="fa-solid fa-chart-line mr-2"></i>
                             Dashboard
                         </a>
-                        <a href="{% url 'ui:datasets' %}" 
-                           class="{% if request.path == '/datasets/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        <a href="{% url 'ui:datasets' %}"
+                           class="{% if request.path == '/datasets/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
                             <i class="fa-solid fa-database mr-2"></i>
                             Datasets
                         </a>
-                        <a href="{% url 'ui:inference' %}" 
-                           class="{% if request.path == '/inference/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        <a href="{% url 'ui:inference' %}"
+                           class="{% if request.path == '/inference/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
                             <i class="fa-solid fa-brain mr-2"></i>
                             Inference
+                        </a>
+                        <a href="{% url 'ui:reports' %}"
+                           class="{% if request.path == '/reports/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                            <i class="fa-solid fa-chart-bar mr-2"></i>
+                            Reports
+                        </a>
+                        <a href="{% url 'ui:profile' %}"
+                           class="{% if request.path == '/profile/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
+                            <i class="fa-solid fa-user mr-2"></i>
+                            Profile
                         </a>
                     </div>
                 </div>
                 
                 <!-- User Menu -->
                 <div class="flex items-center">
+                    <!-- Theme Toggle -->
+                    <button class="theme-toggle mr-4 p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                            id="themeToggle"
+                            aria-label="Toggle dark mode">
+                        <i class="fa-solid fa-moon text-lg"></i>
+                    </button>
+
                     <div class="flex items-center space-x-4">
                         <span class="text-sm text-gray-700">{{ user.username }}</span>
                         <a href="{% url 'ui:logout' %}" 
@@ -102,7 +254,84 @@
     <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'ui/images/logo.svg' %}" alt="NeuroLens" class="w-8 h-8 mr-3">
+                        <span class="text-xl font-bold">NeuroLens</span>
+                    </div>
+                    <p class="text-gray-400 mb-4 max-w-md">
+                        Intelligent Multi-Domain Image Analysis Platform powered by AI.
+                        Advanced medical imaging, animal detection, and biological classification.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-twitter text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-github text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-linkedin text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-discord text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'ui:dashboard' %}" class="text-gray-400 hover:text-white transition-colors">Dashboard</a>
+                        </li>
+                        <li><a href="{% url 'ui:inference' %}" class="text-gray-400 hover:text-white transition-colors">AI
+                            Analysis</a></li>
+                        <li><a href="{% url 'ui:datasets' %}" class="text-gray-400 hover:text-white transition-colors">Datasets</a>
+                        </li>
+                        <li><a href="{% url 'ui:reports' %}" class="text-gray-400 hover:text-white transition-colors">Reports</a>
+                        </li>
+                        <li><a href="{% url 'ui:profile' %}" class="text-gray-400 hover:text-white transition-colors">Profile</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API Reference</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gray-400 text-sm mb-4 md:mb-0">
+                    © 2026 NeuroLens. All rights reserved.
+                </div>
+                <div class="flex space-x-6 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
     
     {% block extra_js %}{% endblock %}
+
+    <!-- Theme Management JavaScript -->
+    <script src="{% static 'ui/js/theme.js' %}"></script>
 </body>
 </html>

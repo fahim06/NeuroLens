@@ -1,0 +1,680 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block title %}Profile - NeuroLens{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* Password field validation states */
+        .relative.success input {
+            border-color: #10b981; /* green-500 */
+            box-shadow: 0 0 0 1px #10b981;
+        }
+
+        .relative.error input {
+            border-color: #ef4444; /* red-500 */
+            box-shadow: 0 0 0 1px #ef4444;
+        }
+
+        .relative.success::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #10b981;
+            font-size: 14px;
+        }
+
+        .relative.error::after {
+            content: '\f00d';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ef4444;
+            font-size: 14px;
+        }
+
+        .error-message {
+            display: block;
+            color: #ef4444;
+            font-size: 11px;
+            margin-top: 4px;
+            padding-left: 0;
+            min-height: 14px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="space-y-8 animate-fade-in-up">
+        <!-- Profile Header -->
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-2xl p-8 text-white relative overflow-hidden">
+            <div class="absolute inset-0 bg-black/10"></div>
+            <div class="relative flex items-center space-x-6">
+                <!-- Profile Avatar -->
+                {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture"
+                         class="w-24 h-24 rounded-full object-cover border-4 border-white/30">
+                {% else %}
+                    <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-3xl font-bold">
+                        {{ user.first_name|first|default:user.username|first|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h1 class="text-3xl font-bold">
+                        {{ user.first_name|default:user.username }}
+                    </h1>
+                    <p class="mt-2 text-primary-100 text-lg">
+                        {{ user.email }}
+                    </p>
+                    <p class="mt-1 text-primary-200">
+                        Member since {{ user.date_joined|date:"F Y" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Profile Info -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Account Information -->
+                <div class="bg-white shadow-lg rounded-2xl border border-gray-100 card-hover p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                        <i class="fa-solid fa-user mr-3 text-primary-600"></i>
+                        Account Information
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <p class="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{{ user.first_name }} {{ user.last_name }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                            <p class="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{{ user.username }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <p class="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{{ user.email }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Account Status</label>
+                            <span class="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium bg-green-100 text-green-800">
+                            <i class="fa-solid fa-check-circle mr-2"></i>
+                            Active
+                        </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Statistics -->
+                <div class="bg-white shadow-lg rounded-2xl border border-gray-100 card-hover p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                        <i class="fa-solid fa-chart-bar mr-3 text-primary-600"></i>
+                        Usage Statistics
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-primary-600">{{ stats.total_requests }}</div>
+                            <div class="text-sm text-gray-600 mt-1">Total Requests</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-600">{{ stats.successful_requests }}</div>
+                            <div class="text-sm text-gray-600 mt-1">Successful</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-blue-600">{{ stats.success_rate|floatformat:1 }}%</div>
+                            <div class="text-sm text-gray-600 mt-1">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white shadow-lg rounded-2xl border border-gray-100 card-hover p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                        <i class="fa-solid fa-history mr-3 text-primary-600"></i>
+                        Recent Activity
+                    </h2>
+                    {% if recent_activity %}
+                        <div class="space-y-4">
+                            {% for activity in recent_activity %}
+                                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                            {% if activity.detection_type == 'human_animal' %}
+                                                <i class="fa-solid fa-users text-primary-600"></i>
+                                            {% elif activity.detection_type == 'brain_tumor' %}
+                                                <i class="fa-solid fa-brain text-primary-600"></i>
+                                            {% else %}
+                                                <i class="fa-solid fa-microscope text-primary-600"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">
+                                                {{ activity.detection_type|title }} Analysis
+                                            </p>
+                                            <p class="text-xs text-gray-500">
+                                                {{ activity.created_at|date:"M j, Y g:i A" }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if activity.status == 'success' %}bg-green-100 text-green-800{% elif activity.status == 'processing' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ activity.status|title }}
+                        </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 text-center py-8">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+                <!-- Account Settings -->
+                <div class="bg-white shadow-lg rounded-2xl border border-gray-100 card-hover p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Settings</h3>
+                    <div class="space-y-3">
+                        <button onclick="openEditProfileModal()"
+                                class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-user-edit mr-3 text-gray-500"></i>
+                            Edit Profile
+                        </button>
+                        <button onclick="openChangePasswordModal()"
+                                class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-key mr-3 text-gray-500"></i>
+                            Change Password
+                        </button>
+                        <button onclick="openNotificationSettingsModal()"
+                                class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-bell mr-3 text-gray-500"></i>
+                            Notification Settings
+                        </button>
+                        <button onclick="openPrivacySettingsModal()"
+                                class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-shield mr-3 text-gray-500"></i>
+                            Privacy Settings
+                        </button>
+                        <button onclick="openDeleteAccountModal()"
+                                class="w-full text-left px-4 py-3 text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-trash mr-3 text-red-500"></i>
+                            Delete Account
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white shadow-lg rounded-2xl border border-gray-100 card-hover p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'ui:inference' %}"
+                           class="flex items-center px-4 py-3 text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-plus mr-3"></i>
+                            New Analysis
+                        </a>
+                        <a href="{% url 'ui:datasets' %}"
+                           class="flex items-center px-4 py-3 text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-upload mr-3"></i>
+                            Upload Dataset
+                        </a>
+                        <a href="{% url 'ui:reports' %}"
+                           class="flex items-center px-4 py-3 text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
+                            <i class="fa-solid fa-chart-line mr-3"></i>
+                            View Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal"
+         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Edit Profile</h3>
+                    <button onclick="closeEditProfileModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <form id="editProfileForm" method="post" action="{% url 'ui:edit_profile' %}"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <!-- Profile Picture Upload -->
+                        <div>
+                            <label for="profile_picture" class="block text-sm font-medium text-gray-700 mb-1">Profile
+                                Picture</label>
+                            <div class="flex items-center space-x-4">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="Current Profile Picture"
+                                         class="w-16 h-16 rounded-full object-cover border-2 border-gray-300">
+                                {% else %}
+                                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+                                        <i class="fa-solid fa-user text-xl"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="flex-1">
+                                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+                                    <div class="flex items-center space-x-2 mt-2">
+                                        <p class="text-xs text-gray-500">Max 5MB. JPEG, PNG, GIF, or WebP only.</p>
+                                        {% if user.profile.profile_picture %}
+                                            <label class="flex items-center text-xs text-gray-500">
+                                                <input type="checkbox" name="remove_picture" value="1" class="mr-1">
+                                                Remove current picture
+                                            </label>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First
+                                Name</label>
+                            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last
+                                Name</label>
+                            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" onclick="closeEditProfileModal()"
+                                class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal"
+         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Change Password</h3>
+                    <button onclick="closeChangePasswordModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <form id="changePasswordForm" method="post" action="{% url 'ui:change_password' %}">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div>
+                            <label for="current_password" class="block text-sm font-medium text-gray-700 mb-1">Current
+                                Password</label>
+                            <div class="relative">
+                                <input type="password" id="current_password" name="current_password" required
+                                       class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <button type="button"
+                                        class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        aria-label="Toggle password visibility">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                            <span class="error-message text-red-500 text-xs mt-1 block"></span>
+                        </div>
+                        <div>
+                            <label for="new_password" class="block text-sm font-medium text-gray-700 mb-1">New
+                                Password</label>
+                            <div class="relative">
+                                <input type="password" id="new_password" name="new_password" required
+                                       class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <button type="button"
+                                        class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        aria-label="Toggle password visibility">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm
+                                New Password</label>
+                            <div class="relative">
+                                <input type="password" id="confirm_password" name="confirm_password" required
+                                       class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <button type="button"
+                                        class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        aria-label="Toggle password visibility">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" onclick="closeChangePasswordModal()"
+                                class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                            Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Settings Modal -->
+    <div id="notificationSettingsModal"
+         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Notification Settings</h3>
+                    <button onclick="closeNotificationSettingsModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <form id="notificationSettingsForm" method="post" action="{% url 'ui:notification_settings' %}">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Email Notifications</h4>
+                                <p class="text-xs text-gray-500">Receive email updates about your analyses</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="email_notifications" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Analysis Complete</h4>
+                                <p class="text-xs text-gray-500">Get notified when analyses finish</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="analysis_complete" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Weekly Reports</h4>
+                                <p class="text-xs text-gray-500">Receive weekly usage summaries</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="weekly_reports" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" onclick="closeNotificationSettingsModal()"
+                                class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                            Save Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Settings Modal -->
+    <div id="privacySettingsModal"
+         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Privacy Settings</h3>
+                    <button onclick="closePrivacySettingsModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <form id="privacySettingsForm" method="post" action="{% url 'ui:privacy_settings' %}">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Profile Visibility</h4>
+                                <p class="text-xs text-gray-500">Make your profile visible to other users</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="profile_visible" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Data Sharing</h4>
+                                <p class="text-xs text-gray-500">Allow anonymized data for research</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="data_sharing" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Analytics Tracking</h4>
+                                <p class="text-xs text-gray-500">Help improve the service with usage data</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="analytics_tracking" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" onclick="closePrivacySettingsModal()"
+                                class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                            Save Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteAccountModal"
+         class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-red-600">Delete Account</h3>
+                    <button onclick="closeDeleteAccountModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <p class="text-gray-700 mb-2">Are you sure you want to delete your account?</p>
+                    <p class="text-sm text-gray-500">This action cannot be undone. All your data, analyses, and datasets
+                        will be permanently deleted.</p>
+                </div>
+                <form id="deleteAccountForm" method="post" action="{% url 'ui:delete_account' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="confirm_username" class="block text-sm font-medium text-gray-700 mb-1">
+                            Type your username to confirm: <strong>{{ user.username }}</strong>
+                        </label>
+                        <input type="text" id="confirm_username" name="confirm_username" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeDeleteAccountModal()"
+                                class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            Delete Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modal Functions -->
+    <script>
+        // Edit Profile Modal
+        function openEditProfileModal() {
+            document.getElementById('editProfileModal').classList.remove('hidden');
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').classList.add('hidden');
+        }
+
+        // Change Password Modal
+        function openChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('hidden');
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.add('hidden');
+        }
+
+        // Notification Settings Modal
+        function openNotificationSettingsModal() {
+            document.getElementById('notificationSettingsModal').classList.remove('hidden');
+        }
+
+        function closeNotificationSettingsModal() {
+            document.getElementById('notificationSettingsModal').classList.add('hidden');
+        }
+
+        // Privacy Settings Modal
+        function openPrivacySettingsModal() {
+            document.getElementById('privacySettingsModal').classList.remove('hidden');
+        }
+
+        function closePrivacySettingsModal() {
+            document.getElementById('privacySettingsModal').classList.add('hidden');
+        }
+
+        // Delete Account Modal
+        function openDeleteAccountModal() {
+            document.getElementById('deleteAccountModal').classList.remove('hidden');
+        }
+
+        function closeDeleteAccountModal() {
+            document.getElementById('deleteAccountModal').classList.add('hidden');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function (event) {
+            const modals = ['editProfileModal', 'changePasswordModal', 'notificationSettingsModal', 'privacySettingsModal', 'deleteAccountModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+
+        // Password Visibility Toggle
+        document.querySelectorAll('.password-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const input = toggle.parentElement.querySelector('input');
+                const icon = toggle.querySelector('i');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.className = 'fa-solid fa-eye-slash';
+                } else {
+                    input.type = 'password';
+                    icon.className = 'fa-solid fa-eye';
+                }
+            });
+        });
+
+        // Real-time current password validation
+        const currentPasswordField = document.getElementById('current_password');
+        if (currentPasswordField) {
+            let passwordValidationTimeout;
+
+            currentPasswordField.addEventListener('input', function () {
+                clearTimeout(passwordValidationTimeout);
+                const password = this.value.trim();
+                const container = this.parentElement;
+                const errorElement = container.querySelector('.error-message') || document.createElement('span');
+
+                // Reset states
+                container.classList.remove('error', 'success');
+                if (!container.querySelector('.error-message')) {
+                    errorElement.className = 'error-message';
+                    container.appendChild(errorElement);
+                }
+                errorElement.textContent = '';
+
+                if (password.length === 0) {
+                    return; // Don't validate empty field
+                }
+
+                // Debounce validation
+                passwordValidationTimeout = setTimeout(async () => {
+                    try {
+                        const formData = new FormData();
+                        formData.append('current_password', password);
+                        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+                        const response = await fetch('/profile/change-password/', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (data.valid) {
+                            container.classList.add('success');
+                            container.classList.remove('error');
+                            errorElement.textContent = '';
+                        } else {
+                            container.classList.add('error');
+                            container.classList.remove('success');
+                            errorElement.textContent = data.error || 'Current password is incorrect.';
+                        }
+                    } catch (error) {
+                        console.error('Password validation error:', error);
+                        container.classList.add('error');
+                        container.classList.remove('success');
+                        errorElement.textContent = 'Unable to validate password.';
+                    }
+                }, 500); // 500ms debounce
+            });
+        }
+    </script>
+
+{% endblock %}
