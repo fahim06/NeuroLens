@@ -52,6 +52,8 @@ services:
       args:
         ENVIRONMENT: ${ENVIRONMENT:-development}
     container_name: neurolens-backend
+    # Override the production CMD to use the dev server with auto-reload
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
       - DEBUG=${DEBUG:-True}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
@@ -88,6 +90,8 @@ services:
       context: .
       dockerfile: infra/docker/backend.Dockerfile
     container_name: neurolens-celery-worker
+    # Use watchdog to auto-reload celery on code changes (optional, requires 'watchdog' in requirements.txt)
+    # For now, standard worker. You may need to restart this container if you change task code.
     command: celery -A neurolens worker -l INFO
     environment:
       - DEBUG=${DEBUG:-False}
@@ -123,6 +127,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    volumes:
+      - .:/app:cached
     depends_on:
       postgres:
         condition: service_healthy
@@ -139,8 +145,3 @@ volumes:
 networks:
   default:
     name: neurolens-network
-    enable_ipv6: true
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16    # IPv4 subnet
-        - subnet: 2001:db8:1::/64   # IPv6 subnet

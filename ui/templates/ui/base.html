@@ -220,15 +220,10 @@
                             <i class="fa-solid fa-chart-bar mr-2"></i>
                             Reports
                         </a>
-                        <a href="{% url 'ui:profile' %}"
-                           class="{% if request.path == '/profile/' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors">
-                            <i class="fa-solid fa-user mr-2"></i>
-                            Profile
-                        </a>
                     </div>
                 </div>
-                
-                <!-- User Menu -->
+
+                <!-- Profile Dropdown -->
                 <div class="flex items-center">
                     <!-- Theme Toggle -->
                     <button class="theme-toggle mr-4 p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -237,13 +232,53 @@
                         <i class="fa-solid fa-moon text-lg"></i>
                     </button>
 
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm text-gray-700">{{ user.username }}</span>
-                        <a href="{% url 'ui:logout' %}" 
-                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                            <i class="fa-solid fa-sign-out-alt mr-2"></i>
-                            Logout
-                        </a>
+                    <!-- Profile Dropdown -->
+                    <div class="relative">
+                        <button id="profileDropdownBtn"
+                                class="flex items-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-full">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}"
+                                     alt="Profile"
+                                     class="w-8 h-8 rounded-full object-cover border-2 border-gray-200">
+                            {% else %}
+                                <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center border-2 border-gray-200">
+                                    <i class="fa-solid fa-user text-primary-600"></i>
+                                </div>
+                            {% endif %}
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="profileDropdown"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden">
+                            <!-- Profile Photo -->
+                            <div class="px-4 py-3 border-b border-gray-200">
+                                <div class="flex justify-center">
+                                    {% if user.profile.profile_picture %}
+                                        <img src="{{ user.profile.profile_picture.url }}"
+                                             alt="Profile"
+                                             class="w-12 h-12 rounded-full object-cover">
+                                    {% else %}
+                                        <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
+                                            <i class="fa-solid fa-user text-primary-600 text-xl"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Menu Items -->
+                            <div class="flex">
+                                <a href="{% url 'ui:profile' %}"
+                                   class="flex-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-center border-r border-gray-200 transition-colors">
+                                    <i class="fa-solid fa-user mr-1"></i>
+                                    Profile
+                                </a>
+                                <a href="{% url 'ui:logout' %}"
+                                   class="flex-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-center transition-colors">
+                                    <i class="fa-solid fa-sign-out-alt mr-1"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -330,6 +365,34 @@
     </footer>
     
     {% block extra_js %}{% endblock %}
+
+    <!-- Profile Dropdown JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+
+            // Toggle dropdown on button click
+            dropdownBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!dropdownBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 
     <!-- Theme Management JavaScript -->
     <script src="{% static 'ui/js/theme.js' %}"></script>
