@@ -21,6 +21,82 @@ env:
 
 jobs:
   # ============================================================
+  # BUMP VERSION - Runs only on django-rebuild, dev, main
+  # ============================================================
+  bump-version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    needs: [ validate, security ]
+    if: github.ref == 'refs/heads/django-rebuild' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Increment Version in README
+        run: |
+          import re
+          import sys
+
+          readme_path = 'README.md'
+
+          try:
+              with open(readme_path, 'r') as f:
+                  content = f.read()
+
+              # Regex to match the badge: <img src="https://img.shields.io/badge/version-2.0.10--alpha-blue" />
+              # Captures: 1=prefix, 2=major, 3=minor, 4=patch, 5=suffix
+              pattern = r'(<img src="https://img.shields.io/badge/version-)(\d+)\.(\d+)\.(\d+)(--alpha-blue" />)'
+
+              match = re.search(pattern, content)
+              if not match:
+                  print("Version badge not found in README.md")
+                  sys.exit(1)
+
+              prefix = match.group(1)
+              major = int(match.group(2))
+              minor = int(match.group(3))
+              patch = int(match.group(4))
+              suffix = match.group(5)
+
+              # Increment patch version
+              new_patch = patch + 1
+              new_version_str = f"{prefix}{major}.{minor}.{new_patch}{suffix}"
+
+              new_content = content.replace(match.group(0), new_version_str)
+
+              with open(readme_path, 'w') as f:
+                  f.write(new_content)
+
+              print(f"Bumped version from {major}.{minor}.{patch} to {major}.{minor}.{new_patch}")
+
+          except Exception as e:
+              print(f"Error: {e}")
+              sys.exit(1)
+        shell: python
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # Check if README.md was modified
+          if git diff --quiet README.md; then
+            echo "No changes to commit."
+          else
+            git add README.md
+            git commit -m "chore: bump version in README [skip ci]"
+            git push
+          fi
+  # ============================================================
   # VALIDATE (CI) - Runs on all branches and PRs
   # ============================================================
   validate:
@@ -134,82 +210,6 @@ jobs:
             fi
           }
 
-  # ============================================================
-  # BUMP VERSION - Runs only on django-rebuild, dev, main
-  # ============================================================
-  bump-version:
-    name: Bump Version
-    runs-on: ubuntu-latest
-    needs: [ validate, security ]
-    if: github.ref == 'refs/heads/django-rebuild' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Increment Version in README
-        run: |
-          import re
-          import sys
-
-          readme_path = 'README.md'
-
-          try:
-              with open(readme_path, 'r') as f:
-                  content = f.read()
-
-              # Regex to match the badge: <img src="https://img.shields.io/badge/version-2.0.10--alpha-blue" />
-              # Captures: 1=prefix, 2=major, 3=minor, 4=patch, 5=suffix
-              pattern = r'(<img src="https://img.shields.io/badge/version-)(\d+)\.(\d+)\.(\d+)(--alpha-blue" />)'
-
-              match = re.search(pattern, content)
-              if not match:
-                  print("Version badge not found in README.md")
-                  sys.exit(1)
-
-              prefix = match.group(1)
-              major = int(match.group(2))
-              minor = int(match.group(3))
-              patch = int(match.group(4))
-              suffix = match.group(5)
-
-              # Increment patch version
-              new_patch = patch + 1
-              new_version_str = f"{prefix}{major}.{minor}.{new_patch}{suffix}"
-
-              new_content = content.replace(match.group(0), new_version_str)
-
-              with open(readme_path, 'w') as f:
-                  f.write(new_content)
-
-              print(f"Bumped version from {major}.{minor}.{patch} to {major}.{minor}.{new_patch}")
-
-          except Exception as e:
-              print(f"Error: {e}")
-              sys.exit(1)
-        shell: python
-
-      - name: Commit and Push
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-          # Check if README.md was modified
-          if git diff --quiet README.md; then
-            echo "No changes to commit."
-          else
-            git add README.md
-            git commit -m "chore: bump version in README [skip ci]"
-            git push
-          fi
 
   # ============================================================
   # BUILD - Runs only on django-rebuild, dev, main
