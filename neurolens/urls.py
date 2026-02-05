@@ -14,33 +14,34 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from django.http import JsonResponse
+
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.http import JsonResponse
+from django.urls import path, include
 
 
 def api_root(request):
     """API root endpoint."""
-    return JsonResponse({
-        'name': 'NeuroLens API',
-        'version': '1.0.0',
-        'docs': '/api/docs/',
-        'health': '/api/health/',
-    })
+    return JsonResponse(
+        {
+            "name": "NeuroLens API",
+            "version": "1.0.0",
+            "docs": "/api/docs/",
+            "health": "/api/health/",
+        }
+    )
 
 
 urlpatterns = [
-    # Admin
-    path('admin/', admin.site.urls),
-    
-    # UI Routes (Django templates + Tailwind) - Phase 9
-    path('', include('ui.urls')),
-    
-    # API Routes
-    path('api/', include('core.urls')),
-    path('api/auth/', include('users.urls')),
-    path('api/datasets/', include('datasets.urls')),
-    path('api/inference/', include('inference.urls')),
+                  # Admin
+                  path("admin/", admin.site.urls),
+                  # UI Routes (Django templates + Tailwind) - Phase 9
+                  path("", include("ui.urls")),
+                  # API Routes
+                  path("api/", include("core.urls")),
+                  path("api/auth/", include("users.urls")),
+                  path("api/datasets/", include("datasets.urls")),
+                  path("api/inference/", include("inference.urls")),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

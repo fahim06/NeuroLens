@@ -4,6 +4,7 @@ Timezone Middleware for User-Specific Timezone Support
 This middleware activates the user's timezone for each request,
 ensuring that dates and times are displayed in the user's local timezone.
 """
+
 import pytz
 from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
@@ -24,7 +25,7 @@ class TimezoneMiddleware(MiddlewareMixin):
         If the user is authenticated and has a timezone set,
         activate that timezone. Otherwise, use UTC.
         """
-        if request.user.is_authenticated and hasattr(request.user, 'profile'):
+        if request.user.is_authenticated and hasattr(request.user, "profile"):
             user_timezone = request.user.profile.timezone
             if user_timezone in pytz.common_timezones:
                 try:

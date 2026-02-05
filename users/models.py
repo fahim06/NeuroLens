@@ -1,9 +1,10 @@
-from django.db import models
+import os
+
+import pytz
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import os
-import pytz
 
 
 def profile_picture_upload_path(instance, filename):
@@ -12,7 +13,7 @@ def profile_picture_upload_path(instance, filename):
     Format: profile_pictures/username.ext
     """
     # Get file extension
-    ext = filename.split('.')[-1] if '.' in filename else ''
+    ext = filename.split(".")[-1] if "." in filename else ""
 
     # Create filename with username
     if ext:
@@ -21,7 +22,7 @@ def profile_picture_upload_path(instance, filename):
         filename = instance.user.username
 
     # Return full path
-    return os.path.join('profile_pictures', filename)
+    return os.path.join("profile_pictures", filename)
 
 
 class UserProfile(models.Model):
@@ -29,48 +30,40 @@ class UserProfile(models.Model):
     Extension of Django's built-in User model.
     Stores role and additional user metadata.
     """
-    
+
     class Role(models.TextChoices):
-        ADMIN = 'admin', 'Admin'
-        BETA_USER = 'beta_user', 'Beta User'
-        VIEWER = 'viewer', 'Viewer'
-    
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='profile'
-    )
-    role = models.CharField(
-        max_length=20,
-        choices=Role.choices,
-        default=Role.VIEWER
-    )
+        ADMIN = "admin", "Admin"
+        BETA_USER = "beta_user", "Beta User"
+        VIEWER = "viewer", "Viewer"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.VIEWER)
     profile_picture = models.ImageField(
         upload_to=profile_picture_upload_path,
         blank=True,
         null=True,
-        help_text='Profile picture (max 5MB, recommended: 400x400px)'
+        help_text="Profile picture (max 5MB, recommended: 400x400px)",
     )
     timezone = models.CharField(
         max_length=50,
-        default='UTC',
+        default="UTC",
         choices=[(tz, tz) for tz in pytz.common_timezones],
-        help_text='User timezone for displaying dates and times'
+        help_text="User timezone for displaying dates and times",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
-        verbose_name = 'User Profile'
-        verbose_name_plural = 'User Profiles'
-    
+        verbose_name = "User Profile"
+        verbose_name_plural = "User Profiles"
+
     def __str__(self):
         return f"{self.user.username} ({self.role})"
-    
+
     @property
     def is_admin(self):
         return self.role == self.Role.ADMIN
-    
+
     @property
     def is_beta_user(self):
         return self.role in [self.Role.ADMIN, self.Role.BETA_USER]
@@ -86,5 +79,5 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     """Save the UserProfile when the User is saved."""
-    if hasattr(instance, 'profile'):
+    if hasattr(instance, "profile"):
         instance.profile.save()

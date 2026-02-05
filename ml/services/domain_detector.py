@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class PrimaryDomain(Enum):
     """Primary content domains."""
+
     HUMAN = "human"
     ANIMAL = "animal"
     PLANT = "plant"
@@ -27,34 +28,36 @@ class PrimaryDomain(Enum):
 
 class SubCategory(Enum):
     """Sub-categories within domains."""
+
     # Human
     HUMAN_FACE = "human_face"
     HUMAN_BODY = "human_body"
-    
+
     # Animal
     ANIMAL_MAMMAL = "mammal"
     ANIMAL_BIRD = "bird"
     ANIMAL_REPTILE = "reptile"
     ANIMAL_FISH = "fish"
     ANIMAL_INSECT = "insect"
-    
+
     # Plant
     PLANT_CITRUS = "citrus"
     PLANT_LEAF = "leaf"
     PLANT_FLOWER = "flower"
     PLANT_FRUIT = "fruit"
-    
+
     # Medical
     MEDICAL_BRAIN_MRI = "brain_mri"
     MEDICAL_XRAY = "xray"
     MEDICAL_CT = "ct_scan"
-    
+
     UNKNOWN = "unknown"
 
 
 @dataclass
 class DomainDetectionResult:
     """Result of domain detection."""
+
     primary_domain: PrimaryDomain
     sub_category: SubCategory
     confidence: float
@@ -97,16 +100,16 @@ class DomainDetectorService:
     """
     Auto-domain detection service.
     Analyzes image content to determine domain and select appropriate model.
-    
+
     Phase 10: Implements the "Lightweight Domain Detector" concept.
     """
-    
+
     def __init__(self):
         self._model = None
         self._model_available = False
         self._load_error: Optional[str] = None
         self._try_load_model()
-    
+
     def _try_load_model(self):
         """Attempt to load the lightweight domain classifier."""
         try:
@@ -119,14 +122,14 @@ class DomainDetectorService:
             self._model_available = False
             self._load_error = str(e)
             logger.warning(f"Domain detector model not available: {e}")
-    
+
     def detect_domain(self, image_data: bytes) -> DomainDetectionResult:
         """
         Detect the primary domain of an image.
-        
+
         Args:
             image_data: Raw image bytes
-            
+
         Returns:
             DomainDetectionResult with domain, category, and recommended model
         """
@@ -134,33 +137,33 @@ class DomainDetectorService:
             return self._model_detect(image_data)
         else:
             return self._heuristic_detect(image_data)
-    
+
     def _model_detect(self, image_data: bytes) -> DomainDetectionResult:
         """Use trained model for domain detection."""
         # Future: Implement CNN-based detection
         raise NotImplementedError("Model-based detection not yet implemented")
-    
+
     def _heuristic_detect(self, image_data: bytes) -> DomainDetectionResult:
         """
         Use heuristics to detect domain.
-        
+
         In production, this would analyze:
         - Image dimensions (medical images have specific ratios)
         - Color distribution (MRI is grayscale, plants are green-heavy)
         - Edge patterns (X-rays have distinct patterns)
-        
+
         For Phase 10, we return a smart default with metadata.
         """
         try:
             # Analyze image properties
             properties = self._analyze_image_properties(image_data)
-            
+
             # Determine domain based on properties
             domain, category, confidence = self._classify_from_properties(properties)
-            
+
             # Get recommended model
             recommended_model = self._get_model_for_domain(domain, category)
-            
+
             return DomainDetectionResult(
                 primary_domain=domain,
                 sub_category=category,
@@ -170,7 +173,7 @@ class DomainDetectorService:
                     "detection_method": "heuristic",
                     "image_properties": properties,
                     "model_available": self._model_available,
-                }
+                },
             )
         except Exception as e:
             logger.error(f"Domain detection failed: {e}")
@@ -182,9 +185,9 @@ class DomainDetectorService:
                 metadata={
                     "detection_method": "fallback",
                     "error": str(e),
-                }
+                },
             )
-    
+
     def _analyze_image_properties(self, image_data: bytes) -> Dict[str, Any]:
         """Analyze basic image properties for domain hints."""
         properties = {
@@ -193,18 +196,20 @@ class DomainDetectorService:
             "dominant_colors": [],
             "aspect_ratio": 1.0,
         }
-        
+
         try:
             from PIL import Image
             import io
-            
+
             img = Image.open(io.BytesIO(image_data))
             properties["width"] = img.width
             properties["height"] = img.height
-            properties["aspect_ratio"] = img.width / img.height if img.height > 0 else 1.0
+            properties["aspect_ratio"] = (
+                img.width / img.height if img.height > 0 else 1.0
+            )
             properties["mode"] = img.mode
             properties["is_grayscale"] = img.mode in ("L", "LA", "1")
-            
+
             # Sample colors for heuristics
             if img.mode != "L":
                 img_rgb = img.convert("RGB")
@@ -217,21 +222,20 @@ class DomainDetectorService:
                     avg_b = sum(p[2] for p in pixels) / len(pixels)
                     properties["avg_color"] = (avg_r, avg_g, avg_b)
                     properties["is_greenish"] = avg_g > avg_r and avg_g > avg_b
-                    
+
         except ImportError:
             logger.debug("PIL not available for image analysis")
         except Exception as e:
             logger.debug(f"Image analysis failed: {e}")
-        
+
         return properties
-    
+
     def _classify_from_properties(
-        self, 
-        properties: Dict[str, Any]
+            self, properties: Dict[str, Any]
     ) -> tuple[PrimaryDomain, SubCategory, float]:
         """
         Classify domain based on image properties.
-        
+
         Heuristics:
         - Grayscale + square-ish = likely medical (MRI, X-ray)
         - Green dominant = likely plant
@@ -240,7 +244,7 @@ class DomainDetectorService:
         is_grayscale = properties.get("is_grayscale", False)
         is_greenish = properties.get("is_greenish", False)
         aspect_ratio = properties.get("aspect_ratio", 1.0)
-        
+
         # Medical images are often grayscale with specific aspect ratios
         if is_grayscale:
             # Square-ish grayscale = likely brain MRI
@@ -248,32 +252,30 @@ class DomainDetectorService:
                 return PrimaryDomain.MEDICAL, SubCategory.MEDICAL_BRAIN_MRI, 0.75
             else:
                 return PrimaryDomain.MEDICAL, SubCategory.MEDICAL_XRAY, 0.65
-        
+
         # Green-dominant images = likely plant
         if is_greenish:
             # Could be citrus or other plant
             return PrimaryDomain.PLANT, SubCategory.PLANT_CITRUS, 0.70
-        
+
         # Default to animal detection (most versatile)
         return PrimaryDomain.ANIMAL, SubCategory.UNKNOWN, 0.60
-    
+
     def _get_model_for_domain(
-        self, 
-        domain: PrimaryDomain, 
-        category: SubCategory
+            self, domain: PrimaryDomain, category: SubCategory
     ) -> str:
         """Get the recommended model for a domain/category combination."""
         domain_models = DOMAIN_MODEL_MAPPING.get(domain, {})
         model = domain_models.get(category)
-        
+
         if not model:
             # Try unknown category for the domain
             model = domain_models.get(SubCategory.UNKNOWN)
-        
+
         if not model:
             # Fallback to animal classifier
             model = "animal_classifier"
-        
+
         return model
 
 

@@ -6,16 +6,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('inference', '0002_inferencerequest_celery_task_id_and_more'),
+        ("inference", "0002_inferencerequest_celery_task_id_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='inferencerequest',
-            name='requested_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='inference_requests', to=settings.AUTH_USER_MODEL),
+            model_name="inferencerequest",
+            name="requested_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="inference_requests",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

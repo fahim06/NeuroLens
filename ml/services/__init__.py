@@ -9,9 +9,9 @@ from .domain_detector import (
 )
 
 __all__ = [
-    'DomainDetectorService',
-    'domain_detector_service',
-    'PrimaryDomain',
-    'SubCategory',
-    'DomainDetectionResult',
+    "DomainDetectorService",
+    "domain_detector_service",
+    "PrimaryDomain",
+    "SubCategory",
+    "DomainDetectionResult",
 ]

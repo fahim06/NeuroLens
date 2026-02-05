@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('inference', '0001_initial'),
+        ("inference", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='inferencerequest',
-            name='celery_task_id',
-            field=models.CharField(blank=True, default='', max_length=255),
+            model_name="inferencerequest",
+            name="celery_task_id",
+            field=models.CharField(blank=True, default="", max_length=255),
         ),
         migrations.AddField(
-            model_name='inferencerequest',
-            name='started_at',
+            model_name="inferencerequest",
+            name="started_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]
