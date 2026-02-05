@@ -33,13 +33,13 @@ NeuroLens is an AI platform for multi-domain image detection and classification,
 
 ## 🧠 Supported Detection Types
 
-| Detection Type | Description | Model |
-|---------------|-------------|-------|
-| 🧑 Human vs Animal | Binary detection | Custom CNN |
-| 🐾 Animal Category | Species classification | Custom CNN |
-| 🧬 Biological | Kingdom → Species taxonomy | Hierarchical |
-| 🧠 Brain Tumor | Medical MRI analysis | VGG16 (95.21% acc) |
-| 🍊 Citrus | Plant genus identification | MobileNet (99.85% acc) |
+| Detection Type     | Description                | Model                  |
+|--------------------|----------------------------|------------------------|
+| 🧑 Human vs Animal | Binary detection           | Custom CNN             |
+| 🐾 Animal Category | Species classification     | Custom CNN             |
+| 🧬 Biological      | Kingdom → Species taxonomy | Hierarchical           |
+| 🧠 Brain Tumor     | Medical MRI analysis       | VGG16 (95.21% acc)     |
+| 🍊 Citrus          | Plant genus identification | MobileNet (99.85% acc) |
 
 ## 🏗️ Architecture
 
@@ -126,35 +126,35 @@ Frontend will be available at `http://localhost:5173`
 
 ### Authentication
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/auth/token/` | POST | Get JWT access/refresh tokens |
-| `/api/auth/token/refresh/` | POST | Refresh access token |
+| Endpoint                   | Method | Description                   |
+|----------------------------|--------|-------------------------------|
+| `/api/auth/token/`         | POST   | Get JWT access/refresh tokens |
+| `/api/auth/token/refresh/` | POST   | Refresh access token          |
 
 ### Health Checks
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/health/` | GET | System health check |
-| `/api/inference/health/` | GET | ML predictor health |
+| Endpoint                 | Method | Description         |
+|--------------------------|--------|---------------------|
+| `/api/health/`           | GET    | System health check |
+| `/api/inference/health/` | GET    | ML predictor health |
 
 ### Datasets
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| `/api/datasets/` | GET | JWT | List user datasets |
-| `/api/datasets/` | POST | JWT | Create dataset |
-| `/api/datasets/<id>/` | GET | JWT | Get dataset details |
-| `/api/datasets/<id>/` | DELETE | JWT | Delete dataset |
+| Endpoint              | Method | Auth | Description         |
+|-----------------------|--------|------|---------------------|
+| `/api/datasets/`      | GET    | JWT  | List user datasets  |
+| `/api/datasets/`      | POST   | JWT  | Create dataset      |
+| `/api/datasets/<id>/` | GET    | JWT  | Get dataset details |
+| `/api/datasets/<id>/` | DELETE | JWT  | Delete dataset      |
 
 ### Inference
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| `/api/inference/predict/` | POST | JWT | Run prediction (sync) |
-| `/api/inference/predict/async/` | POST | JWT | Run prediction (async) |
-| `/api/inference/<id>/status/` | GET | JWT | Check async request status |
-| `/api/inference/history/` | GET | JWT | View prediction history |
+| Endpoint                        | Method | Auth | Description                |
+|---------------------------------|--------|------|----------------------------|
+| `/api/inference/predict/`       | POST   | JWT  | Run prediction (sync)      |
+| `/api/inference/predict/async/` | POST   | JWT  | Run prediction (async)     |
+| `/api/inference/<id>/status/`   | GET    | JWT  | Check async request status |
+| `/api/inference/history/`       | GET    | JWT  | View prediction history    |
 
 ### Example Prediction Request
 
@@ -271,13 +271,13 @@ npm run dev
 
 ### Pages
 
-| Route | Description |
-|-------|-------------|
-| `/login` | Animated login with JWT auth |
-| `/signup` | Registration with password strength |
-| `/dashboard` | Overview stats and quick actions |
-| `/datasets` | Upload and manage datasets |
-| `/inference` | Run AI analysis with polling |
+| Route        | Description                         |
+|--------------|-------------------------------------|
+| `/login`     | Animated login with JWT auth        |
+| `/signup`    | Registration with password strength |
+| `/dashboard` | Overview stats and quick actions    |
+| `/datasets`  | Upload and manage datasets          |
+| `/inference` | Run AI analysis with polling        |
 
 ---
 
