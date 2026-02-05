@@ -51,9 +51,9 @@ jobs:
               with open(readme_path, 'r') as f:
                   content = f.read()
           
-              # Regex to match the badge: <img src="https://img.shields.io/badge/version-2.0.10--alpha-blue" />
+              # Regex to match the badge: <img src="https://img.shields.io/badge/version-2.0.14--beta-yellow" />
               # Captures: 1=prefix, 2=major, 3=minor, 4=patch, 5=suffix
-              pattern = r'(<img src="https://img.shields.io/badge/version-)(\d+)\.(\d+)\.(\d+)(--alpha-blue" />)'
+              pattern = r'(<img src="https://img.shields.io/badge/version-)(\d+)\.(\d+)\.(\d+)(--beta-yellow" />)'
           
               match = re.search(pattern, content)
               if not match:

@@ -9,7 +9,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.0.14--beta-yellow" />
   <a href="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml">
-    <img src="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml/badge.svg?branch=main" alt="CI/CD" />
+    <img src="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml/badge.svg?branch=django-rebuild" alt="CI/CD" />
   </a>
   <img src="https://img.shields.io/badge/python-3.12-green" />
   <img src="https://img.shields.io/badge/framework-Django 6.0 | DRF-purple" />
