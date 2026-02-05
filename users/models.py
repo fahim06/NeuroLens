@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os
+import pytz
 
 
 def profile_picture_upload_path(instance, filename):
@@ -49,6 +50,12 @@ class UserProfile(models.Model):
         blank=True,
         null=True,
         help_text='Profile picture (max 5MB, recommended: 400x400px)'
+    )
+    timezone = models.CharField(
+        max_length=50,
+        default='UTC',
+        choices=[(tz, tz) for tz in pytz.common_timezones],
+        help_text='User timezone for displaying dates and times'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

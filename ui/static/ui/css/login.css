@@ -464,7 +464,8 @@ body {
     margin: 4px 0;
 }
 
-.input-group input {
+.input-group input,
+.input-group select {
     background: var(--md-surface-variant);
     border: 2px solid transparent;
     padding: 14px 45px 14px 16px;
@@ -476,13 +477,15 @@ body {
     color: var(--md-on-surface);
 }
 
-.input-group input:focus {
+.input-group input:focus,
+.input-group select:focus {
     border-color: var(--md-primary);
     box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.15);
 }
 
 .input-group input:focus,
-.input-group input:not(:placeholder-shown) {
+.input-group input:not(:placeholder-shown),
+.input-group select:focus {
     padding-top: 20px;
     padding-bottom: 8px;
 }
@@ -499,7 +502,8 @@ body {
 }
 
 .input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
+.input-group input:not(:placeholder-shown) + label,
+.input-group select:focus + label {
     top: 10px;
     font-size: 10px;
     color: var(--md-primary);
@@ -507,7 +511,8 @@ body {
 }
 
 /* Error State */
-.input-group.error input {
+.input-group.error input,
+.input-group.error select {
     border-color: var(--md-error);
     animation: shake 0.4s ease;
 }
@@ -545,7 +550,8 @@ body {
 }
 
 /* Success State */
-.input-group.success input {
+.input-group.success input,
+.input-group.success select {
     border-color: var(--md-success);
 }
 

@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 import json
+import pytz
 
 
 def login_view(request):
@@ -30,6 +31,7 @@ def login_view(request):
             email = data.get('email', '').strip()
             password = data.get('password', '')
             confirm_password = data.get('confirm_password', '')
+            timezone = data.get('timezone', 'UTC').strip()
 
             # Validation
             errors = {}
@@ -48,6 +50,10 @@ def login_view(request):
             if password != confirm_password:
                 errors['confirm_password'] = 'Passwords do not match'
 
+            # Validate timezone
+            if timezone not in pytz.common_timezones:
+                timezone = 'UTC'  # Default to UTC if invalid
+
             if errors:
                 return JsonResponse({'success': False, 'errors': errors}, status=400)
 
@@ -60,6 +66,9 @@ def login_view(request):
                     first_name=name.split()[0] if name else '',
                     last_name=' '.join(name.split()[1:]) if len(name.split()) > 1 else ''
                 )
+                # Set user timezone
+                user.profile.timezone = timezone
+                user.profile.save()
                 return JsonResponse({
                     'success': True,
                     'message': 'Account created successfully!'
@@ -98,7 +107,9 @@ def login_view(request):
                     'errors': {'general': 'Invalid username or password. Please try again.'}
                 }, status=401)
 
-    return render(request, 'ui/login.html')
+    return render(request, 'ui/login.html', {
+        'timezones': pytz.common_timezones
+    })
 
 
 @login_required(login_url='/login/')
@@ -269,6 +280,7 @@ def profile_view(request):
     User profile page.
     Shows user information and account settings.
     """
+    import pytz
     user = request.user
 
     # Get user statistics
@@ -283,6 +295,7 @@ def profile_view(request):
 
     context = {
         'user': user,
+        'timezones': [(tz, tz.replace('_', ' ')) for tz in pytz.common_timezones],
         'stats': {
             'total_requests': total_requests,
             'successful_requests': successful_requests,
@@ -302,12 +315,14 @@ def edit_profile(request):
     """
     Handle profile editing with file upload support.
     """
+    import pytz
     user = request.user
 
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
         email = request.POST.get('email', '').strip()
+        timezone = request.POST.get('timezone', 'UTC').strip()
         profile_picture = request.FILES.get('profile_picture')
         remove_picture = request.POST.get('remove_picture') == '1'
 
@@ -317,6 +332,10 @@ def edit_profile(request):
             errors.append('Email is required.')
         elif User.objects.filter(email=email).exclude(id=user.id).exists():
             errors.append('This email is already in use.')
+
+        # Validate timezone
+        if timezone not in pytz.common_timezones:
+            errors.append('Invalid timezone selected.')
 
         # Validate profile picture
         if profile_picture:
@@ -338,6 +357,10 @@ def edit_profile(request):
             user.last_name = last_name
             user.email = email
             user.save()
+
+            # Update timezone
+            user.profile.timezone = timezone
+            user.profile.save()
 
             # Handle profile picture
             if remove_picture and user.profile.profile_picture:

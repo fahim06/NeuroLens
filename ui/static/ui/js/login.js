@@ -232,6 +232,10 @@ const validators = {
         const password = document.getElementById("signUpPassword")?.value;
         if (value !== password) return "Passwords do not match";
         return "";
+    },
+    required: (value) => {
+        if (!value.trim()) return "This field is required";
+        return "";
     }
 };
 
@@ -421,7 +425,8 @@ signUpForm.addEventListener("submit", async (e) => {
         { id: "signUpUsername", validator: "username" },
         { id: "signUpEmail", validator: "email" },
         { id: "signUpPassword", validator: "password" },
-        { id: "signUpConfirmPassword", validator: "confirmPassword" }
+        {id: "signUpConfirmPassword", validator: "confirmPassword"},
+        {id: "signUpTimezone", validator: "required"}
     ];
 
     if (!validateForm(signUpForm, fields)) {
@@ -581,6 +586,36 @@ document.getElementById('forgotPassword')?.addEventListener('click', (e) => {
 });
 
 // ========================================
+// Timezone Detection for Signup
+// ========================================
+
+// Auto-detect user's timezone for signup form
+function detectUserTimezone() {
+    const timezoneSelect = document.getElementById('signUpTimezone');
+    if (timezoneSelect && (!timezoneSelect.value || timezoneSelect.value === 'UTC')) {
+        try {
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // Check if the detected timezone is in our options
+            const options = Array.from(timezoneSelect.options);
+            const matchingOption = options.find(option => option.value === userTimezone);
+            if (matchingOption) {
+                timezoneSelect.value = userTimezone;
+                console.log(`🌍 Auto-detected timezone: ${userTimezone}`);
+            } else {
+                console.log(`🌍 Detected timezone "${userTimezone}" not in available options, keeping UTC`);
+            }
+        } catch (e) {
+            console.log('Could not auto-detect timezone:', e);
+        }
+    }
+}
+
+// Run timezone detection when page loads
+document.addEventListener('DOMContentLoaded', function () {
+    detectUserTimezone();
+});
+
+// ========================================
 // Debug: Log security features status
 // ========================================
 
@@ -591,3 +626,4 @@ console.log("   - Rate Limiting (2s cooldown)");
 console.log("   - Input Validation");
 console.log("   - XSS Prevention");
 console.log("   - Password Strength Checker (debounced)");
+console.log("   - Timezone Auto-Detection");

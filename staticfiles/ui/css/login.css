@@ -65,7 +65,8 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    overflow: hidden;
+    padding: 0.5rem;
+    overflow-x: hidden;
 }
 
 [data-theme="dark"] body {
@@ -291,11 +292,11 @@ body {
     border-radius: 30px;
     box-shadow: var(--shadow-lg);
     position: relative;
-    width: 850px;
-    max-width: 95%;
+    width: 100%;
+    max-width: 850px;
     min-height: 700px;
-    overflow: hidden;
     z-index: 1;
+    margin: 0 auto;
 }
 
 [data-theme="dark"] .container {
@@ -406,6 +407,7 @@ body {
     flex-direction: column;
     padding: 20px 40px;
     height: 100%;
+    width: 100%;
 }
 
 .sign-in {
@@ -462,7 +464,8 @@ body {
     margin: 4px 0;
 }
 
-.input-group input {
+.input-group input,
+.input-group select {
     background: var(--md-surface-variant);
     border: 2px solid transparent;
     padding: 14px 45px 14px 16px;
@@ -474,13 +477,15 @@ body {
     color: var(--md-on-surface);
 }
 
-.input-group input:focus {
+.input-group input:focus,
+.input-group select:focus {
     border-color: var(--md-primary);
     box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.15);
 }
 
 .input-group input:focus,
-.input-group input:not(:placeholder-shown) {
+.input-group input:not(:placeholder-shown),
+.input-group select:focus {
     padding-top: 20px;
     padding-bottom: 8px;
 }
@@ -497,7 +502,8 @@ body {
 }
 
 .input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
+.input-group input:not(:placeholder-shown) + label,
+.input-group select:focus + label {
     top: 10px;
     font-size: 10px;
     color: var(--md-primary);
@@ -505,7 +511,8 @@ body {
 }
 
 /* Error State */
-.input-group.error input {
+.input-group.error input,
+.input-group.error select {
     border-color: var(--md-error);
     animation: shake 0.4s ease;
 }
@@ -543,7 +550,8 @@ body {
 }
 
 /* Success State */
-.input-group.success input {
+.input-group.success input,
+.input-group.success select {
     border-color: var(--md-success);
 }
 
@@ -811,20 +819,18 @@ body {
 }
 
 /* ========================================
-   Mobile Responsive
+   Enhanced Responsive Design - Maintains Original UI
    ======================================== */
 
-@media (max-width: 850px) {
-    .container {
-        width: 95%;
-    }
-
+/* Hide particles on smaller screens for better performance */
+@media (max-width: 768px) {
     .particles {
         display: none;
     }
 }
 
-@media (max-width: 650px) {
+/* Adjust theme toggle position on smaller screens */
+@media (max-width: 480px) {
     .theme-toggle {
         top: 10px;
         right: 10px;
@@ -832,23 +838,234 @@ body {
         height: 40px;
         font-size: 16px;
     }
+}
+
+/* Extra large screens (1440px+) */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 900px;
+        min-height: 750px;
+        margin: 3rem auto;
+    }
+
+    .form-container form {
+        padding: 30px 50px;
+    }
+
+    .container h1 {
+        font-size: 28px;
+    }
+
+    .social-icons a {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+}
+
+/* Large screens (desktop) - Original design */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .container {
+        max-width: 850px;
+        min-height: 700px;
+        margin: 2rem auto;
+    }
+
+    .form-container form {
+        padding: 25px 45px;
+    }
+}
+
+/* Medium-large screens (1024px) */
+@media (min-width: 1024px) {
+    .container h1 {
+        font-size: 26px;
+    }
+
+    .social-icons a {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+}
+
+/* Medium screens (tablets landscape) - Maintain side-by-side layout */
+@media (max-width: 1023px) and (min-width: 769px) {
+    .container {
+        max-width: 95%;
+        min-height: 600px;
+        max-height: 100vh;
+        margin: 1rem auto;
+        border-radius: 20px;
+        overflow-y: auto;
+    }
+
+    .form-container form {
+        padding: 20px 35px;
+    }
+
+    .container h1 {
+        font-size: 22px;
+    }
+
+    .social-icons {
+        gap: 12px;
+    }
+
+    .social-icons a {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .input-group input,
+    .input-group label {
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        padding: 10px 30px;
+        font-size: 14px;
+    }
+
+    .toggle-panel h1 {
+        font-size: 20px;
+    }
+
+    .toggle-panel p {
+        font-size: 13px;
+    }
+}
+
+/* Small tablets / Large mobile (landscape) */
+@media (max-width: 768px) and (min-width: 641px) {
+    .container {
+        max-width: 98%;
+        min-height: 550px;
+        max-height: 100vh;
+        margin: 0.75rem auto;
+        border-radius: 18px;
+        overflow-y: auto;
+    }
+
+    .form-container form {
+        padding: 18px 30px;
+    }
+
+    .container h1 {
+        font-size: 20px;
+    }
+
+    .social-icons {
+        gap: 10px;
+    }
+
+    .social-icons a {
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+    }
+
+    .input-group input,
+    .input-group label {
+        font-size: 13px;
+    }
+
+    .btn-primary {
+        padding: 9px 25px;
+        font-size: 13px;
+    }
+}
+
+/* Mobile landscape / Small tablets */
+@media (max-width: 640px) and (min-width: 481px) {
+    .container {
+        max-width: 100%;
+        min-height: 500px;
+        max-height: 100vh;
+        margin: 0.5rem auto;
+        border-radius: 15px;
+        overflow-y: auto;
+    }
+
+    .form-container form {
+        padding: 15px 25px;
+    }
+
+    .container h1 {
+        font-size: 18px;
+    }
+
+    .social-icons {
+        gap: 8px;
+    }
+
+    .social-icons a {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .input-group input,
+    .input-group label {
+        font-size: 12px;
+    }
+
+    .btn-primary {
+        padding: 8px 20px;
+        font-size: 12px;
+    }
+
+    .toggle-panel h1 {
+        font-size: 16px;
+    }
+
+    .toggle-panel p {
+        font-size: 11px;
+    }
+
+    .remember-forgot {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+    }
+}
+
+/* Small mobile screens - Switch to stacked layout */
+@media (max-width: 480px) {
+    body {
+        height: auto;
+        min-height: 100%;
+        max-height: none;
+        overflow: visible;
+    }
 
     .container {
         width: 100%;
-        min-height: 100vh;
+        height: auto;
+        min-height: 100%;
+        max-height: none;
         border-radius: 0;
         display: flex;
         flex-direction: column;
+        margin: 0;
+        padding: 0;
+        overflow: visible;
     }
 
     .form-container {
         position: relative;
         width: 100% !important;
         height: auto;
-        min-height: 100vh;
+        min-height: calc(100vh - 70px);
         transform: none !important;
         opacity: 1 !important;
         z-index: 1 !important;
+    }
+
+    .form-container form {
+        justify-content: flex-start;
+        padding: 60px 20px 30px;
     }
 
     .sign-in {
@@ -868,10 +1085,48 @@ body {
         animation: none;
     }
 
-    .container form {
-        padding: 60px 25px;
-        padding-bottom: 100px;
-        justify-content: flex-start;
+    .container h1 {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .social-icons {
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .social-icons a {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .container span {
+        text-align: center;
+        display: block;
+        margin: 15px 0 20px 0;
+        font-size: 13px;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    .input-group input,
+    .input-group label {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        margin-top: 10px;
+        margin-bottom: 50px;
     }
 
     .toggle-container {
@@ -883,6 +1138,7 @@ body {
         height: 70px;
         border-radius: 25px 25px 0 0;
         transform: none !important;
+        margin: 0;
     }
 
     .toggle {
@@ -925,12 +1181,26 @@ body {
     .toggle-panel button {
         margin: 0;
         padding: 10px 25px;
+        font-size: 14px;
     }
 
     .remember-forgot {
         flex-direction: column;
         gap: 10px;
         align-items: flex-start;
+        width: 100%;
+    }
+
+    .password-strength {
+        margin: 10px 0;
+    }
+
+    /* Mobile stability fixes - contain absolute elements */
+    .container,
+    .form-container,
+    .toggle-container {
+        max-width: 100vw;
+        overflow-x: hidden;
     }
 }
 

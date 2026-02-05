@@ -88,6 +88,19 @@
                 <span class="error-message" id="signUpConfirmPasswordError"></span>
             </div>
 
+            <div class="input-group">
+                <select id="signUpTimezone" name="timezone" required>
+                    <option value="UTC" selected>UTC (Coordinated Universal Time)</option>
+                    {% for tz in timezones %}
+                        <option value="{{ tz }}">
+                            {{ tz }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="signUpTimezone">Timezone</label>
+                <span class="error-message" id="signUpTimezoneError"></span>
+            </div>
+
             <div class="password-strength" id="passwordStrength">
                 <div class="strength-bar">
                     <div class="strength-fill" id="strengthFill"></div>

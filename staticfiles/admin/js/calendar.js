@@ -133,7 +133,6 @@ depends on core.js for utility functions like removeChildren or quickElement
                     e.preventDefault();
                     callback(y, m, this.textContent);
                 }
-
                 return onClick;
             }
 
@@ -189,7 +188,6 @@ depends on core.js for utility functions like removeChildren or quickElement
             this.selected = selected;
         }
     }
-
     Calendar.prototype = {
         drawCurrent: function () {
             CalendarNamespace.draw(this.currentMonth, this.currentYear, this.div_id, this.callback, this.selected);
