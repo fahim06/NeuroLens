@@ -8,6 +8,7 @@ This service analyzes an uploaded image and determines:
 2. Sub-category within that domain
 3. Which model should be used
 """
+
 import logging
 from dataclasses import dataclass
 from enum import Enum

@@ -229,7 +229,7 @@ jobs:
             echo "requirements.txt not found; aborting."
             exit 1
           fi
-          pip install ruff black pytest pytest-django bandit safety
+          pip install ruff==0.6.9 black==25.1.0 pytest pytest-django bandit safety
 
       - name: Django System Check
         run: python manage.py check --fail-level WARNING
