@@ -358,18 +358,7 @@ jobs:
             ENVIRONMENT=${{ github.ref == 'refs/heads/django-rebuild' && 'beta' || github.ref == 'refs/heads/dev' && 'staging' || 'production' }}
 #
       # Frontend Build
-      - name: Frontend Image Metadata
-        id: frontend-meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
-          tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build & Push Frontend
+      
         uses: docker/build-push-action@v5
         if: steps.login.outcome == 'success'
         with:
