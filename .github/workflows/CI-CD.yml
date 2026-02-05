@@ -247,7 +247,7 @@ jobs:
         run: ruff check . --output-format=github --ignore F401,E402,F541,F841
 
       - name: Lint - Black
-        run: cl --check --diff .
+        run: black --check --diff .
 
       - name: Security Analysis - Bandit
         run: bandit -r . -f json -o bandit-report.json || true
