@@ -523,3 +523,17 @@ def delete_account(request):
             return redirect("ui:login")
 
     return redirect("ui:profile")
+
+
+def privacy_policy(request):
+    """
+    Privacy Policy page - publicly accessible
+    """
+    return render(request, "ui/legal/privacy.html")
+
+
+def terms_of_service(request):
+    """
+    Terms of Service page - publicly accessible
+    """
+    return render(request, "ui/legal/terms.html")

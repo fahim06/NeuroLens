@@ -26,4 +26,6 @@ urlpatterns = [
     path("profile/privacy/", views.privacy_settings, name="privacy_settings"),
     path("profile/delete/", views.delete_account, name="delete_account"),
     path("logout/", views.logout_view, name="logout"),
+    path("privacy/", views.privacy_policy, name="privacy"),
+    path("terms/", views.terms_of_service, name="terms"),
 ]
