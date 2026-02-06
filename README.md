@@ -11,14 +11,14 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.38--beta-yellow" />
+  <img src="https://img.shields.io/badge/version-2.0.38--beta-orange" />
   <a href="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml">
     <img src="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml/badge.svg?branch=django-rebuild" alt="CI/CD" />
   </a>
   <img src="https://img.shields.io/badge/python-3.12-green" />
   <img src="https://img.shields.io/badge/framework-Django 6.0 | DRF-purple" />
   <img src="https://img.shields.io/badge/frontend-Django Templates | Tailwind-cyan" />
-  <img src="https://img.shields.io/badge/license-MIT-orange" />
+  <img src="https://img.shields.io/badge/license-MIT-yellow" />
 </p>
 
 ---
@@ -51,36 +51,73 @@ NeuroLens is an AI platform for multi-domain image detection and classification,
 ### High-Level Architecture
 
 ```
-┌─────────┐     ┌─────────────────────────────┐     ┌─────────────────┐     ┌─────────────────────────────────────────┐
-│ Browser │ ──► │ Django Templates + Tailwind │ ──► │ Django REST API │ ──► │ Service Layer                          │
-│         │     │ UI                          │     │                 │     │ (Router, Registry, Taxonomy)           │
-└─────────┘     └─────────────────────────────┘     └─────────────────┘     └─────────────────────────────────────────┘
-                                                                                      │
-                                                                                      ▼
-┌─────────────────────┐     ┌─────────────────────────────┐
-│ Async Worker        │ ──► │ ML Runtime                  │
-│ (Celery + Redis)    │     │ (Isolated Models)           │
-└─────────────────────┘     └─────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                      HIGH-LEVEL ARCHITECTURE                                                  │
+├───────────────┬──────────────────────────────┬──────────────────┬─────────────────────────────────────────────┤
+│ 🌐 Browser    │ 🎨 Frontend                   │ 🚀 API           │ 🔧 Services                                 │
+│ • Login       │ • Django Templates + Tailwind│ • Django REST    │ • Router / Registry / Taxonomy              │
+│ • Dashboard   │ • Responsive UI              │ • JWT Auth       │ • Domain Detection                          │
+│ • Upload      │ • Interactive Forms          │ • REST + Async   │ • Model Selection & Result Processing       │
+└───────────────┴──────────────────────────────┴──────────────────┴─────────────────────────────────────────────┘
+                                               │
+                                               ▼
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ ⚡ Async Processing                                🤖 ML Runtime                                               │
+├───────────────────────────────┬───────────────────────────────────────────────────────────────────────────────┤
+│ Async Worker (Celery + Redis) │ ML Runtime                                                                    │
+│ • Task Queues                 │ • Isolated ML Environment                                                     │
+│ • Background Tasks            │ • Model Loading & Inference                                                   │
+│ • Result Caching              │ • Resource Management + Performance Optimization                              │
+└───────────────────────────────┴───────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Inference Pipeline Flow
+
+```
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                           INFERENCE PIPELINE                                                  │
+├───────────────────────────────┬───────────────────────────────────────────────────────────────────────────────┤
+│ 1) 📤 Image Upload            │ • File validation + preprocessing                                             │
+│                               │ • Format conversion (if needed)                                               │
+├───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ 2) 🔍 Domain Detection        │ • Lightweight model/heuristic (ms)                                            │
+│                               │ • Detects: Human/Animal 🧑🐾, Biological 🧬, Medical 🧠, Plant 🍊               │
+├───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ 3) 🛣️ Model Routing           │ • Selects the best domain-specific model                                      │
+├───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ 4) 🤖 Model Inference         │ • Custom CNN • VGG16 • MobileNet • Hierarchical                               │
+│                               │ • Optimized for accuracy + speed                                              │
+├───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ 5) 🔧 Post-Processing         │ • Result formatting + validation                                              │
+│                               │ • Confidence scoring + taxonomy generation                                    │
+├───────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ 6) 📤 API Response            │ • JSON results + metadata + timing                                            │
+│                               │ • Error handling + status codes                                               │
+└───────────────────────────────┴───────────────────────────────────────────────────────────────────────────────┘
 ```
 
 #### Sequence Diagram (Inference Request)
 
 ```
-User                    Controller                Service             ML Runtime      Database
-  │                         │                        │                     │              │
-  │───POST /api/inference──►│                        │                     │              │
-  │                         │                        │                     │              │
-  │                         │───validate_request()──►│                     │              │
-  │                         │                        │                     │              │
-  │                         │                        │───process_image()──►│              │
-  │                         │                        │                     │              │
-  │                         │                        │                     │◄───result────│
-  │                         │                        │                     │              │
-  │                         │                        │◄───save_result()────│              │
-  │                         │                        │                     │              │
-  │                         │◄───response────────────│                     │              │
-  │                         │                        │                     │              │
-  │◄───JSON Response───────►│                        │◄────────────────────│              │
+┌────────┐            ┌────────────┐       ┌─────────┐            ┌───────────┐     ┌─────────┐
+│ User   │            │ Controller │       │ Service │            │ ML Runtime│     │ Database│
+└───┬────┘            └─────┬──────┘       └────┬────┘            └────┬──────┘     └────┬────┘
+    │   POST /api/inference │                   │                      │                 │
+    ├─────────────────────► │                   │                      │                 │
+    │                       │ validate_request  │                      │                 │
+    │                       ├─────────────────► │                      │                 │
+    │                       │                   │ process_image        │                 │
+    │                       │                   ├────────────────────► │                 │
+    │                       │                   │                      │ write_result    │
+    │                       │                   │                      ├───────────────► │
+    │                       │                   │                      │ result          │
+    │                       │                   │ ◄────────────────────┤                 │
+    │                       │ save_result       │                      │                 │
+    │                       ├─────────────────► │                      │                 │
+    │                       │ response          │                      │                 │
+    │  ◄────────────────────┤                   │                      │                 │
+    │ JSON response         │                   │                      │                 │
+    └───────────────────────┘                   └──────────────────────┴─────────────────┘
 ```
 
 ### Website & User Experience (UX) Diagrams
@@ -117,32 +154,6 @@ User                    Controller                Service             ML Runtime
 │  Inference  │    │   Upload    │
 │   Results   │    │   Dataset   │
 └─────────────┘    └─────────────┘
-```
-
-#### Wireframe Sketch (Dashboard)
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ NeuroLens                    [Profile] [Logout]             │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  Welcome back, [User]!              [Upload Dataset]        │
-│                                                             │
-├─────────────────┬─────────────────┬─────────────────┬───────┤
-│ Total Datasets  │ Active Models   │ Today's         │ Health│
-│       12        │       5         │ Predictions     │  ✅   │
-│                 │                 │      47         │       │
-├─────────────────┬─────────────────┬─────────────────┬───────┤
-│                                                             │
-│ Recent Activity:                                            │
-│ • Dataset "cats_vs_dogs" uploaded 2h ago                    │
-│ • Inference completed on "medical_scan_001" 1h ago          │
-│ • Model "brain_tumor_v2" deployed 30m ago                   │
-│                                                             │
-│ [View All Activity]                                         │
-├─────────────────────────────────────────────────────────────┤
-│ Quick Actions: [New Inference] [Manage Datasets] [Settings] │
-└─────────────────────────────────────────────────────────────┘
 ```
 
 ### Data & System Architecture Diagrams
@@ -242,6 +253,15 @@ NeuroLens/
 ├── logs/                   # Application logs
 ├── demo_images/            # Sample images for testing
 ```
+
+### Key Components
+
+- **Domain Detector**: Fast, lightweight classifier that identifies the image domain (human/animal, biological, medical,
+  plant)
+- **Model Router**: Intelligent routing system that selects the most appropriate ML model based on detected domain
+- **Model Registry**: Centralized registry of all available models with their capabilities and requirements
+- **ML Runtime**: Isolated execution environment for model inference with proper resource management
+- **Post-processing**: Result formatting, confidence thresholding, and hierarchical taxonomy generation
 
 ## ⚙️ Quick Start
 
@@ -352,11 +372,11 @@ celery -A neurolens worker --loglevel=info
 
 - `logo.svg` is the single source of brand identity
 - Used for:
-  - navbar
-  - login page
-  - dashboard
-  - dataset page
-  - favicon
+    - navbar
+    - login page
+    - dashboard
+    - dataset page
+    - favicon
 
 ## 🧪 Testing
 
