@@ -222,12 +222,11 @@ NeuroLens/
 ├── manage.py               # Django management script
 ├── requirements.txt        # Python dependencies
 ├── dump.rdb                # Redis database dump
-├── core/                   # Health checks, base utilities
 ├── users/                  # User profiles, roles, permissions
 ├── datasets/               # Dataset management
 ├── inference/              # Prediction API, service layer
 │   └── services/           # Prediction services
-├── ui/                     # Django Templates + Tailwind CSS
+├── ui/                     # Django Templates + Tailwind CSS, health checks
 │   ├── templates/ui/       # HTML templates
 │   └── static/ui/          # CSS, JS assets
 ├── ml/                     # ML runtime (isolated from Django)
@@ -242,7 +241,6 @@ NeuroLens/
 ├── staticfiles/            # Collected static files
 ├── logs/                   # Application logs
 ├── demo_images/            # Sample images for testing
-└── tests/                  # Test suite
 ```
 
 ## ⚙️ Quick Start

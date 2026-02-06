@@ -12,6 +12,17 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 
 
+def health_check(request):
+    """
+    Health check endpoint for monitoring and load balancers.
+    Public endpoint - no authentication required.
+    """
+    return JsonResponse(
+        {"status": "ok", "service": "neurolens", "phase": "django-rebuild"},
+        status=200,
+    )
+
+
 def login_view(request):
     """
     Animated login/signup page.
@@ -523,17 +534,3 @@ def delete_account(request):
             return redirect("ui:login")
 
     return redirect("ui:profile")
-
-
-def privacy_policy(request):
-    """
-    Privacy Policy page - publicly accessible
-    """
-    return render(request, "ui/legal/privacy.html")
-
-
-def terms_of_service(request):
-    """
-    Terms of Service page - publicly accessible
-    """
-    return render(request, "ui/legal/terms.html")
