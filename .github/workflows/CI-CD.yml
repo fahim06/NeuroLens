@@ -51,7 +51,7 @@ jobs:
               with open(readme_path, 'r') as f:
                   content = f.read()
           
-              pattern = r'(<img src="https://img.shields.io/badge/version-)(\d+)\.(\d+)\.(\d+)(--beta-yellow" />)'
+              pattern = r'(<img src="https://img.shields.io/badge/version-)(\d+)\.(\d+)\.(\d+)(--beta-orange" />)'
           
               match = re.search(pattern, content)
               if not match:
@@ -97,7 +97,7 @@ jobs:
                   readme_content = f.read()
           
               # Extract version from README badge
-              version_pattern = r'<img src="https://img.shields.io/badge/version-(\d+\.\d+\.\d+--beta)-yellow" />'
+              version_pattern = r'<img src="https://img.shields.io/badge/version-(\d+\.\d+\.\d+--beta)-orange" />'
               version_match = re.search(version_pattern, readme_content)
           
               if not version_match:
@@ -137,7 +137,7 @@ jobs:
                   readme_content = f.read()
           
               # Extract version from README badge
-              version_pattern = r'<img src="https://img.shields.io/badge/version-(\d+\.\d+\.\d+--beta)-yellow" />'
+              version_pattern = r'<img src="https://img.shields.io/badge/version-(\d+\.\d+\.\d+--beta)-orange" />'
               version_match = re.search(version_pattern, readme_content)
           
               if not version_match:
