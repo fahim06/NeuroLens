@@ -34,7 +34,7 @@ def api_root(request):
     return JsonResponse(
         {
             "name": "NeuroLens API",
-            "version": "2.0.39--beta",
+            "version": "2.1.2--beta",
             "docs": "/api/docs/",
             "health": "/api/health/",
         }
