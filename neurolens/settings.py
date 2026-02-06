@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# NeuroLens version
+NEUROLENS_VERSION = "2.1.1-beta"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     "datasets",
     "inference",
     "ui",  # Phase 9: Django templates + Tailwind UI
+    "ml",  # Phase 0: ML system architecture
 ]
 
 MIDDLEWARE = [

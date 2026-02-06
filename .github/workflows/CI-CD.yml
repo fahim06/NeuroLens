@@ -64,16 +64,28 @@ jobs:
               patch = int(match.group(4))
               suffix = match.group(5)
           
-              # Increment patch version
+              # Increment version following NeuroLens rules
+              # PATCH increments normally, but rolls over at 9
               new_patch = patch + 1
-              new_version_str = f"{prefix}{major}.{minor}.{new_patch}{suffix}"
+              new_minor = minor
+              new_major = major
+          
+              if new_patch > 9:
+                  new_patch = 0
+                  new_minor += 1
+          
+              if new_minor > 9:
+                  new_minor = 0
+                  new_major += 1
+          
+              new_version_str = f"{prefix}{new_major}.{new_minor}.{new_patch}{suffix}"
           
               new_content = content.replace(match.group(0), new_version_str)
           
               with open(readme_path, 'w') as f:
                   f.write(new_content)
           
-              print(f"Bumped version from {major}.{minor}.{patch} to {major}.{minor}.{new_patch}")
+              print(f"Bumped version from {major}.{minor}.{patch} to {new_major}.{new_minor}.{new_patch}")
           
           except Exception as e:
               print(f"Error: {e}")

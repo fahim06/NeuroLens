@@ -1,10 +1,8 @@
 """
-NeuroLens — Model Registry
+Model Registry — ML Model Metadata
 
-Multi-domain detection model registry.
-Maps detection types to their corresponding models and preprocessing pipelines.
-
-Phase 10: Replaces single-purpose DR detection with extensible multi-domain system.
+Registry for model configurations and metadata.
+Phase 0: Metadata structures, no actual model loading.
 """
 
 import logging
@@ -130,7 +128,7 @@ class ModelRegistry:
 
     Responsibilities:
     - Map detection type → model configuration
-    - Lazy load models on demand
+    - Lazy load models on demand (Phase 0: metadata only)
     - Enforce model isolation
     """
 
@@ -159,52 +157,15 @@ class ModelRegistry:
         """
         Lazy load a model for the specified detection type.
 
-        Returns None if model is not available (mock mode).
+        Phase 0: Always returns None (no actual loading).
         """
-        if detection_type in self._loaded_models:
-            return self._loaded_models[detection_type]
-
-        config = self.get_config(detection_type)
-
-        if config.model_path is None:
-            logger.warning(f"No model path configured for {detection_type.value}")
-            return None
-
-        try:
-            # Attempt to load the model
-            import os
-            from pathlib import Path
-
-            model_path = Path(config.model_path)
-            if not model_path.exists():
-                logger.warning(f"Model file not found: {model_path}")
-                return None
-
-            # Load Keras model
-            try:
-                from tensorflow import keras
-
-                model = keras.models.load_model(str(model_path))
-                self._loaded_models[detection_type] = model
-                logger.info(f"Loaded model for {detection_type.value}: {model_path}")
-                return model
-            except ImportError:
-                logger.warning("TensorFlow not available for model loading")
-                return None
-
-        except Exception as e:
-            logger.error(f"Failed to load model for {detection_type.value}: {e}")
-            return None
+        logger.info(f"Phase 0: Would load model for {detection_type.value}")
+        return None
 
     def is_model_available(self, detection_type: DetectionType) -> bool:
         """Check if a model is available for the detection type."""
         config = self.get_config(detection_type)
-        if config.model_path is None:
-            return False
-
-        from pathlib import Path
-
-        return Path(config.model_path).exists()
+        return config.model_path is not None
 
 
 # Global registry instance

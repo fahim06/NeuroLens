@@ -14,7 +14,7 @@ from typing import Any, Dict
 
 import numpy as np
 
-from ml.registry import DetectionType, model_registry
+from ml.registry.models import DetectionType, model_registry
 
 
 class CitrusClassifier:
