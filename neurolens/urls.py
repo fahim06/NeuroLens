@@ -35,12 +35,12 @@ def api_root(request):
 
 
 urlpatterns = [
-                  # Admin
-                  path("admin/", admin.site.urls),
-                  # UI Routes (Django templates + Tailwind) - Phase 9
-                  path("", include("ui.urls")),
-                  # API Routes
-                  path("api/auth/", include("users.urls")),
-                  path("api/datasets/", include("datasets.urls")),
-                  path("api/inference/", include("inference.urls")),
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # Admin
+    path("admin/", admin.site.urls),
+    # UI Routes (Django templates + Tailwind) - Phase 9
+    path("", include("ui.urls")),
+    # API Routes
+    path("api/auth/", include("users.urls")),
+    path("api/datasets/", include("datasets.urls")),
+    path("api/inference/", include("inference.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
