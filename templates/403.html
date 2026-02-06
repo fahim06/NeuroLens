@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="NeuroLens - Access Forbidden" name="description">
+    <title>403 | Access Forbidden</title>
+
+    <!-- Favicon using logo.svg -->
+    <link href="{% static 'ui/images/logo.svg' %}" rel="icon" type="image/svg+xml">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        neurolens: {
+                            purple: '#6750A4',
+                            'purple-dark': '#4F378B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+<div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
+    <div class="mb-8">
+        <i class="fas fa-shield-alt text-6xl text-red-300 mb-4"></i>
+    </div>
+    <h1 class="text-8xl font-bold text-gray-800 mb-4">403</h1>
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Access Forbidden</h2>
+    <p class="text-gray-500 mb-8 max-w-md">
+        You don't have permission to access this resource.
+    </p>
+    <div class="space-x-4">
+        <a class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+           href="/">
+            <i class="fas fa-home mr-2"></i>
+            Go Home
+        </a>
+        <a class="inline-flex items-center px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+           href="/login/">
+            <i class="fas fa-sign-in-alt mr-2"></i>
+            Login
+        </a>
+    </div>
+</div>
+</body>
+</html>

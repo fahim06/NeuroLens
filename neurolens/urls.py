@@ -21,6 +21,13 @@ from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path, include
 
+# Universal error handlers - work regardless of DEBUG=True/False
+from ui.error_views import error_404, error_403, error_500
+
+handler404 = error_404
+handler403 = error_403
+handler500 = error_500
+
 
 def api_root(request):
     """API root endpoint."""

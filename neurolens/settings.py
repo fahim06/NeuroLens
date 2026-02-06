@@ -17,6 +17,9 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-default-key-change-in-prod
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
+# Prevent Django from short-circuiting custom error handlers
+DEBUG_PROPAGATE_EXCEPTIONS = False
+
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 # Application definition
@@ -47,6 +50,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "neurolens.middleware.TimezoneMiddleware",  # User-specific timezone activation
+    "neurolens.middleware.CustomErrorMiddleware",  # Custom error pages even in DEBUG mode
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -56,7 +60,7 @@ ROOT_URLCONF = "neurolens.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],  # Root templates directory for error pages
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

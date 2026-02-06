@@ -55,7 +55,7 @@ services:
     # Override the production CMD to use the dev server with auto-reload
     command: python manage.py runserver 0.0.0.0:8000
     environment:
-      - DEBUG=${DEBUG:-True}
+      - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
       - DATABASE_URL=postgres://${POSTGRES_USER:-neurolens}:${POSTGRES_PASSWORD:-neurolens_secret}@postgres:5432/${POSTGRES_DB:-neurolens}
