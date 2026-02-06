@@ -68,7 +68,7 @@
                 {% endif %}
                 <div>
                     <h1 class="text-3xl font-bold">
-                        {{ user.first_name|default:user.username }}
+                        {{ user.get_full_name|default:user.username }}
                     </h1>
                     <p class="mt-2 text-primary-100 text-lg">
                         {{ user.email }}

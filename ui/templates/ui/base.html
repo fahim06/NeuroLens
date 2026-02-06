@@ -249,32 +249,40 @@
 
                         <!-- Dropdown Menu -->
                         <div id="profileDropdown"
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden">
-                            <!-- Profile Photo -->
-                            <div class="px-4 py-3 border-b border-gray-200">
-                                <div class="flex justify-center">
-                                    {% if user.profile.profile_picture %}
-                                        <img src="{{ user.profile.profile_picture.url }}"
-                                             alt="Profile"
-                                             class="w-12 h-12 rounded-full object-cover">
-                                    {% else %}
-                                        <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-                                            <i class="fa-solid fa-user text-primary-600 text-xl"></i>
-                                        </div>
-                                    {% endif %}
+                             class="absolute right-0 mt-2 w-48 sm:w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 hidden">
+                            <!-- Header Section -->
+                            <div class="flex flex-col items-center gap-2 py-4">
+                                {% if user.profile.profile_picture %}
+                                <img alt="Profile"
+                                     class="w-10 h-10 rounded-full object-cover"
+                                     src="{{ user.profile.profile_picture.url }}">
+                                {% else %}
+                                <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                                    <i class="fa-solid fa-user text-primary-600 dark:text-primary-400"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ user.get_full_name|default:user.username }}</span>
+                                    <div class="flex items-center gap-1">
+                                        <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Online</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Menu Items -->
-                            <div class="flex">
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200 dark:border-gray-700"></div>
+
+                            <!-- Action List -->
+                            <div class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
                                 <a href="{% url 'ui:profile' %}"
-                                   class="flex-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-center border-r border-gray-200 transition-colors">
-                                    <i class="fa-solid fa-user mr-1"></i>
-                                    Profile
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <i class="fa-solid fa-user text-gray-500 dark:text-gray-400"></i>
+                                    View Profile
                                 </a>
                                 <a href="{% url 'ui:logout' %}"
-                                   class="flex-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-center transition-colors">
-                                    <i class="fa-solid fa-sign-out-alt mr-1"></i>
+                                   class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-b-xl">
+                                    <i class="fa-solid fa-sign-out-alt text-gray-500 dark:text-gray-400"></i>
                                     Logout
                                 </a>
                             </div>

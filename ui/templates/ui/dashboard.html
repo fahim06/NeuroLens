@@ -15,7 +15,7 @@
             <div class="relative flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold">
-                        Welcome back, {{ user.first_name|default:user.username }}! 👋
+                        Welcome back, {{ user.get_full_name|default:user.username }}! 👋
                     </h1>
                     <p class="mt-2 text-primary-100 text-lg">
                         Multi-Domain AI Detection Dashboard
@@ -432,32 +432,32 @@
                     data: {
                         labels: ['Medical', 'Animal', 'Plant'],
                         datasets: [{
-                            data: [{{ domain_stats.medical|default:0 }}, {{ domain_stats.animal|default:0 }}, {{ domain_stats.plant|default:0 }}],
-                            backgroundColor: [
+                            data: [{{ domain_stats.medical|default:0 }}, {{ domain_stats.animal|default:0 }},; {{ domain_stats.plant|;default:0 }}],
+                            [
                                 '#8b5cf6',
                                 '#10b981',
                                 '#f59e0b'
                             ],
-                            borderWidth: 0,
-                            hoverOffset: 8
+                            borderWidth;: 0,
+                            hoverOffset;: 8
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    padding: 20,
-                                    usePointStyle: true,
-                                    font: {
-                                        size: 12
+                    {
+                        true,
+                        maintainAspectRatio;: false,
+                        plugins;: {
+                            {
+                                'bottom',
+                                labels;: {
+                                    20,
+                                    usePointStyle;: true,
+                                    font;: {
+                                        12
                                     }
                                 }
                             },
-                            tooltip: {
-                                callbacks: {
+                            {
+                                {
                                     label: function (context) {
                                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                         const percentage = total > 0 ? Math.round((context.parsed / total) * 100) : 0;
@@ -466,9 +466,9 @@
                                 }
                             }
                         },
-                        cutout: '60%'
+                        '60%'
                     }
-                });
+                })
             }
 
             // Activity Timeline Chart
