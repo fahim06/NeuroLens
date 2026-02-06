@@ -2,13 +2,13 @@ name: CI/CD
 
 on:
   push:
-    branches: [ django-rebuild, dev, main ]
+    branches: [ django-rebuild, dev, main, ml-build ]
     tags: [ 'v*.*.*' ]
     paths:
       - '**'
       - '!README.md'  # Prevent recursive loop if the only change is README
   pull_request:
-    branches: [ django-rebuild, dev, main ]
+    branches: [ django-rebuild, dev, main, ml-build ]
 
 concurrency:
   group: neuroLens-${{ github.workflow }}-${{ github.ref }}
@@ -26,7 +26,7 @@ jobs:
   bump-version:
     name: Bump Version
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/django-rebuild' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/django-rebuild' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ml-build'
     permissions:
       contents: write
 
@@ -307,7 +307,7 @@ jobs:
           # Run scan
           ./gitleaks detect --source . --verbose || {
             echo "⚠️ Potential secrets detected"
-            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/ml-build" ]]; then
               exit 1
             fi
           }
