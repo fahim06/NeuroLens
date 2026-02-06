@@ -332,75 +332,26 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-16">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Company Info -->
-                <div class="col-span-1 md:col-span-2">
-                    <div class="flex items-center mb-4">
-                        <img src="{% static 'ui/images/logo.svg' %}" alt="NeuroLens" class="w-8 h-8 mr-3">
-                        <span class="text-xl font-bold">NeuroLens</span>
-                    </div>
-                    <p class="text-gray-400 mb-4 max-w-md">
-                        Intelligent Multi-Domain Image Analysis Platform powered by AI.
-                        Advanced medical imaging, animal detection, and biological classification.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa-brands fa-twitter text-lg"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa-brands fa-github text-lg"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa-brands fa-linkedin text-lg"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fa-brands fa-discord text-lg"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'ui:dashboard' %}" class="text-gray-400 hover:text-white transition-colors">Dashboard</a>
-                        </li>
-                        <li><a href="{% url 'ui:inference' %}" class="text-gray-400 hover:text-white transition-colors">AI
-                            Analysis</a></li>
-                        <li><a href="{% url 'ui:datasets' %}" class="text-gray-400 hover:text-white transition-colors">Datasets</a>
-                        </li>
-                        <li><a href="{% url 'ui:reports' %}" class="text-gray-400 hover:text-white transition-colors">Reports</a>
-                        </li>
-                        <li><a href="{% url 'ui:profile' %}" class="text-gray-400 hover:text-white transition-colors">Profile</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Support -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Support</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API Reference</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Status</a></li>
-                    </ul>
-                </div>
+    <footer class="border-t border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <!-- Branding -->
+            <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <img alt="NeuroLens" class="h-5 w-5" src="{% static 'ui/images/logo.svg' %}">
+                <span class="font-medium text-gray-700 dark:text-gray-300">NeuroLens</span>
+                <span class="hidden sm:inline text-xs text-gray-500 dark:text-gray-400">
+                    · Intelligent AI Image Analysis
+                </span>
             </div>
 
-            <!-- Bottom Bar -->
-            <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <div class="text-gray-400 text-sm mb-4 md:mb-0">
-                    © 2026 NeuroLens. All rights reserved.
-                </div>
-                <div class="flex space-x-6 text-sm">
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a>
-                </div>
+            <!-- Legal Links -->
+            <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                <span>© {% now "Y" %} NeuroLens</span>
+                <span class="hidden sm:inline">|</span>
+                <a class="hover:text-gray-700 dark:hover:text-gray-300 font-medium" href="https://fahimyusuf.com.bd/" rel="noopener"
+                   target="_blank">Fahim Yusuf</a>
+                <span class="hidden sm:inline">·</span>
+                <a class="hover:text-gray-700 dark:hover:text-gray-300" href="/privacy">Privacy</a>
+                <a class="hover:text-gray-700 dark:hover:text-gray-300" href="/terms">Terms</a>
             </div>
         </div>
     </footer>

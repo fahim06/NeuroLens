@@ -164,7 +164,7 @@
                     </div>
                 </div>
                 <div class="flex-shrink-0">
-                    <button type="button" id="closeSystemInfo" onclick="hideSystemInfo()"
+                    <button id="closeSystemInfo" type="button"
                             class="text-yellow-600 hover:text-yellow-800 hover:bg-yellow-100 transition-colors cursor-pointer p-2 rounded w-8 h-8 flex items-center justify-center bg-transparent border-0">
                         <i class="fa-solid fa-times text-sm"></i>
                     </button>
@@ -408,12 +408,17 @@
             if (systemInfoHidden !== 'true') {
                 initializeSystemInfo();
             }
+            // Add event listener for close button
+            const closeButton = document.getElementById('closeSystemInfo');
+            if (closeButton) {
+                closeButton.addEventListener('click', hideSystemInfo);
+            }
         });
 
         function hideSystemInfo() {
             const systemInfoSection = document.getElementById('systemInfoSection');
             if (systemInfoSection) {
-                systemInfoSection.style.display = 'none';
+                systemInfoSection.remove();
                 localStorage.setItem('systemInfoHidden', 'true');
             }
         }
@@ -432,7 +437,17 @@
                     data: {
                         labels: ['Medical', 'Animal', 'Plant'],
                         datasets: [{
-                            data: [{{ domain_stats.medical|default:0 }}, {{ domain_stats.animal|default:0 }},; {{ domain_stats.plant|;default:0 }}],
+                            data: [{{domain_stats.medical |default: 0}
+                        }, {{domain_stats.animal |default: 0}
+                    },;
+                {
+                    {
+                        domain_stats.plant |;
+                    default:
+                        0
+                    }
+                }
+            ],
                             [
                                 '#8b5cf6',
                                 '#10b981',
