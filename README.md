@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.1.3--beta-orange" />
+  <img src="https://img.shields.io/badge/version-2.1.4--beta-orange" />
   <a href="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml">
     <img src="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml/badge.svg?branch=ml-build" alt="CI/CD" />
   </a>
