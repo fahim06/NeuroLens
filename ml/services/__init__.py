@@ -3,7 +3,7 @@
 
 from .domain_detector import DomainDetectorService, domain_detector_service
 from .model_router import ModelRouterService, model_router_service
-from .postprocessor import PostprocessorService
+from .postprocessor import PostprocessorService, postprocessor_service
 
 __all__ = [
     "DomainDetectorService",
@@ -11,3 +11,5 @@ __all__ = [
     "ModelRouterService",
     "model_router_service",
     "PostprocessorService",
+    "postprocessor_service",
+]

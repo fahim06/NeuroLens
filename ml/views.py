@@ -6,6 +6,7 @@ Phase 0: Basic structure, no actual inference logic yet.
 """
 
 import logging
+import base64
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +14,8 @@ from rest_framework.response import Response
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.conf import settings
+
+from ml.services.domain_detector import domain_detector_service
 
 logger = logging.getLogger(__name__)
 
@@ -27,14 +30,33 @@ def detect_domain(request):
     Body: {'image': <base64_encoded_image>}
     """
     try:
-        # Phase 0: Return placeholder response
+        image_b64 = request.data.get("image")
+        if not image_b64:
+            return Response(
+                {"error": "No image provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Decode base64
+        try:
+            image_bytes = base64.b64decode(image_b64)
+        except Exception as e:
+            logger.error(f"Base64 decode error: {e}")
+            return Response(
+                {"error": "Invalid image format"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Detect domain
+        result = domain_detector_service.detect(image_bytes)
+
         return Response(
             {
-                "domain": "unknown",
-                "confidence": 0.0,
-                "message": "Domain detection not implemented in Phase 0",
+                "domain": result.domain.value,
+                "confidence": result.confidence,
+                "meta": result.meta,
             },
-            status=status.HTTP_501_NOT_IMPLEMENTED,
+            status=status.HTTP_200_OK,
         )
 
     except Exception as e:

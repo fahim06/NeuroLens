@@ -154,6 +154,7 @@ CELERY_TIMEZONE = "UTC"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 300  # 5 minutes max per task
 CELERY_TASK_SOFT_TIME_LIMIT = 240  # Soft limit at 4 minutes
+CELERY_BEAT_SCHEDULE = {}  # No scheduled tasks yet
 
 # Logging Configuration
 

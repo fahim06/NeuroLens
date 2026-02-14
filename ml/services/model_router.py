@@ -74,3 +74,7 @@ class ModelRouterService:
         """
         # Phase 0: Return empty dict
         return {}
+
+
+# Global service instance
+model_router_service = ModelRouterService()

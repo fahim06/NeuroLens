@@ -53,7 +53,7 @@ services:
         ENVIRONMENT: ${ENVIRONMENT:-development}
     container_name: neurolens-backend
     # Override the production CMD to use the dev server with auto-reload
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     environment:
       - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
@@ -94,7 +94,7 @@ services:
     container_name: neurolens-celery-worker
     # Use watchdog to auto-reload celery on code changes (optional, requires 'watchdog' in requirements.txt)
     # For now, standard worker. You may need to restart this container if you change task code.
-    command: celery -A neurolens worker -l INFO
+    command: sh -c "python manage.py migrate --noinput && celery -A neurolens worker -l INFO"
     environment:
       - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
@@ -121,7 +121,7 @@ services:
       context: .
       dockerfile: infra/docker/backend.Dockerfile
     container_name: neurolens-celery-beat
-    command: celery -A neurolens beat -l INFO --schedule=/tmp/celerybeat-schedule
+    command: sh -c "python manage.py migrate --noinput && celery -A neurolens beat -l INFO --schedule=/tmp/celerybeat-schedule"
     environment:
       - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}

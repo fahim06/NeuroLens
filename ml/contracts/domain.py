@@ -7,6 +7,7 @@ Phase 0: Enums and basic structure only.
 
 from enum import Enum
 from typing import List, Dict
+from dataclasses import dataclass
 
 
 class PrimaryDomain(Enum):
@@ -43,6 +44,13 @@ class SubCategory(Enum):
     MEDICAL_BRAIN = "brain"
     MEDICAL_XRAY = "xray"
     MEDICAL_MRI = "mri"
+
+
+@dataclass
+class DomainDetectionResult:
+    domain: PrimaryDomain
+    confidence: float
+    meta: dict | None = None
 
 
 # Domain mapping for detection routing

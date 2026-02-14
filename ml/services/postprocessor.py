@@ -91,3 +91,7 @@ class PostprocessorService:
             "hierarchy": hierarchy_levels,
             "message": "Postprocessing not implemented in Phase 0",
         }
+
+
+# Global service instance
+postprocessor_service = PostprocessorService()
