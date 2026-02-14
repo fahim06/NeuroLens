@@ -109,7 +109,15 @@ def inference(request):
 
         # Check for errors
         if "error" in result:
-            return Response(result, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # Determine appropriate HTTP status code
+            error_detail = result.get("detail", "")
+            if "Invalid image" in error_detail or "No image" in error_detail:
+                status_code = status.HTTP_400_BAD_REQUEST
+            elif "processing failed" in error_detail:
+                status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+            else:
+                status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return Response(result, status=status_code)
 
         return Response(result, status=status.HTTP_200_OK)
 

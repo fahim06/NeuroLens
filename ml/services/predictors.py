@@ -12,6 +12,7 @@ from ml.runtime.loader import load_animal_model
 from ml.runtime.preprocessing import prepare_image
 from ml.registry.class_maps import ANIMAL_CLASSES
 from ml.registry.datasets_adapter import get_classes_for_domain
+from ml.errors import PredictionError
 
 logger = logging.getLogger(__name__)
 
@@ -37,23 +38,26 @@ class AnimalPredictor:
         self.classes = AnimalPredictor._classes
 
     def predict(self, image):
-        # Use centralized preprocessing
-        arr = prepare_image(image)
+        try:
+            # Use centralized preprocessing
+            arr = prepare_image(image)
 
-        # Predict
-        preds = self.model.predict(arr)
-        confidence = float(preds.max())
+            # Predict
+            preds = self.model.predict(arr)
+            confidence = float(preds.max())
 
-        # Get label
-        label_index = int(preds.argmax())
-        if isinstance(self.classes, dict):
-            label = self.classes.get(label_index, f"class_{label_index}")
-        elif isinstance(self.classes, list) and label_index < len(self.classes):
-            label = self.classes[label_index]
-        else:
-            label = f"class_{label_index}"
+            # Get label
+            label_index = int(preds.argmax())
+            if isinstance(self.classes, dict):
+                label = self.classes.get(label_index, f"class_{label_index}")
+            elif isinstance(self.classes, list) and label_index < len(self.classes):
+                label = self.classes[label_index]
+            else:
+                label = f"class_{label_index}"
 
-        return PredictionResult(label=label, confidence=confidence)
+            return PredictionResult(label=label, confidence=confidence)
+        except Exception as e:
+            raise PredictionError(f"Prediction failed: {str(e)}")
 
 
 class PlantPredictor:

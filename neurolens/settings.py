@@ -209,3 +209,18 @@ LOGGING = {
         },
     },
 }
+
+# Phase 7: Optional Sentry integration for error tracking
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        # Capture 100% of transactions for performance monitoring
+        traces_sample_rate=1.0,
+        # Capture 100% of errors
+        send_default_pii=True,
+    )

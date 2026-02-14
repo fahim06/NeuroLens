@@ -39,9 +39,13 @@ from functools import lru_cache
 @lru_cache(maxsize=4)
 def load_animal_model():
     from tensorflow.keras.models import load_model
+    from ml.errors import ModelLoadError
 
     model_path = Path(__file__).parent.parent / "models_store" / "animal_classifier.h5"
-    return load_model(str(model_path))
+    try:
+        return load_model(str(model_path))
+    except Exception as e:
+        raise ModelLoadError(f"Failed to load animal model: {str(e)}")
 
 
 class ModelLoaderSingleton:
