@@ -48,6 +48,30 @@ def load_animal_model():
         raise ModelLoadError(f"Failed to load animal model: {str(e)}")
 
 
+@lru_cache(maxsize=4)
+def load_plant_model():
+    from tensorflow.keras.models import load_model
+    from ml.errors import ModelLoadError
+
+    model_path = Path(__file__).parent.parent / "models_store" / "plant_classifier.h5"
+    try:
+        return load_model(str(model_path))
+    except Exception as e:
+        raise ModelLoadError(f"Failed to load plant model: {str(e)}")
+
+
+@lru_cache(maxsize=4)
+def load_medical_model():
+    from tensorflow.keras.models import load_model
+    from ml.errors import ModelLoadError
+
+    model_path = Path(__file__).parent.parent / "models_store" / "medical_classifier.h5"
+    try:
+        return load_model(str(model_path))
+    except Exception as e:
+        raise ModelLoadError(f"Failed to load medical model: {str(e)}")
+
+
 class ModelLoaderSingleton:
     """
     Singleton class for loading and caching ML models.
