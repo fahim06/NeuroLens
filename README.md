@@ -13,7 +13,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.1.5--beta-orange" />
   <a href="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml">
-    <img src="https://github.com/fahim06/NeuroLens/actions/workflows/CI-CD.yml/badge.svg?branch=ml-build" alt="CI/CD" />
+    <img src="https://img.shields.io/github/actions/workflow/status/fahim06/NeuroLens/CI-CD.yml?branch=ml-build" alt="CI/CD" />
   </a>
   <img src="https://img.shields.io/badge/python-3.12-green" />
   <img src="https://img.shields.io/badge/framework-Django 6.0 | DRF-purple" />
