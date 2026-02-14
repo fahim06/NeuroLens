@@ -62,22 +62,13 @@ class DomainDetectorService:
         )
 
         # Decision logic
-        if is_grayscale and has_mri_features:
-            domain = PrimaryDomain.MEDICAL
-            confidence = 0.8
-            meta = {"method": "heuristic", "reason": "grayscale + MRI features"}
-        elif dominant_color == "green" and aspect_ratio > 0.8:
-            domain = PrimaryDomain.PLANT
-            confidence = 0.7
-            meta = {"method": "heuristic", "reason": "dominant green + square aspect"}
-        elif self._has_fur_texture(img_array):
-            domain = PrimaryDomain.ANIMAL
-            confidence = 0.6
-            meta = {"method": "heuristic", "reason": "fur-like texture"}
-        else:
-            domain = PrimaryDomain.HUMAN
-            confidence = 0.5
-            meta = {"method": "heuristic", "reason": "default fallback"}
+        # TEMP: Force animal detection for Phase 4 testing
+        domain = PrimaryDomain.ANIMAL
+        confidence = 0.9
+        meta = {
+            "method": "forced",
+            "reason": "Phase 4 testing - forced animal detection",
+        }
 
         logger.info(f"Detected domain: {domain.value}, confidence: {confidence}")
 

@@ -5,16 +5,22 @@ Animal predictor uses real TensorFlow model.
 Others remain as stub predictors.
 """
 
+import logging
 import numpy as np
 from ml.contracts.inference import PredictionResult
 from ml.runtime.loader import load_animal_model
 from ml.registry.class_maps import ANIMAL_CLASSES
+from ml.registry.datasets_adapter import get_classes_for_domain
+
+logger = logging.getLogger(__name__)
 
 
 class AnimalPredictor:
-
     def __init__(self):
         self.model = load_animal_model()
+        # Try to get classes from dataset registry, fallback to hardcoded
+        self.classes = get_classes_for_domain("animal") or ANIMAL_CLASSES
+        logger.info(f"AnimalPredictor initialized with classes: {self.classes}")
 
     def predict(self, image):
         # Preprocess image
@@ -31,7 +37,12 @@ class AnimalPredictor:
 
         # Get label
         label_index = int(preds.argmax())
-        label = ANIMAL_CLASSES.get(label_index, f"class_{label_index}")
+        if isinstance(self.classes, dict):
+            label = self.classes.get(label_index, f"class_{label_index}")
+        elif isinstance(self.classes, list) and label_index < len(self.classes):
+            label = self.classes[label_index]
+        else:
+            label = f"class_{label_index}"
 
         return PredictionResult(label=label, confidence=confidence)
 

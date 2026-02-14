@@ -14,6 +14,11 @@ class DatasetSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "domain",
+            "classes",
+            "version",
+            "source",
+            "active",
             "owner",
             "owner_username",
             "created_at",
@@ -27,7 +32,15 @@ class DatasetCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = ["name", "description"]
+        fields = [
+            "name",
+            "description",
+            "domain",
+            "classes",
+            "version",
+            "source",
+            "active",
+        ]
 
     def validate_name(self, value):
         """Ensure dataset name is not empty and has reasonable length."""
