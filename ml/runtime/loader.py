@@ -18,6 +18,22 @@ logger = logging.getLogger(__name__)
 
 class ModelLoader:
     """
+    Lazy loading and caching of multiple ML models.
+    """
+    _models = {}
+
+    @classmethod
+    def get_model(cls, name, loader_func):
+        if name not in cls._models:
+            logger.info(f"Loading model: {name}")
+            cls._models[name] = loader_func()
+        else:
+            logger.info(f"Using cached model: {name}")
+        return cls._models[name]
+
+
+class ModelLoaderSingleton:
+    """
     Singleton class for loading and caching ML models.
 
     Features:

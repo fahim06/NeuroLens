@@ -354,33 +354,38 @@ class MultiDomainPredictorService:
 
         # Try to use model router for auto-detection
         try:
-            from ml.services.model_router import model_router_service
+            from ml.services.model_router import model_router
+            from ml.services.domain_detector import domain_detector_service
 
             # Decode base64 if needed
             image_bytes = self._get_image_bytes(image_data)
+            from PIL import Image
+            from io import BytesIO
 
-            # Route and predict
-            routed_result = model_router_service.route_and_predict(image_bytes)
+            image = Image.open(BytesIO(image_bytes))
 
-            if routed_result.success:
-                return {
-                    "success": True,
-                    "mode": "auto_analyze",
-                    "detected_domain": routed_result.domain_result.primary_domain.value,
-                    "detected_category": routed_result.domain_result.sub_category.value,
-                    "domain_confidence": routed_result.domain_result.confidence,
-                    "model_used": routed_result.model_used,
-                    "prediction": routed_result.prediction,
-                    "biological_classification": routed_result.prediction.get(
-                        "biological_classification"
-                    ),
-                    "timestamp": datetime.utcnow().isoformat(),
-                    "metadata": routed_result.domain_result.metadata,
-                }
-            else:
-                # Model router failed, use mock
-                logger.warning(f"Model router failed: {routed_result.error}")
-                return self._mock_auto_analyze()
+            # Detect domain
+            domain_result = domain_detector_service.detect(image)
+
+            # Route to predictor
+            predictor = model_router.get_predictor(domain_result.domain)
+
+            # Get prediction
+            prediction_result = predictor.predict(image)
+
+            return {
+                "success": True,
+                "mode": "auto_analyze",
+                "detected_domain": domain_result.domain.value,
+                "domain_confidence": domain_result.confidence,
+                "model_used": predictor.__class__.__name__,
+                "prediction": {
+                    "label": prediction_result.label,
+                    "confidence": prediction_result.confidence,
+                },
+                "timestamp": datetime.utcnow().isoformat(),
+                "metadata": domain_result.meta,
+            }
 
         except ImportError as e:
             logger.warning(f"Model router not available: {e}")

@@ -17,4 +17,6 @@ urlpatterns = [
     # Inference endpoints
     path("detect-domain/", views.detect_domain, name="detect_domain"),
     path("predict/", views.predict, name="predict"),
+    # Test endpoint
+    path("test-route/", views.test_route, name="test_route"),
 ]

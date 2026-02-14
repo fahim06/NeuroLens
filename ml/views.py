@@ -16,6 +16,7 @@ from django.views.decorators.cache import cache_page
 from django.conf import settings
 
 from ml.services.domain_detector import domain_detector_service
+from ml.services.model_router import model_router
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,74 @@ def detect_domain(request):
         logger.error(f"Domain detection error: {e}")
         return Response(
             {"error": "Domain detection failed"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def test_route(request):
+    """
+    End-to-end test route: detect domain, route to predictor, return prediction.
+
+    POST /api/ml/test-route/
+    Body: {'image': <base64_encoded_image>}
+    """
+    try:
+        image_b64 = request.data.get("image")
+        if not image_b64:
+            return Response(
+                {"error": "No image provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Decode base64
+        try:
+            image_bytes = base64.b64decode(image_b64)
+        except Exception as e:
+            logger.error(f"Base64 decode error: {e}")
+            return Response(
+                {"error": "Invalid image format"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Convert to PIL Image
+        from PIL import Image
+        from io import BytesIO
+
+        try:
+            image = Image.open(BytesIO(image_bytes))
+        except Exception as e:
+            logger.error(f"Image decode error: {e}")
+            return Response(
+                {"error": "Invalid image data"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Detect domain
+        domain_result = domain_detector_service.detect(image)
+        logger.info(f"Detected domain: {domain_result.domain.value}")
+
+        # Route to predictor
+        predictor = model_router.get_predictor(domain_result.domain)
+        logger.info(f"Selected predictor: {predictor.__class__.__name__}")
+
+        # Get prediction
+        prediction_result = predictor.predict(image)
+
+        return Response(
+            {
+                "domain": domain_result.domain.value,
+                "prediction": prediction_result.label,
+                "confidence": prediction_result.confidence,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        logger.error(f"Test route error: {e}")
+        return Response(
+            {"error": "Test route failed"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 

@@ -10,6 +10,18 @@ from dataclasses import dataclass
 from enum import Enum
 
 
+@dataclass
+class PredictionResult:
+    label: str
+    confidence: float
+    metadata: dict | None = None
+
+
+class BasePredictor:
+    def predict(self, image) -> PredictionResult:
+        raise NotImplementedError
+
+
 class DetectionType(str, Enum):
     """Supported detection types."""
 
