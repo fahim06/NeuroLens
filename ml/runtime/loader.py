@@ -20,6 +20,7 @@ class ModelLoader:
     """
     Lazy loading and caching of multiple ML models.
     """
+
     _models = {}
 
     @classmethod
@@ -30,6 +31,17 @@ class ModelLoader:
         else:
             logger.info(f"Using cached model: {name}")
         return cls._models[name]
+
+
+from functools import lru_cache
+
+
+@lru_cache(maxsize=4)
+def load_animal_model():
+    from tensorflow.keras.models import load_model
+
+    model_path = Path(__file__).parent.parent / "models_store" / "animal_classifier.h5"
+    return load_model(str(model_path))
 
 
 class ModelLoaderSingleton:
