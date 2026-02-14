@@ -12,6 +12,7 @@ class MLException(Exception):
     """
     Base exception for all ML-related errors.
     """
+
     pass
 
 
