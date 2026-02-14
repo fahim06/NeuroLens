@@ -1,12 +1,14 @@
 """
-Postprocessor Service — Output Formatting
+Postprocessor Service — Output Formatting & Enrichment
 
-Handles post-processing of ML model outputs.
-Phase 0: Interface only, no actual processing logic.
+Handles post-processing of ML model outputs and biological classification enrichment.
+Phase 8: Biological Classification Expansion.
 """
 
 import logging
 from typing import Any, Dict, List, Optional
+
+from ml.registry.taxonomy import get_taxonomy_for_label
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +93,21 @@ class PostprocessorService:
             "hierarchy": hierarchy_levels,
             "message": "Postprocessing not implemented in Phase 0",
         }
+
+    def enrich_with_taxonomy(self, label: str) -> Optional[Dict[str, str]]:
+        """
+        Enrich a prediction label with biological taxonomy information.
+
+        Args:
+            label: The predicted class label (e.g., "dog", "cat")
+
+        Returns:
+            Dictionary containing taxonomy information, or None if not available
+        """
+        taxonomy = get_taxonomy_for_label(label)
+        if taxonomy:
+            logger.info(f"[TAXONOMY] Enriched {label} with biological classification")
+        return taxonomy
 
 
 # Global service instance

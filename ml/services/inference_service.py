@@ -14,6 +14,7 @@ from ml.contracts.inference import InferenceResponse, PredictionResult
 from ml.contracts.domain import PrimaryDomain
 from ml.services.domain_detector import domain_detector_service
 from ml.services.model_router import model_router
+from ml.services.postprocessor import postprocessor_service
 from ml.errors import MLException
 
 logger = logging.getLogger(__name__)
@@ -72,6 +73,11 @@ class InferenceService:
                 f"Prediction completed in {prediction_time:.2f}s: {prediction_result.label} ({prediction_result.confidence:.3f})"
             )
 
+            # Step 3.5: Enrich with biological taxonomy (Phase 8)
+            taxonomy = postprocessor_service.enrich_with_taxonomy(
+                prediction_result.label
+            )
+
             # Step 4: Calculate processing time
             processing_time_ms = int((time.time() - total_start_time) * 1000)
 
@@ -90,6 +96,10 @@ class InferenceService:
                     "domain_confidence": domain_result.confidence,
                 },
             }
+
+            # Add taxonomy if available (Phase 8)
+            if taxonomy:
+                response["taxonomy"] = taxonomy
 
             logger.info(
                 f"Inference completed in {processing_time_ms}ms (domain: {int(domain_time * 1000)}ms, prediction: {int(prediction_time * 1000)}ms): {prediction_result.label} ({prediction_result.confidence:.3f})"
