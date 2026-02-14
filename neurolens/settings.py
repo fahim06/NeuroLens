@@ -87,6 +87,10 @@ DATABASES = {
     )
 }
 
+# File upload limits (Phase 6: Performance optimization)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB - protects container memory
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB - additional protection
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {

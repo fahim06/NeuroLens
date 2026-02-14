@@ -9,6 +9,7 @@ import logging
 import numpy as np
 from ml.contracts.inference import PredictionResult
 from ml.runtime.loader import load_animal_model
+from ml.runtime.preprocessing import prepare_image
 from ml.registry.class_maps import ANIMAL_CLASSES
 from ml.registry.datasets_adapter import get_classes_for_domain
 
@@ -16,20 +17,28 @@ logger = logging.getLogger(__name__)
 
 
 class AnimalPredictor:
+    _model = None
+    _classes = None
+
     def __init__(self):
-        self.model = load_animal_model()
-        # Try to get classes from dataset registry, fallback to hardcoded
-        self.classes = get_classes_for_domain("animal") or ANIMAL_CLASSES
-        logger.info(f"AnimalPredictor initialized with classes: {self.classes}")
+        # Singleton pattern: load model only once
+        if AnimalPredictor._model is None:
+            AnimalPredictor._model = load_animal_model()
+            logger.info("AnimalPredictor model loaded (singleton)")
+
+        # Singleton pattern: load classes only once
+        if AnimalPredictor._classes is None:
+            AnimalPredictor._classes = (
+                get_classes_for_domain("animal") or ANIMAL_CLASSES
+            )
+            logger.info(f"AnimalPredictor classes loaded: {AnimalPredictor._classes}")
+
+        self.model = AnimalPredictor._model
+        self.classes = AnimalPredictor._classes
 
     def predict(self, image):
-        # Preprocess image
-        img = image.resize((224, 224))
-        # Convert to RGB if necessary
-        if img.mode != "RGB":
-            img = img.convert("RGB")
-        arr = np.array(img) / 255.0
-        arr = arr.reshape(1, 224, 224, 3)
+        # Use centralized preprocessing
+        arr = prepare_image(image)
 
         # Predict
         preds = self.model.predict(arr)

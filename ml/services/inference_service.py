@@ -31,15 +31,17 @@ class InferenceService:
         """
         Run complete inference pipeline.
         """
-        start_time = time.time()
+        total_start_time = time.time()
 
         try:
             # Step 1: Detect domain
             logger.info("Starting domain detection")
+            domain_start_time = time.time()
             domain_result = self.domain_detector.detect(image)
+            domain_time = time.time() - domain_start_time
             domain = domain_result.domain.value
             logger.info(
-                f"Detected domain: {domain}, confidence: {domain_result.confidence}"
+                f"Domain detection completed in {domain_time:.2f}s: {domain}, confidence: {domain_result.confidence}"
             )
 
             # Step 2: Route to predictor
@@ -52,10 +54,15 @@ class InferenceService:
 
             # Step 3: Run prediction
             logger.info("Running prediction")
+            prediction_start_time = time.time()
             prediction_result = predictor.predict(image)
+            prediction_time = time.time() - prediction_start_time
+            logger.info(
+                f"Prediction completed in {prediction_time:.2f}s: {prediction_result.label} ({prediction_result.confidence:.3f})"
+            )
 
             # Step 4: Calculate processing time
-            processing_time_ms = int((time.time() - start_time) * 1000)
+            processing_time_ms = int((time.time() - total_start_time) * 1000)
 
             # Step 5: Build standardized response
             response = {
@@ -67,18 +74,20 @@ class InferenceService:
                     "dataset": f"{domain}-v1",
                     "method": "cnn",
                     "processing_time_ms": processing_time_ms,
+                    "domain_detection_time_ms": int(domain_time * 1000),
+                    "prediction_time_ms": int(prediction_time * 1000),
                     "domain_confidence": domain_result.confidence,
                 },
             }
 
             logger.info(
-                f"Inference completed in {processing_time_ms}ms: {prediction_result.label} ({prediction_result.confidence:.3f})"
+                f"Inference completed in {processing_time_ms}ms (domain: {int(domain_time * 1000)}ms, prediction: {int(prediction_time * 1000)}ms): {prediction_result.label} ({prediction_result.confidence:.3f})"
             )
             return response
 
         except Exception as e:
             logger.error(f"Inference failed: {e}")
-            processing_time_ms = int((time.time() - start_time) * 1000)
+            processing_time_ms = int((time.time() - total_start_time) * 1000)
             return {
                 "error": "Inference failed",
                 "domain": "unknown",

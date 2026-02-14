@@ -55,13 +55,17 @@ services:
     # Override the production CMD to use the dev server with auto-reload
     command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
     environment:
-      - DEBUG=${DEBUG:-False}
-      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
-      - DATABASE_URL=postgres://${POSTGRES_USER:-neurolens}:${POSTGRES_PASSWORD:-neurolens_secret}@postgres:5432/${POSTGRES_DB:-neurolens}
+      - DEBUG=False
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - DATABASE_URL=postgresql://neurolens:neurolens_secret@postgres:5432/neurolens
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      # TensorFlow thread controls for memory optimization
+      - OMP_NUM_THREADS=1
+      - TF_NUM_INTRAOP_THREADS=1
+      - TF_NUM_INTEROP_THREADS=1
     ports:
       - "${BACKEND_PORT:-8000}:8000"
       - "${UI_PORT:-80}:80"
