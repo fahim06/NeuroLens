@@ -6,7 +6,6 @@ Phase 0: Basic structure, no actual inference logic yet.
 """
 
 import logging
-import base64
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -17,123 +16,9 @@ from django.conf import settings
 
 from ml.services.domain_detector import domain_detector_service
 from ml.services.model_router import model_router
+from ml.services.inference_service import inference_service
 
 logger = logging.getLogger(__name__)
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def detect_domain(request):
-    """
-    Auto-detect the domain of an uploaded image.
-
-    POST /api/ml/detect-domain/
-    Body: {'image': <base64_encoded_image>}
-    """
-    try:
-        image_b64 = request.data.get("image")
-        if not image_b64:
-            return Response(
-                {"error": "No image provided"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Decode base64
-        try:
-            image_bytes = base64.b64decode(image_b64)
-        except Exception as e:
-            logger.error(f"Base64 decode error: {e}")
-            return Response(
-                {"error": "Invalid image format"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Detect domain
-        result = domain_detector_service.detect(image_bytes)
-
-        return Response(
-            {
-                "domain": result.domain.value,
-                "confidence": result.confidence,
-                "meta": result.meta,
-            },
-            status=status.HTTP_200_OK,
-        )
-
-    except Exception as e:
-        logger.error(f"Domain detection error: {e}")
-        return Response(
-            {"error": "Domain detection failed"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def test_route(request):
-    """
-    End-to-end test route: detect domain, route to predictor, return prediction.
-
-    POST /api/ml/test-route/
-    Body: {'image': <base64_encoded_image>}
-    """
-    try:
-        image_b64 = request.data.get("image")
-        if not image_b64:
-            return Response(
-                {"error": "No image provided"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Decode base64
-        try:
-            image_bytes = base64.b64decode(image_b64)
-        except Exception as e:
-            logger.error(f"Base64 decode error: {e}")
-            return Response(
-                {"error": "Invalid image format"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Convert to PIL Image
-        from PIL import Image
-        from io import BytesIO
-
-        try:
-            image = Image.open(BytesIO(image_bytes))
-        except Exception as e:
-            logger.error(f"Image decode error: {e}")
-            return Response(
-                {"error": "Invalid image data"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Detect domain
-        domain_result = domain_detector_service.detect(image)
-        logger.info(f"Detected domain: {domain_result.domain.value}")
-
-        # Route to predictor
-        predictor = model_router.get_predictor(domain_result.domain)
-        logger.info(f"Selected predictor: {predictor.__class__.__name__}")
-
-        # Get prediction
-        prediction_result = predictor.predict(image)
-
-        return Response(
-            {
-                "domain": domain_result.domain.value,
-                "prediction": prediction_result.label,
-                "confidence": prediction_result.confidence,
-            },
-            status=status.HTTP_200_OK,
-        )
-
-    except Exception as e:
-        logger.error(f"Test route error: {e}")
-        return Response(
-            {"error": "Test route failed"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
 
 
 @api_view(["POST"])
@@ -166,6 +51,73 @@ def predict(request):
         logger.error(f"Prediction error: {e}")
         return Response(
             {"error": "Prediction failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def inference(request):
+    """
+    Unified inference endpoint — production-ready ML API.
+
+    POST /api/ml/inference/
+    Multipart form upload: {'image': <image_file>}
+    """
+    try:
+        # Validate image file
+        if "image" not in request.FILES:
+            return Response(
+                {"error": "No image file provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        image_file = request.FILES["image"]
+
+        # Validate file type
+        if not image_file.content_type.startswith("image/"):
+            return Response(
+                {"error": "File must be an image"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Validate file size (max 10MB)
+        max_size = 10 * 1024 * 1024  # 10MB
+        if image_file.size > max_size:
+            return Response(
+                {"error": "Image file too large (max 10MB)"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Convert to PIL Image
+        from PIL import Image
+        from io import BytesIO
+
+        try:
+            image = Image.open(BytesIO(image_file.read()))
+            # Convert to RGB if necessary
+            if image.mode not in ("RGB", "L"):
+                image = image.convert("RGB")
+        except Exception as e:
+            logger.error(f"Image processing error: {e}")
+            return Response(
+                {"error": "Invalid image file"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Run inference
+        result = inference_service.infer(image)
+
+        # Check for errors
+        if "error" in result:
+            return Response(result, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        logger.error(f"Inference endpoint error: {e}")
+        return Response(
+            {"error": "Internal server error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 

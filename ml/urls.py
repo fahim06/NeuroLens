@@ -14,9 +14,8 @@ urlpatterns = [
     path("health/", views.health_check, name="health_check"),
     # Model information
     path("models/", views.available_models, name="available_models"),
-    # Inference endpoints
-    path("detect-domain/", views.detect_domain, name="detect_domain"),
+    # Unified inference endpoint (Phase 5)
+    path("inference/", views.inference, name="inference"),
+    # Legacy endpoints (still functional)
     path("predict/", views.predict, name="predict"),
-    # Test endpoint
-    path("test-route/", views.test_route, name="test_route"),
 ]
