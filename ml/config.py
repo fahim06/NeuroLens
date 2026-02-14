@@ -1,0 +1,3 @@
+# ML Configuration - Phase 10: Advanced Auto-Model Intelligence
+DOMAIN_CONFIDENCE_THRESHOLD = 0.60
+PREDICTION_CONFIDENCE_THRESHOLD = 0.55

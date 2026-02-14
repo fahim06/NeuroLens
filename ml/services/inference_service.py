@@ -16,6 +16,7 @@ from ml.services.domain_detector import domain_detector_service
 from ml.services.model_router import model_router
 from ml.services.postprocessor import postprocessor_service
 from ml.errors import MLException
+from ml.config import PREDICTION_CONFIDENCE_THRESHOLD
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,18 @@ class InferenceService:
                 f"Prediction completed in {prediction_time:.2f}s: {prediction_result.label} ({prediction_result.confidence:.3f})"
             )
 
-            # Step 3.5: Enrich with biological taxonomy (Phase 8)
+            # Step 3.5: Validate prediction confidence (Phase 10)
+            warning = None
+            if prediction_result.confidence < PREDICTION_CONFIDENCE_THRESHOLD:
+                warning = f"Low confidence prediction ({prediction_result.confidence:.2f} < {PREDICTION_CONFIDENCE_THRESHOLD})"
+                logger.warning(
+                    f"low_confidence_prediction domain={domain} confidence={prediction_result.confidence:.2f} threshold={PREDICTION_CONFIDENCE_THRESHOLD}"
+                )
+
+            # Step 3.6: Determine confidence level
+            confidence_level = self._get_confidence_level(prediction_result.confidence)
+
+            # Step 3.7: Enrich with biological taxonomy (Phase 8)
             taxonomy = postprocessor_service.enrich_with_taxonomy(
                 prediction_result.label
             )
@@ -86,6 +98,7 @@ class InferenceService:
                 "domain": domain,
                 "prediction": prediction_result.label,
                 "confidence": prediction_result.confidence,
+                "confidence_level": confidence_level,
                 "model": model_name,
                 "metadata": {
                     "dataset": f"{domain}-v1",
@@ -96,6 +109,10 @@ class InferenceService:
                     "domain_confidence": domain_result.confidence,
                 },
             }
+
+            # Add warning if low confidence
+            if warning:
+                response["warning"] = warning
 
             # Add taxonomy if available (Phase 8)
             if taxonomy:
@@ -162,6 +179,15 @@ class InferenceService:
                     "error_type": type(e).__name__,
                 },
             }
+
+    def _get_confidence_level(self, confidence: float) -> str:
+        """Determine confidence level based on confidence score."""
+        if confidence >= 0.8:
+            return "high"
+        elif confidence >= 0.6:
+            return "medium"
+        else:
+            return "low"
 
 
 # Global service instance

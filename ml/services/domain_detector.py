@@ -13,6 +13,7 @@ from io import BytesIO
 import numpy as np
 
 from ml.contracts.domain import PrimaryDomain, DomainDetectionResult
+from ml.config import DOMAIN_CONFIDENCE_THRESHOLD
 
 logger = logging.getLogger(__name__)
 
@@ -55,24 +56,99 @@ class DomainDetectorService:
         is_grayscale = self._is_grayscale(img_array)
         dominant_color = self._get_dominant_color(img_array)
         has_mri_features = self._has_mri_features(img_array)
+        has_fur_texture = self._has_fur_texture(img_array)
 
         logger.info(
             f"Image analysis: size={width}x{height}, aspect={aspect_ratio:.2f}, "
-            f"grayscale={is_grayscale}, dominant_color={dominant_color}, mri={has_mri_features}"
+            f"grayscale={is_grayscale}, dominant_color={dominant_color}, mri={has_mri_features}, fur={has_fur_texture}"
         )
 
-        # Decision logic
-        # TEMP: Force animal detection for Phase 4 testing
-        domain = PrimaryDomain.ANIMAL
-        confidence = 0.9
-        meta = {
-            "method": "forced",
-            "reason": "Phase 4 testing - forced animal detection",
+        # Domain detection logic with confidence scoring
+        domain_scores = self._calculate_domain_scores(
+            is_grayscale,
+            dominant_color,
+            has_mri_features,
+            has_fur_texture,
+            aspect_ratio,
+        )
+
+        # Select domain with highest confidence
+        best_domain = max(domain_scores, key=domain_scores.get)
+        confidence = domain_scores[best_domain]
+
+        # Fallback logic for low confidence
+        if confidence < DOMAIN_CONFIDENCE_THRESHOLD:
+            logger.warning(
+                f"Low confidence detection: {best_domain.value} ({confidence:.2f}) < {DOMAIN_CONFIDENCE_THRESHOLD}, falling back to human"
+            )
+            best_domain = PrimaryDomain.HUMAN
+            confidence = 0.5  # Low confidence fallback
+            meta = {
+                "method": "fallback",
+                "reason": f"Low confidence detection, original: {max(domain_scores, key=domain_scores.get).value}",
+                "original_confidence": domain_scores[
+                    max(domain_scores, key=domain_scores.get)
+                ],
+            }
+        else:
+            meta = {
+                "method": "heuristic",
+                "scores": domain_scores,
+            }
+
+        logger.info(
+            f"Detected domain: {best_domain.value}, confidence: {confidence:.2f}"
+        )
+
+        return DomainDetectionResult(
+            domain=best_domain, confidence=confidence, meta=meta
+        )
+
+    def _calculate_domain_scores(
+        self,
+        is_grayscale: bool,
+        dominant_color: str,
+        has_mri_features: bool,
+        has_fur_texture: bool,
+        aspect_ratio: float,
+    ) -> Dict[PrimaryDomain, float]:
+        """Calculate confidence scores for each domain."""
+        scores = {
+            PrimaryDomain.HUMAN: 0.0,
+            PrimaryDomain.ANIMAL: 0.0,
+            PrimaryDomain.PLANT: 0.0,
+            PrimaryDomain.MEDICAL: 0.0,
         }
 
-        logger.info(f"Detected domain: {domain.value}, confidence: {confidence}")
+        # Medical domain: grayscale + MRI features
+        if is_grayscale and has_mri_features:
+            scores[PrimaryDomain.MEDICAL] += 0.8
+        elif is_grayscale:
+            scores[PrimaryDomain.MEDICAL] += 0.4
 
-        return DomainDetectionResult(domain=domain, confidence=confidence, meta=meta)
+        # Plant domain: green dominant color
+        if dominant_color == "green":
+            scores[PrimaryDomain.PLANT] += 0.7
+        elif dominant_color in ["mixed", "red"]:
+            scores[PrimaryDomain.PLANT] += 0.3
+
+        # Animal domain: fur texture + not green
+        if has_fur_texture and dominant_color != "green":
+            scores[PrimaryDomain.ANIMAL] += 0.6
+        elif dominant_color not in ["green", "blue"]:
+            scores[PrimaryDomain.ANIMAL] += 0.4
+
+        # Human domain: default fallback
+        max_score = max(scores.values())
+        if max_score < 0.5:
+            scores[PrimaryDomain.HUMAN] = 0.5  # Baseline human confidence
+
+        # Normalize scores to sum to 1 (optional, but helps with confidence interpretation)
+        total = sum(scores.values())
+        if total > 0:
+            scores = {k: v / total for k, v in scores.items()}
+
+        return scores
 
     def _is_grayscale(self, img_array: np.ndarray) -> bool:
         """Check if image is mostly grayscale."""
@@ -112,9 +188,16 @@ class DomainDetectorService:
         # Placeholder: check for high frequency changes
         if len(img_array.shape) < 3:
             return False
-        # Simple edge detection
+        # Simple edge detection - avoid broadcasting issues
         gray = np.mean(img_array, axis=2)
-        edges = np.abs(np.diff(gray, axis=0)) + np.abs(np.diff(gray, axis=1))
+        # Calculate horizontal and vertical gradients separately
+        horiz_edges = np.abs(np.diff(gray, axis=1))  # Shape: (224, 223)
+        vert_edges = np.abs(np.diff(gray, axis=0))  # Shape: (223, 224)
+        # Use the minimum dimension to avoid shape mismatch
+        min_h, min_w = min(horiz_edges.shape[0], vert_edges.shape[0]), min(
+            horiz_edges.shape[1], vert_edges.shape[1]
+        )
+        edges = horiz_edges[:min_h, :min_w] + vert_edges[:min_h, :min_w]
         return np.mean(edges) > 20
 
 
